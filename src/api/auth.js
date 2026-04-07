@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'https://debtbackend.vercel.app/api';
 
 const getToken = () => localStorage.getItem('token');
 const getAgencyToken = () => localStorage.getItem('agencyToken');
