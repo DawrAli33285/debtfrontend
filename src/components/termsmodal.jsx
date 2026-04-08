@@ -66,7 +66,7 @@ export default function TermsModal({
     setSubmitting(true);
     setError('');
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/accept-terms`, {
+      const res = await fetch(`https://debtbackend.vercel.app/api/auth/accept-terms`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
