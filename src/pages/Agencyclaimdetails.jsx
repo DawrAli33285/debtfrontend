@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getClaimById } from '../api/auth';
+import { getAgencyClaimById, getAgencyMe, acceptAgencyClaim, denyAgencyClaim } from '../api/auth';
+
 
 const STATUS_META = {
   submitted:   { label: 'Submitted',   cls: 'status-submitted'  },
   assigned:    { label: 'Assigned',    cls: 'status-assigned'   },
   in_progress: { label: 'In Progress', cls: 'status-progress'   },
   closed:      { label: 'Closed',      cls: 'status-closed'     },
+  denied:      { label: 'Denied',      cls: 'status-denied'     },
 };
+
 
 function StatusBadge({ status }) {
   const { label, cls } = STATUS_META[status] || STATUS_META.submitted;
@@ -30,17 +33,46 @@ function Field({ label, value }) {
   );
 }
 
-export default function ClaimDetail() {
+export default function AgencyClaimDetail() {
   const { id } = useParams();
   const [claim, setClaim]   = useState(null);
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(true);
+  const [agency, setAgency] = useState(null);
+const [actionLoading, setActionLoading] = useState('');
+const [actionError, setActionError] = useState('');
+
+const handleAccept = async () => {
+  setActionLoading('accept');
+  setActionError('');
+  const res = await acceptAgencyClaim(id);
+  setActionLoading('');
+  if (res.claim) setClaim(res.claim);
+  else setActionError(res.message || 'Failed to accept claim');
+};
+
+const handleDeny = async () => {
+  setActionLoading('deny');
+  setActionError('');
+  const res = await denyAgencyClaim(id);
+  setActionLoading('');
+  if (res.claim) setClaim(res.claim);
+  else setActionError(res.message || 'Failed to deny claim');
+};
+
+
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const res = await getClaimById(id);
+      const [res, agencyRes] = await Promise.all([
+        getAgencyClaimById(id),
+        getAgencyMe(),
+      ]);
       setLoading(false);
+ 
+      if (agencyRes) setAgency(agencyRes.agency);
+
       if (res.claim) setClaim(res.claim);
       else setError(res.message || 'Failed to load claim');
     })();
@@ -187,6 +219,12 @@ export default function ClaimDetail() {
         .status-closed     { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
         .status-closed .status-dot     { background:#27ae60; }
 
+
+
+        .status-denied     { background:#fdf0ef; color:#c0392b; border:1px solid #f1c0bc; }
+.status-denied .status-dot     { background:#c0392b; }
+
+
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
 
@@ -296,7 +334,7 @@ export default function ClaimDetail() {
       {/* NAVBAR */}
       <nav className="navbar">
       
-        <Link to="/dashboard" className="back-link">
+        <Link to="/agency/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
@@ -412,6 +450,68 @@ export default function ClaimDetail() {
               </div>
             </div>
 
+
+            {agency && (
+  <div className="section">
+    <div className="section-card">
+      <div className="section-head">
+        <div className="section-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h2 className="section-title">Claim Quota</h2>
+      </div>
+      <div style={{ padding: '20px 24px' }}>
+
+        {/* Progress bar */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              Monthly Usage
+            </span>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--navy)' }}>
+              {agency.claims_used} / {agency.claim_limit}
+            </span>
+          </div>
+          <div style={{ background: 'var(--border)', borderRadius: '99px', height: '8px', overflow: 'hidden' }}>
+            <div style={{
+              height: '100%',
+              borderRadius: '99px',
+              width: `${Math.min((agency.claims_used / agency.claim_limit) * 100, 100)}%`,
+              background: agency.claims_used >= agency.claim_limit ? '#c0392b' : 'var(--gold)',
+              transition: 'width 0.4s ease',
+            }} />
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+          {[
+            { label: 'Plan', value: agency.plan_type?.charAt(0).toUpperCase() + agency.plan_type?.slice(1) },
+            { label: 'Claims Left', value: Math.max(agency.claim_limit - agency.claims_used, 0) },
+            { label: 'Total Limit', value: agency.claim_limit },
+          ].map(({ label, value }) => (
+            <div key={label} style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{label}</p>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--navy)' }}>{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Warning if at limit */}
+        {agency.claims_used >= agency.claim_limit && (
+          <div style={{ marginTop: '12px', background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b', fontSize: '13px', padding: '10px 14px', borderRadius: '10px' }}>
+            You've reached your monthly claim limit. Upgrade your plan to accept more claims.
+          </div>
+        )}
+
+      </div>
+    </div>
+  </div>
+)}
+
           
           
  <div className="section">
@@ -480,6 +580,64 @@ export default function ClaimDetail() {
     </div>
   </div>
 </div>
+
+
+{claim.status === 'assigned' && (
+  <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+
+    {actionError && (
+      <div className="err-box" style={{ width: '100%' }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {actionError}
+      </div>
+    )}
+
+    <button
+      onClick={handleAccept}
+      disabled={!!actionLoading}
+      style={{
+        flex: 1, minWidth: '140px',
+        padding: '13px 24px', borderRadius: '12px', border: 'none',
+        background: actionLoading === 'accept' ? '#b8975e' : 'var(--gold)',
+        color: '#fff', fontSize: '14px', fontWeight: 600,
+        cursor: actionLoading ? 'not-allowed' : 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+        transition: 'background 0.15s',
+      }}
+    >
+      {actionLoading === 'accept' ? (
+        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Accepting…</>
+      ) : (
+        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
+      )}
+    </button>
+
+    <button
+      onClick={handleDeny}
+      disabled={!!actionLoading}
+      style={{
+        flex: 1, minWidth: '140px',
+        padding: '13px 24px', borderRadius: '12px',
+        border: '1px solid #f1c0bc',
+        background: '#fdf0ef', color: '#c0392b',
+        fontSize: '14px', fontWeight: 600,
+        cursor: actionLoading ? 'not-allowed' : 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+        transition: 'background 0.15s',
+      }}
+    >
+      {actionLoading === 'deny' ? (
+        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(192,57,43,0.3)', borderTopColor: '#c0392b', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Denying…</>
+      ) : (
+        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
+      )}
+    </button>
+
+  </div>
+)}
+
           
             <p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed

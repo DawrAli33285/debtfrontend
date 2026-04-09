@@ -56,8 +56,10 @@ export default function Chat() {
             },
             claim: {
               debtor_name: r.claim_id?.debtor_name || '—',
+              description: r?.claim_id?.description || '',
               amount:      r.claim_id?.amount      || 0,
               status:      r.claim_id?.status      || 'submitted',
+            
             },
             last_message: r.last_message || null,
             unread:       r.unread       || 0,
@@ -376,16 +378,7 @@ export default function Chat() {
 
         {/* Navbar */}
         <nav className="chat-nav">
-          <div className="nav-brand">
-            <div className="logo-mark">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:15,height:15}}>
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                <path d="M2 17l10 5 10-5"/>
-                <path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="logo-text">Collections Connector</span>
-          </div>
+        
           <div className="nav-right">
             <Link to="/dashboard" className="nav-back">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -481,22 +474,36 @@ export default function Chat() {
             {activeRoom && (
               <>
                 {/* Claim bar */}
-                <div className="claim-bar">
-                  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                  </button>
-                  <div className="claim-bar-avatar">{activeRoom.agency.initials}</div>
-                  <div>
-                    <div className="claim-bar-name">{activeRoom.agency.name}</div>
-                    <div className="claim-bar-sub">Claim: {activeRoom.claim.debtor_name}</div>
-                  </div>
-                  <div className="claim-bar-right">
-                    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
-                    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
-                  </div>
-                </div>
+              {/* Claim bar */}
+<div className="claim-bar">
+  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+
+  <div className="claim-bar-avatar">{activeRoom.agency.initials}</div>
+
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div className="claim-bar-name">{activeRoom.agency.name}</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      <div className="claim-bar-sub">vs {activeRoom.claim.debtor_name}</div>
+      {activeRoom.claim.description && (
+        <>
+          <span style={{ color: 'var(--border)', fontSize: 12 }}>·</span>
+          <div className="claim-bar-sub" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>
+            {activeRoom.claim.description}
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+
+  <div className="claim-bar-right">
+    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
+    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
+  </div>
+</div>
 
                 {/* Messages area */}
                 <div className="messages-area">

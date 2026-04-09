@@ -186,30 +186,16 @@ export default function AgencyDashboard() {
         .mini-tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--muted);font-weight:500}
         .quick-link{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--navy);text-decoration:none;padding:9px 0;border-bottom:1px solid var(--border);transition:color .15s}
         .quick-link:last-child{border-bottom:none}.quick-link:hover{color:var(--gold-d)}
-      `}</style>
+     
+     
+
+        .new-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:#fef9ec;border:1px solid #f0d080;color:#a8883a;margin-left:6px}
+.claim-table tbody tr.is-new td{background:#fffdf5}
+.claim-table tbody tr.is-new:hover td{background:#fef9ec}
+     `}</style>
 
       <div className="dash-root">
-        <nav className="dash-nav">
-          <div className="nav-brand">
-            <div className="logo-mark">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:15,height:15}}>
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="logo-text">Collections Connector</span>
-          </div>
-          <div className="nav-right">
-            {agency && <span className="nav-agency-label"><strong>{agency.name}</strong></span>}
-            {user && (
-              <div className="nav-user-pill">
-                <div className="nav-avatar">{user.name?.[0]?.toUpperCase()||'A'}</div>
-                <span className="nav-user-name">{user.name}</span>
-              </div>
-            )}
-            <button className="btn-logout" onClick={handleLogout}>Sign out</button>
-          </div>
-        </nav>
-
+        
         <div className="dash-body">
           <div className="dash-header">
             <h1>Agency Dashboard</h1>
@@ -268,27 +254,36 @@ export default function AgencyDashboard() {
                 <div className="table-wrap">
                   <table className="claim-table">
                     <thead>
-                      <tr><th>Debtor</th><th>Amount</th><th>Due Date</th><th>Assigned On</th><th>Update Status</th></tr>
+                      <tr><th>Debtor</th><th>Amount</th><th>Due Date</th><th>Assigned On</th></tr>
                     </thead>
                     <tbody>
                       {filtered.map(a=>{
+
                         const claim=a.claim_id||{};
+                        
                         return (
-                          <tr key={a._id}>
-                            <td>
-                              <div className="debtor-name">{claim.debtor_name||'—'}</div>
-                              <div className="debtor-email">{claim.debtor_email||''}</div>
-                            </td>
+                          <tr
+                          key={a._id}
+                          className={a.status === 'assigned' ? 'is-new' : ''}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => navigate(`/agency-claims/${claim._id}`)}
+                        >
+  <td>
+    <div className="debtor-name">
+      {claim.debtor_name||'—'}
+      {a.status === 'assigned' && (
+        <span className="new-badge">
+          <svg width="7" height="7" viewBox="0 0 24 24" fill="#a8883a"><circle cx="12" cy="12" r="10"/></svg>
+          New
+        </span>
+      )}
+    </div>
+    <div className="debtor-email">{claim.debtor_email||''}</div>
+  </td>
                             <td><span className="amount-cell">{fmt(claim.amount)}</span></td>
                             <td style={{color:'var(--muted)',fontSize:13}}>{fmtDate(claim.due_date)}</td>
                             <td style={{color:'var(--muted)',fontSize:12}}>{fmtDate(a.assigned_at)}</td>
-                            <td>
-                              <select className="status-select" value={a.status} disabled={updating===a._id} onChange={e=>handleStatusChange(a._id,e.target.value)}>
-                                <option value="assigned">Assigned</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="closed">Closed</option>
-                              </select>
-                            </td>
+                         
                           </tr>
                         );
                       })}
@@ -342,7 +337,10 @@ export default function AgencyDashboard() {
 
               <div className="side-card" style={{animationDelay:'.36s'}}>
                 <p className="side-card-title">Quick Links</p>
-                {[{label:'Business portal',to:'/login'},{label:'Agency register',to:'/agency/register'}].map(l=>(
+                {[  {label:'Business portal',      to:'/login'},
+  {label:'Agency register',      to:'/agency/register'},
+  {label:'Subscription Plans',   to:'/agency/subscription'},
+  {label:'Agency Chat',          to:'/agency/chat'},].map(l=>(
                   <Link key={l.to} to={l.to} className="quick-link">
                     {l.label}
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

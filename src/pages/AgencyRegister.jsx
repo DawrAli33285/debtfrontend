@@ -423,7 +423,7 @@ export default function AgencyRegister() {
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Collections Connector</span>
+              <span className="logo-text">Pasado</span>
             </div>
             <h2 className="left-headline">
               Grow your agency<br />with <em>qualified claims.</em>
@@ -481,7 +481,7 @@ export default function AgencyRegister() {
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Collections Connector</span>
+              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
             </div>
 
             {/* Mobile step dots */}

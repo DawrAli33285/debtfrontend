@@ -351,7 +351,7 @@ export default function Login() {
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Collections Connector</span>
+              <span className="logo-text">Pasado</span>
             </div>
 
             <h2 className="left-headline">
@@ -390,7 +390,7 @@ export default function Login() {
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Collections Connector</span>
+              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
             </div>
 
             <p className="card-eyebrow">Welcome back</p>

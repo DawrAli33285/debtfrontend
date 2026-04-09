@@ -506,16 +506,7 @@ export default function Dashboard() {
 
       {/* ── NAVBAR ── */}
       <nav className="navbar">
-        <div className="nav-brand">
-          <div className="logo-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:16,height:16}}>
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span className="logo-text">Collections Connector</span>
-        </div>
+       
         <div className="nav-actions">
           <Link
             to="/claims"
@@ -544,6 +535,18 @@ export default function Dashboard() {
             Agencies
           </Link>
 
+
+          <Link
+  to="/business-plans"
+  className="inline-flex items-center gap-1.5 text-white/70 border border-white/10 hover:text-white hover:border-white/30 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 no-underline"
+>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/>
+    <line x1="8" y1="21" x2="16" y2="21"/>
+    <line x1="12" y1="17" x2="12" y2="21"/>
+  </svg>
+  Plans
+</Link>
 
 
           <Link
@@ -726,7 +729,7 @@ export default function Dashboard() {
         </div>
 
         <p className="footer-note">
-          Collections Connector is a technology platform that connects businesses with
+        Pasado is a technology platform that connects businesses with
           independent, licensed collection agencies. We do not provide debt collection
           services, legal advice, or contact debtors on your behalf.
         </p>

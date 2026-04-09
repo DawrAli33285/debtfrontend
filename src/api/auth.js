@@ -1,5 +1,5 @@
 const BASE_URL = 'https://debtbackend.vercel.app/api';
-
+// const BASE_URL = 'http://localhost:5000/api';
 const getToken = () => localStorage.getItem('token');
 const getAgencyToken = () => localStorage.getItem('agencyToken');
 
@@ -31,14 +31,13 @@ export const createClaim = async (data) => {
   const res = await fetch(`${BASE_URL}/claims/create`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${getToken()}`,
+      // NO Content-Type header — let browser set it automatically for FormData
     },
-    body: JSON.stringify(data),
+    body: data, // ← pass FormData directly, NOT JSON.stringify(data)
   });
   return res.json();
 };
-
 export const getClaims = async () => {
   const res = await fetch(`${BASE_URL}/claims`, {
     headers: { Authorization: `Bearer ${getToken()}` },
@@ -60,6 +59,15 @@ export const getAgencies = async () => {
   const res = await fetch(`${BASE_URL}/agencies`, {
     headers: { Authorization: `Bearer ${getToken()}` },
   });
+  return res.json();
+};
+
+
+export const getAgencyClaimById = async (id) => {
+  const res = await fetch(`${BASE_URL}/agencies/claim/${id}`, {
+    headers: { Authorization: `Bearer ${getAgencyToken()}` },
+  });
+
   return res.json();
 };
 
@@ -144,6 +152,24 @@ export const getAgencyMe = async () => {
   return res.json();
 };
 
+
+export const acceptAgencyClaim = async (id) => {
+  const res = await fetch(`${BASE_URL}/agency/claims/${id}/accept`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${getAgencyToken()}` },
+  });
+  return res.json();
+};
+
+export const denyAgencyClaim = async (id) => {
+  const res = await fetch(`${BASE_URL}/agency/claims/${id}/deny`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${getAgencyToken()}` },
+  });
+  return res.json();
+};
+
+
 export const getAgencyAssignments = async () => {
   const res = await fetch(`${BASE_URL}/agencies/assignments`, {
     headers: { Authorization: `Bearer ${getAgencyToken()}` },
@@ -211,6 +237,8 @@ export const getAgencyChatRooms = async () => {
   const res = await fetch(`${BASE_URL}/chat/agency/rooms`, {
     headers: { Authorization: `Bearer ${getAgencyToken()}` },
   });
+  
+
   return res.json();
 };
 

@@ -311,7 +311,7 @@ export default function Register() {
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Collections Connector</span>
+              <span className="logo-text">Pasado</span>
             </div>
             <h2 className="left-headline">
               Smarter debt recovery,<br /><em>without the friction.</em>
@@ -370,7 +370,7 @@ export default function Register() {
                     <path d="M2 12l10 5 10-5"/>
                   </svg>
                 </div>
-                <span className="logo-text">Collections Connector</span>
+                <span className="logo-text">Pasado</span>
               </div>
 
               <p style={{fontSize:11,fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--gold)',marginBottom:8}}>
@@ -448,7 +448,7 @@ export default function Register() {
                   required
                 />
                 <label htmlFor="auth_check">
-                  I authorize Collections Connector to submit claims on my behalf to licensed
+                  I authorize Pasado to submit claims on my behalf to licensed
                   collection agencies. I understand this platform does not perform debt
                   collection or contact debtors directly.
                 </label>

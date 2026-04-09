@@ -57,6 +57,7 @@ export default function AgencyChat() {
             claim: {
               debtor_name: r.claim_id?.debtor_name || '—',
               amount:      r.claim_id?.amount      || 0,
+              description: r.claim_id?.description || '',   // ← add this
               status:      r.claim_id?.status      || 'submitted',
             },
             last_message: r.last_message || null,
@@ -383,34 +384,7 @@ export default function AgencyChat() {
       <div className="chat-root">
 
         {/* Navbar */}
-        <nav className="chat-nav">
-          <div className="nav-brand">
-            <div className="logo-mark">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:15,height:15}}>
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                <path d="M2 17l10 5 10-5"/>
-                <path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="logo-text">Collections Connector</span>
-            <span className="nav-badge">Agency</span>
-          </div>
-          <div className="nav-right">
-            <Link to="/agency/dashboard" className="nav-back">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
-              Dashboard
-            </Link>
-            <button className="menu-btn" onClick={() => setSidebarOpen(o => !o)}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        </nav>
+      
 
         {/* Error bar */}
         {error && (
@@ -489,24 +463,36 @@ export default function AgencyChat() {
 
             {activeRoom && (
               <>
-                {/* Claim bar */}
-                <div className="claim-bar">
-                  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                  </button>
-                  <div className="claim-bar-avatar">{activeRoom.client.initials}</div>
-                  <div>
-                    <div className="claim-bar-name">{activeRoom.client.name}</div>
-                    <div className="claim-bar-sub">Claim: {activeRoom.claim.debtor_name}</div>
-                  </div>
-                  <div className="claim-bar-right">
-                    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
-                    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
-                  </div>
-                </div>
+              {/* Claim bar */}
+<div className="claim-bar">
+  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
 
+  <div className="claim-bar-avatar">{activeRoom.client.initials}</div>
+
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div className="claim-bar-name">{activeRoom.client.name}</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      <div className="claim-bar-sub">vs {activeRoom.claim.debtor_name}</div>
+      {activeRoom.claim.description && (
+        <>
+          <span style={{ color: 'var(--border)', fontSize: 12 }}>·</span>
+          <div className="claim-bar-sub" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>
+            {activeRoom.claim.description}
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+
+  <div className="claim-bar-right">
+    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
+    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
+  </div>
+</div>
                 {/* Messages area */}
                 <div className="messages-area">
                   {loadingMessages ? (

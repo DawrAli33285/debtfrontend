@@ -137,16 +137,7 @@ export default function AgencySelection() {
       `}</style>
 
       <nav className="navbar">
-        <div className="nav-brand">
-          <div className="logo-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:16,height:16}}>
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span className="logo-text">Collections Connector</span>
-        </div>
+      
         <Link to="/agencies" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
@@ -195,21 +186,7 @@ export default function AgencySelection() {
           }
         </div>
 
-        {/* Method */}
-        <div className="form-section">
-          <label className="form-label">Assignment Method</label>
-          <div className="method-group">
-            {['manual','auto'].map(m => (
-              <button
-                key={m}
-                onClick={() => setMethod(m)}
-                className={`method-btn ${method === m ? 'method-btn-active' : ''}`}
-              >
-                {m === 'auto' ? '⚡ Auto' : '✋ Manual'}
-              </button>
-            ))}
-          </div>
-        </div>
+      
 
         {error && (
           <div className="error-box">

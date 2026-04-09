@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createClaim } from '../api/auth';
 
@@ -12,21 +12,30 @@ export default function CreateClaim() {
     debtor_address: '',
     amount: '',
     due_date: '',
+    past_due_period: '',
     description: '',
   });
+  const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-
+  const [usageInfo, setUsageInfo] = useState(null);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (usageInfo && usageInfo.limit < 999999 && usageInfo.used >= usageInfo.limit) {
+      setError('Monthly claim limit reached. Please upgrade your plan.');
+      return;
+    }
     setLoading(true);
     setError('');
-    const res = await createClaim(form);
+    const payload = new FormData();
+    Object.entries(form).forEach(([key, val]) => payload.append(key, val));
+    files.forEach(file => payload.append('documents', file));
+    const res = await createClaim(payload);
     setLoading(false);
     if (res.claim) {
       navigate('/dashboard');
@@ -34,6 +43,26 @@ export default function CreateClaim() {
       setError(res.message || 'Failed to submit claim');
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    fetch('https://debtbackend.vercel.app/api/auth/getUser', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.user) {
+          setUsageInfo({
+            used:  data.user.claims_used_this_month,
+            limit: data.user.monthly_claim_limit,
+            plan:  data.user.subscription_plan,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
 
   return (
     <>
@@ -371,6 +400,75 @@ export default function CreateClaim() {
           margin-bottom: 24px;
         }
 
+        /* ── UPLOAD ZONE ── */
+        .upload-zone {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 28px 20px;
+          border: 1.5px dashed var(--border);
+          border-radius: 12px;
+          background: var(--cream);
+          cursor: pointer;
+          transition: border-color 0.15s, background 0.15s;
+          text-align: center;
+        }
+        .upload-zone:hover {
+          border-color: var(--gold);
+          background: #fdf9f0;
+        }
+        .upload-label {
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--navy);
+        }
+        .upload-sub {
+          font-size: 11px;
+          color: var(--muted);
+        }
+
+        /* ── FILE LIST ── */
+        .file-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        .file-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+        .file-name {
+          flex: 1;
+          color: var(--navy);
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .file-size { color: var(--muted); flex-shrink: 0; }
+        .file-remove {
+          background: none;
+          border: none;
+          color: var(--muted);
+          font-size: 16px;
+          line-height: 1;
+          cursor: pointer;
+          padding: 0 2px;
+          flex-shrink: 0;
+        }
+        .file-remove:hover { color: var(--error); }
+
+
         /* ── FOOTER ── */
         .footer-note {
           text-align: center;
@@ -383,16 +481,7 @@ export default function CreateClaim() {
 
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="nav-brand">
-          <div className="logo-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:16,height:16}}>
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span className="logo-text">Collections Connector</span>
-        </div>
+      
         <Link to="/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
@@ -414,6 +503,99 @@ export default function CreateClaim() {
             {error}
           </div>
         )}
+
+{/* CLAIMS USAGE BANNER */}
+{usageInfo && (() => {
+  const isUnlimited = usageInfo.limit >= 999999;
+  const remaining   = isUnlimited ? Infinity : usageInfo.limit - usageInfo.used;
+  const pct         = isUnlimited ? 0 : Math.min((usageInfo.used / usageInfo.limit) * 100, 100);
+  const isWarning   = !isUnlimited && remaining <= 1;
+  const isBlocked   = !isUnlimited && remaining <= 0;
+
+  return (
+    <div style={{
+      background: isBlocked ? '#fdf0ef' : '#fff',
+      border: `1px solid ${isBlocked ? '#f1c0bc' : isWarning ? '#f9e79f' : '#e4e2dd'}`,
+      borderRadius: '14px',
+      padding: '16px 20px',
+      marginBottom: '24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '16px',
+      flexWrap: 'wrap',
+      boxShadow: '0 2px 12px rgba(15,31,61,0.04)',
+    }}>
+      {/* Left: info */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          width: '36px', height: '36px', borderRadius: '9px', flexShrink: 0,
+          background: isBlocked ? 'rgba(192,57,43,0.08)' : 'rgba(201,168,76,0.1)',
+          border: `1px solid ${isBlocked ? 'rgba(192,57,43,0.2)' : 'rgba(201,168,76,0.25)'}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke={isBlocked ? '#c0392b' : '#a8883a'} strokeWidth="1.8" strokeLinecap="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <div>
+          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0f1f3d', marginBottom: '2px' }}>
+            {isBlocked
+              ? 'Monthly claim limit reached'
+              : isUnlimited
+              ? 'Unlimited claims available'
+              : `${remaining} claim${remaining !== 1 ? 's' : ''} remaining this month`}
+          </p>
+          <p style={{ fontSize: '11.5px', color: '#8a95a3' }}>
+            {isUnlimited
+              ? `${usageInfo.plan.charAt(0).toUpperCase() + usageInfo.plan.slice(1)} Plan · Unlimited`
+              : `${usageInfo.used} used of ${usageInfo.limit} · ${usageInfo.plan.charAt(0).toUpperCase() + usageInfo.plan.slice(1)} Plan`}
+          </p>
+        </div>
+      </div>
+
+      {/* Right: progress bar or upgrade */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        {!isUnlimited && (
+          <div style={{ width: '100px' }}>
+            <div style={{
+              height: '5px', borderRadius: '99px',
+              background: '#e4e2dd', overflow: 'hidden',
+            }}>
+              <div style={{
+                height: '100%', borderRadius: '99px',
+                width: `${pct}%`,
+                background: isBlocked ? '#c0392b' : isWarning ? '#e67e22' : '#c9a84c',
+                transition: 'width 0.4s ease',
+              }} />
+            </div>
+            <p style={{ fontSize: '10px', color: '#8a95a3', marginTop: '4px', textAlign: 'right' }}>
+              {Math.round(pct)}%
+            </p>
+          </div>
+        )}
+        {isBlocked && (
+          <Link to="/business-plans" style={{
+            background: '#0f1f3d', color: '#fff',
+            fontSize: '12px', fontWeight: 600,
+            padding: '7px 14px', borderRadius: '8px',
+            textDecoration: 'none', whiteSpace: 'nowrap',
+            display: 'inline-flex', alignItems: 'center', gap: '5px',
+          }}>
+            Upgrade Plan
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+})()}
 
         {/* PAGE HEADER */}
         <div className="page-header">
@@ -560,8 +742,8 @@ export default function CreateClaim() {
                 </div>
               </div>
 
-              {/* Due Date */}
-              <div className="field-item">
+           {/* Due Date */}
+           <div className="field-item">
                 <label className="field-label" htmlFor="due_date">Due Date</label>
                 <input
                   id="due_date"
@@ -571,6 +753,25 @@ export default function CreateClaim() {
                   onChange={handleChange}
                   className="field-input"
                 />
+              </div>
+
+              {/* Past Due Period */}
+              <div className="field-item">
+                <label className="field-label" htmlFor="past_due_period">Past Due Period</label>
+                <div className="select-wrap">
+                  <select
+                    id="past_due_period"
+                    name="past_due_period"
+                    value={form.past_due_period}
+                    onChange={handleChange}
+                    className="field-select"
+                  >
+                    <option value="">Select period…</option>
+                    <option value="3_months">3 Months</option>
+                    <option value="6_months">6 Months</option>
+                    <option value="8_months">8 Months</option>
+                  </select>
+                </div>
               </div>
 
               {/* Description */}
@@ -587,6 +788,51 @@ export default function CreateClaim() {
                 />
               </div>
 
+              {/* Document Upload */}
+              <div className="field-item full-width">
+                <p className="field-label">Supporting Documents</p>
+                <label htmlFor="doc_upload" className="upload-zone">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <span className="upload-label">
+                    {files.length > 0
+                      ? `${files.length} file${files.length > 1 ? 's' : ''} selected`
+                      : 'Click to upload or drag & drop'}
+                  </span>
+                  <span className="upload-sub">PDF, JPG, PNG, DOC — max 10 MB each, up to 5 files</span>
+                  <input
+                    id="doc_upload"
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    style={{ display: 'none' }}
+                    onChange={(e) => setFiles(Array.from(e.target.files).slice(0, 5))}
+                  />
+                </label>
+                {files.length > 0 && (
+                  <ul className="file-list">
+                    {files.map((f, i) => (
+                      <li key={i} className="file-item">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2" strokeLinecap="round">
+                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span className="file-name">{f.name}</span>
+                        <span className="file-size">{(f.size / 1024).toFixed(0)} KB</span>
+                        <button
+                          type="button"
+                          className="file-remove"
+                          onClick={() => setFiles(files.filter((_, j) => j !== i))}
+                        >×</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
             </div>
 
             {/* Legal confirmation */}
@@ -601,7 +847,7 @@ export default function CreateClaim() {
               />
               <label htmlFor="legal_confirm" className="legal-text">
                 I confirm that the information provided is accurate and that I am authorized
-                to submit this claim. I understand that Collections Connector will assign
+                to submit this claim. I understand that Pasado will assign
                 this claim to a licensed collection agency and does not perform collection
                 activities directly.
               </label>

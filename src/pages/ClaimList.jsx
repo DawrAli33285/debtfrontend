@@ -187,16 +187,7 @@ export default function ClaimsList() {
 
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="nav-brand">
-          <div className="logo-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:16,height:16}}>
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span className="logo-text">Collections Connector</span>
-        </div>
+       
         <div className="nav-actions">
           <Link to="/agencies" className="back-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -358,7 +349,7 @@ export default function ClaimsList() {
         </div>
 
         <p className="footer-note">
-          Collections Connector is a technology platform that connects businesses with
+        Pasado is a technology platform that connects businesses with
           independent, licensed collection agencies. We do not provide debt collection
           services, legal advice, or contact debtors on your behalf.
         </p>
