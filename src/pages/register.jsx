@@ -26,7 +26,7 @@ export default function Register() {
     setLoading(false);
     if (res.token) {
       localStorage.setItem('token', res.token);
-      navigate('/dashboard');
+      navigate('/business-plans');
     } else {
       setError(res.message || 'Registration failed');
     }

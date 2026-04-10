@@ -62,7 +62,7 @@ export default function AgencyDashboard() {
   const handleLogout = () => { localStorage.removeItem('agencyToken'); navigate('/agency/login'); };
 
   const filtered = assignments.filter(a => {
-    const matchTab = activeTab === 'all' || a.status === activeTab;
+    const matchTab = activeTab === 'all' || a.claim_id.status === activeTab;
     const q = search.toLowerCase();
     const matchSearch = !q
       || (a.claim_id?.debtor_name || '').toLowerCase().includes(q)
@@ -73,10 +73,12 @@ export default function AgencyDashboard() {
 
   const stats = {
     total:       assignments.length,
-    in_progress: assignments.filter(a => a.status === 'in_progress').length,
-    closed:      assignments.filter(a => a.status === 'closed').length,
+    in_progress: assignments.filter(a => a.claim_id.status === 'in_progress').length,
+    closed:      assignments.filter(a => a.claim_id.status === 'closed').length,
+    denied:      assignments.filter(a => a.claim_id.status === 'denied').length,
     totalValue:  assignments.reduce((s, a) => s + (a.claim_id?.amount || 0), 0),
   };
+
 
   const planUsedPct = agency
     ? Math.min(100, Math.round(((agency.claims_used || 0) / (agency.claim_limit || 1)) * 100))
@@ -197,11 +199,18 @@ export default function AgencyDashboard() {
       <div className="dash-root">
         
         <div className="dash-body">
-          <div className="dash-header">
+        <div className="dash-header">
             <h1>Agency Dashboard</h1>
             <p>{new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>
+            <div style={{display:'flex',gap:'18px',marginTop:'10px',flexWrap:'wrap'}}>
+              {[{label:'Business portal',to:'/login'},{label:'Agency register',to:'/agency/register'},{label:'Subscription Plans',to:'/agency/subscription'},{label:'Agency Chat',to:'/agency/chat'}].map(l=>(
+                <Link key={l.to} to={l.to} className="quick-link" style={{borderBottom:'none',padding:'0',fontSize:'12.5px'}}>
+                  {l.label}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </Link>
+              ))}
+            </div>
           </div>
-
           {error && <div className="err-box">{error}</div>}
 
           <div className="stats-row">
@@ -232,10 +241,10 @@ export default function AgencyDashboard() {
               </div>
 
               <div className="tabs">
-                {[{key:'all',label:'All'},{key:'assigned',label:'Assigned'},{key:'in_progress',label:'In Progress'},{key:'closed',label:'Closed'}].map(t=>(
+              {[{key:'all',label:'All'},{key:'assigned',label:'Assigned'},{key:'in_progress',label:'In Progress'},{key:'closed',label:'Closed'},{key:'denied',label:'Denied'}].map(t=>(
                   <button key={t.key} className={`tab${activeTab===t.key?' active':''}`} onClick={()=>setActiveTab(t.key)}>
                     {t.label}
-                    <span className="tab-count">{t.key==='all'?assignments.length:assignments.filter(a=>a.status===t.key).length}</span>
+                    <span className="tab-count">{t.key==='all'?assignments.length:assignments.filter(a=>a.claim_id.status===t.key).length}</span>
                   </button>
                 ))}
               </div>
@@ -264,19 +273,36 @@ export default function AgencyDashboard() {
                         return (
                           <tr
                           key={a._id}
-                          className={a.status === 'assigned' ? 'is-new' : ''}
+                          className={a.claim_id.status === 'assigned' ? 'is-new' : ''}
                           style={{ cursor: 'pointer' }}
                           onClick={() => navigate(`/agency-claims/${claim._id}`)}
                         >
   <td>
     <div className="debtor-name">
       {claim.debtor_name||'—'}
-      {a.status === 'assigned' && (
-        <span className="new-badge">
-          <svg width="7" height="7" viewBox="0 0 24 24" fill="#a8883a"><circle cx="12" cy="12" r="10"/></svg>
-          New
-        </span>
-      )}
+      {a.claim_id.status === 'assigned' && (
+  <span className="new-badge">
+    <svg width="7" height="7" viewBox="0 0 24 24" fill="#a8883a"><circle cx="12" cy="12" r="10"/></svg>
+    New
+  </span>
+)}
+{a.claim_id.status === 'in_progress' && (
+  <span className="new-badge" style={{ background: '#ecfdf5', border: '1px solid #6ee7b7', color: '#065f46' }}>
+    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#065f46" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    In Progress
+  </span>
+)}
+
+{a.claim_id.status === 'denied' && (
+  <span className="new-badge" style={{ background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b' }}>
+    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    Denied
+  </span>
+)}
     </div>
     <div className="debtor-email">{claim.debtor_email||''}</div>
   </td>
@@ -303,6 +329,9 @@ export default function AgencyDashboard() {
                     <div className={`progress-fill${planUsedPct>=90?' danger':planUsedPct>=70?' warn':''}`} style={{width:`${planUsedPct}%`}}/>
                   </div>
                   {agency.subscription_end_date&&<p style={{fontSize:11.5,color:'var(--muted)',marginTop:9}}>Renews {fmtDate(agency.subscription_end_date)}</p>}
+             <span onClick={()=>{
+              navigate('/agency/subscription')
+             }} className='cursor-pointer'>  Upgrade plan</span>
                 </div>
               )}
 
@@ -335,18 +364,7 @@ export default function AgencyDashboard() {
                 </div>
               )}
 
-              <div className="side-card" style={{animationDelay:'.36s'}}>
-                <p className="side-card-title">Quick Links</p>
-                {[  {label:'Business portal',      to:'/login'},
-  {label:'Agency register',      to:'/agency/register'},
-  {label:'Subscription Plans',   to:'/agency/subscription'},
-  {label:'Agency Chat',          to:'/agency/chat'},].map(l=>(
-                  <Link key={l.to} to={l.to} className="quick-link">
-                    {l.label}
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  </Link>
-                ))}
-              </div>
+          
             </div>
           </div>
         </div>

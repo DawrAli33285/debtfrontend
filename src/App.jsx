@@ -21,6 +21,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AgencySubscriptionPlans from './pages/AgencySubscription';
 import AgencyClaimDetail from './pages/Agencyclaimdetails';
+import ClaimEdit from './pages/claimedit';
 
 
 const stripePromise = loadStripe("pk_test_51SRynCPBwgTANTk6OM3ADMEkOYuyTGcfBfz92xAXVsLmm8O6tH7dCVgcwhG4rmi5OH3URGSa6faVFD2WYbI7E8oA00drLGc9l6");
@@ -49,6 +50,10 @@ export default function App() {
 
 <Route path="/claims/:id" element={
   <PrivateRoute><ClaimDetail /></PrivateRoute>
+} />
+
+<Route path="/edit-claim/:id" element={
+  <PrivateRoute><ClaimEdit /></PrivateRoute>
 } />
 
 <Route path="/claims" element={<ClaimsList />} />

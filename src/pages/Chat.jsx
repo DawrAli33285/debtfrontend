@@ -35,6 +35,7 @@ export default function Chat() {
   const [messages, setMessages]               = useState([]);
   const [input, setInput]                     = useState('');
   const [sending, setSending]                 = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
   const [sidebarOpen, setSidebarOpen]         = useState(false);
   const [loadingRooms, setLoadingRooms]       = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -101,15 +102,36 @@ export default function Chat() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || sending || !activeRoom) return;
+    if ((!input.trim() && !pendingFile) || sending || !activeRoom) return;
     const text = input.trim();
     setInput('');
     setSending(true);
+    const file = pendingFile;
+    setPendingFile(null);
+  
     const optimisticId = `opt_${Date.now()}`;
-    const optimistic = { _id: optimisticId, sender: 'user', text, created_at: new Date() };
+    const optimistic = {
+      _id: optimisticId, sender: 'user', text, created_at: new Date(),
+      attachment: file ? { original_name: file.name, url: null } : undefined,
+    };
     setMessages(prev => [...prev, optimistic]);
+  
     try {
-      const res = await sendMessage(activeRoom._id, text);
+      let res;
+      if (file) {
+        const form = new FormData();
+        form.append('file', file);
+        if (text) form.append('text', text);
+        const r = await fetch(`https://debtbackend.vercel.app/api/chat/${activeRoom._id}/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: form,
+        });
+        res = await r.json();
+      } else {
+        res = await sendMessage(activeRoom._id, text);
+      }
+  
       if (res.message) {
         setMessages(prev => prev.map(m =>
           m._id === optimisticId
@@ -118,7 +140,7 @@ export default function Chat() {
         ));
         setRooms(prev => prev.map(r =>
           r._id === activeRoom._id
-            ? { ...r, last_message: { text, created_at: new Date() } }
+            ? { ...r, last_message: { text: text || `📎 ${file?.name}`, created_at: new Date() } }
             : r
         ));
       }
@@ -128,6 +150,7 @@ export default function Chat() {
     }
     setSending(false);
   };
+
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
@@ -530,10 +553,30 @@ export default function Chat() {
                                   {!isUser && !prevSame && (
                                     <p className="agency-label">{activeRoom.agency.name}</p>
                                   )}
-                                  <div className="msg-bubble">
-                                    {msg.text}
-                                    <span className="msg-time">{fmtTime(msg.created_at)}</span>
-                                  </div>
+                               <div className="msg-bubble">
+  {msg.text && <span>{msg.text}</span>}
+  {msg.attachment?.url && (
+    <a
+      href={msg.attachment.url}
+      target="_blank"
+      rel="noreferrer"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        marginTop: msg.text ? 8 : 0,
+        color: 'inherit', textDecoration: 'none',
+        background: 'rgba(255,255,255,0.12)', borderRadius: 8,
+        padding: '6px 10px', fontSize: 12,
+      }}
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
+      </svg>
+      {msg.attachment.original_name}
+    </a>
+  )}
+  <span className="msg-time">{fmtTime(msg.created_at)}</span>
+</div>
+
                                 </div>
                               </div>
                             );
@@ -558,29 +601,48 @@ export default function Chat() {
                 </div>
 
                 {/* Input bar */}
-                <div className="input-bar">
-                  <div className="input-wrap">
-                    <textarea
-                      ref={inputRef}
-                      className="chat-input"
-                      placeholder="Type a message…"
-                      value={input}
-                      onChange={e => setInput(e.target.value)}
-                      onKeyDown={handleKey}
-                      rows={1}
-                    />
-                    <button
-                      className="send-btn"
-                      onClick={handleSend}
-                      disabled={!input.trim() || sending}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"/>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+               {/* Input bar — replace entirely */}
+<div className="input-bar" style={{ position: 'relative' }}>
+  {pendingFile && (
+    <div style={{
+      position: 'absolute', bottom: '80px', left: '18px', right: '18px',
+      background: 'var(--white)', border: '1px solid var(--border)',
+      borderRadius: '10px', padding: '10px 14px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      fontSize: '12.5px', color: 'var(--navy)', boxShadow: '0 2px 8px rgba(15,31,61,.08)',
+    }}>
+      <span>📎 {pendingFile.name}</span>
+      <button onClick={() => setPendingFile(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '16px', lineHeight: 1 }}>×</button>
+    </div>
+  )}
+  <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--muted)', flexShrink: 0 }} title="Attach file">
+    <input type="file" style={{ display: 'none' }} onChange={e => setPendingFile(e.target.files[0] || null)} />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
+    </svg>
+  </label>
+  <div className="input-wrap">
+    <textarea
+      ref={inputRef}
+      className="chat-input"
+      placeholder="Type a message…"
+      value={input}
+      onChange={e => setInput(e.target.value)}
+      onKeyDown={handleKey}
+      rows={1}
+    />
+    <button
+      className="send-btn"
+      onClick={handleSend}
+      disabled={(!input.trim() && !pendingFile) || sending}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
                 <p className="input-hint">Press Enter to send · Shift+Enter for new line</p>
               </>
             )}

@@ -717,8 +717,14 @@ export default function Dashboard() {
                           </span>
                         </td>
                         <td>
-                          <Link to={`/claims/${claim._id}`} className="view-link">View →</Link>
-                        </td>
+  <div style={{ display: 'flex', gap: 8 }}>
+    <Link to={`/claims/${claim._id}`} className="view-link">View →</Link>
+    <Link to={`/edit-claim/${claim._id}`} className="view-link" style={{
+      color: 'var(--navy)',
+      borderColor: 'rgba(15,31,61,0.2)',
+    }}>Edit</Link>
+  </div>
+</td>
                       </tr>
                     );
                   })}

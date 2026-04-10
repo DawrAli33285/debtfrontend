@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getAgencyClaimById, getAgencyMe, acceptAgencyClaim, denyAgencyClaim } from '../api/auth';
+import { getClaimById } from '../api/auth';
 
 
 const STATUS_META = {
@@ -8,9 +8,16 @@ const STATUS_META = {
   assigned:    { label: 'Assigned',    cls: 'status-assigned'   },
   in_progress: { label: 'In Progress', cls: 'status-progress'   },
   closed:      { label: 'Closed',      cls: 'status-closed'     },
-  denied:      { label: 'Denied',      cls: 'status-denied'     },
 };
 
+const inputStyle = {
+    width: '100%', padding: '9px 12px',
+    border: '1.5px solid var(--gold)',  borderRadius: 9,
+    fontSize: 13.5, fontFamily: 'DM Sans, sans-serif',
+    color: 'var(--navy)', background: '#fff',
+    outline: 'none', transition: 'border-color 0.15s',
+    boxShadow: '0 0 0 3px rgba(201,168,76,0.08)',
+  };
 
 function StatusBadge({ status }) {
   const { label, cls } = STATUS_META[status] || STATUS_META.submitted;
@@ -33,50 +40,69 @@ function Field({ label, value }) {
   );
 }
 
-export default function AgencyClaimDetail() {
+export default function ClaimEdit() {
   const { id } = useParams();
-  const [claim, setClaim]   = useState(null);
-  const [error, setError]   = useState('');
-  const [loading, setLoading] = useState(true);
-  const [agency, setAgency] = useState(null);
-const [actionLoading, setActionLoading] = useState('');
-const [actionError, setActionError] = useState('');
-
-const handleAccept = async () => {
-  setActionLoading('accept');
-  setActionError('');
-  const res = await acceptAgencyClaim(id);
-  setActionLoading('');
-  if (res.claim) setClaim(res.claim);
-  else setActionError(res.message || 'Failed to accept claim');
-};
-
-const handleDeny = async () => {
-  setActionLoading('deny');
-  setActionError('');
-  const res = await denyAgencyClaim(id);
-  setActionLoading('');
-  if (res.claim) setClaim(res.claim);
-  else setActionError(res.message || 'Failed to deny claim');
-};
+const [claim, setClaim]     = useState(null);
+const [error, setError]     = useState('');
+const [loading, setLoading] = useState(true);
+const [editing, setEditing] = useState(false);
+const [saving, setSaving]   = useState(false);
+const [saveError, setSaveError] = useState('');
+const [form, setForm]       = useState({});
 
 
+const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
-  useEffect(() => {
+
+useEffect(() => {
     (async () => {
       setLoading(true);
-      const [res, agencyRes] = await Promise.all([
-        getAgencyClaimById(id),
-        getAgencyMe(),
-      ]);
+      const res = await getClaimById(id);
       setLoading(false);
- 
-      if (agencyRes) setAgency(agencyRes.agency);
-
-      if (res.claim) setClaim(res.claim);
-      else setError(res.message || 'Failed to load claim');
+      if (res.claim) {
+        setClaim(res.claim);
+        setForm({
+          debtor_name:    res.claim.debtor_name    || '',
+          debtor_email:   res.claim.debtor_email   || '',
+          debtor_phone:   res.claim.debtor_phone   || '',
+          debtor_address: res.claim.debtor_address || '',
+          debtor_type:    res.claim.debtor_type    || 'individual',
+          amount:         res.claim.amount         || '',
+          due_date:       res.claim.due_date ? res.claim.due_date.slice(0,10) : '',
+          description:    res.claim.description    || '',
+        });
+      } else {
+        setError(res.message || 'Failed to load claim');
+      }
     })();
   }, [id]);
+
+
+  // Add save function (add your actual API call — updateClaim — to api/auth.js)
+const handleSave = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to save');
+      setClaim(data.claim);
+      setEditing(false);
+    } catch (err) {
+      setSaveError(err.message);
+    }
+    setSaving(false);
+  };
+
+
 
   const formatDate = (iso) =>
     iso ? new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
@@ -219,12 +245,6 @@ const handleDeny = async () => {
         .status-closed     { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
         .status-closed .status-dot     { background:#27ae60; }
 
-
-
-        .status-denied     { background:#fdf0ef; color:#c0392b; border:1px solid #f1c0bc; }
-.status-denied .status-dot     { background:#c0392b; }
-
-
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
 
@@ -334,7 +354,7 @@ const handleDeny = async () => {
       {/* NAVBAR */}
       <nav className="navbar">
       
-        <Link to="/agency/dashboard" className="back-link">
+        <Link to="/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
@@ -366,17 +386,55 @@ const handleDeny = async () => {
 
         {/* CONTENT */}
         {!loading && claim && (
-          <>
-            {/* Page Header */}
-            <div className="page-header">
-              <div>
-                <p className="page-eyebrow">Claim Record</p>
-                <h1 className="page-title">Claim <em>Details</em></h1>
-                <div className="header-divider" />
-                <p className="claim-id">{claim._id}</p>
-              </div>
-              <StatusBadge status={claim.status} />
-            </div>
+  <>
+  
+<div className="page-header">
+  <div>
+    <p className="page-eyebrow">Claim Record</p>
+    <h1 className="page-title">Claim <em>Details</em></h1>
+    <div className="header-divider" />
+    <p className="claim-id">{claim._id}</p>
+  </div>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+    <StatusBadge status={claim.status} />
+    {!editing ? (
+      <button onClick={() => setEditing(true)} style={{
+        background: 'var(--navy)', color: '#fff', border: 'none',
+        borderRadius: 8, padding: '8px 16px', fontSize: 13,
+        fontFamily: 'DM Sans, sans-serif', fontWeight: 600,
+        cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+      }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit Claim
+      </button>
+    ) : (
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => { setEditing(false); setSaveError(''); }} style={{
+          background: 'none', color: 'var(--muted)', border: '1px solid var(--border)',
+          borderRadius: 8, padding: '8px 14px', fontSize: 13,
+          fontFamily: 'DM Sans, sans-serif', fontWeight: 500, cursor: 'pointer',
+        }}>
+          Cancel
+        </button>
+        <button onClick={handleSave} disabled={saving} style={{
+          background: 'var(--gold-d)', color: '#fff', border: 'none',
+          borderRadius: 8, padding: '8px 16px', fontSize: 13,
+          fontFamily: 'DM Sans, sans-serif', fontWeight: 600,
+          cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+        }}>
+          {saving ? 'Saving…' : 'Save Changes'}
+        </button>
+      </div>
+    )}
+    {saveError && <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 2 }}>{saveError}</p>}
+  </div>
+</div>
+
+
 
             {/* Debtor Information */}
             <div className="section">
@@ -391,14 +449,36 @@ const handleDeny = async () => {
                   <h2 className="section-title">Debtor Information</h2>
                 </div>
                 <div className="section-body">
-                  <Field label="Debtor Type"  value={claim.debtor_type === 'individual' ? 'Individual' : 'Business'} />
-                  <Field label="Debtor Name"  value={claim.debtor_name} />
-                  <Field label="Email"        value={claim.debtor_email} />
-                  <Field label="Phone"        value={claim.debtor_phone} />
-                  <div className="full-width">
-                    <Field label="Address"    value={claim.debtor_address} />
-                  </div>
-                </div>
+  <div className="field-item">
+    <p className="field-label">Debtor Type</p>
+    {editing ? (
+      <select value={form.debtor_type} onChange={set('debtor_type')} style={inputStyle}>
+        <option value="individual">Individual</option>
+        <option value="business">Business</option>
+      </select>
+    ) : (
+      <p className="field-value">{claim.debtor_type === 'individual' ? 'Individual' : 'Business'}</p>
+    )}
+  </div>
+  <div className="field-item">
+    <p className="field-label">Debtor Name</p>
+    {editing ? <input value={form.debtor_name} onChange={set('debtor_name')} style={inputStyle} /> : <p className="field-value">{claim.debtor_name || <span className="field-empty">Not provided</span>}</p>}
+  </div>
+  <div className="field-item">
+    <p className="field-label">Email</p>
+    {editing ? <input value={form.debtor_email} onChange={set('debtor_email')} style={inputStyle} /> : <p className="field-value">{claim.debtor_email || <span className="field-empty">Not provided</span>}</p>}
+  </div>
+  <div className="field-item">
+    <p className="field-label">Phone</p>
+    {editing ? <input value={form.debtor_phone} onChange={set('debtor_phone')} style={inputStyle} /> : <p className="field-value">{claim.debtor_phone || <span className="field-empty">Not provided</span>}</p>}
+  </div>
+  <div className="full-width">
+    <div className="field-item">
+      <p className="field-label">Address</p>
+      {editing ? <input value={form.debtor_address} onChange={set('debtor_address')} style={inputStyle} /> : <p className="field-value">{claim.debtor_address || <span className="field-empty">Not provided</span>}</p>}
+    </div>
+  </div>
+</div>
               </div>
             </div>
 
@@ -414,23 +494,35 @@ const handleDeny = async () => {
                   </div>
                   <h2 className="section-title">Debt Information</h2>
                 </div>
+             
                 <div className="section-body">
-                  <div className="field-item">
-                    <p className="field-label">Amount Owed</p>
-                    <p className="amount-value">
-                      {formatCurrency(claim.amount) || <span className="field-empty">Not provided</span>}
-                    </p>
-                  </div>
-                  <Field label="Due Date" value={formatDate(claim.due_date)} />
-                  <div className="full-width">
-                    <Field label="Description" value={claim.description} />
-                  </div>
-                </div>
+  <div className="field-item">
+    <p className="field-label">Amount</p>
+    {editing
+      ? <input type="number" value={form.amount} onChange={set('amount')} style={inputStyle} />
+      : <p className="amount-value">{formatCurrency(claim.amount)}</p>}
+  </div>
+  <div className="field-item">
+    <p className="field-label">Due Date</p>
+    {editing
+      ? <input type="date" value={form.due_date} onChange={set('due_date')} style={inputStyle} />
+      : <p className="field-value">{formatDate(claim.due_date) || <span className="field-empty">Not provided</span>}</p>}
+  </div>
+  <div className="full-width">
+    <div className="field-item">
+      <p className="field-label">Description</p>
+      {editing
+        ? <textarea value={form.description} onChange={set('description')} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+        : <p className="field-value">{claim.description || <span className="field-empty">Not provided</span>}</p>}
+    </div>
+  </div>
+</div>
+
               </div>
             </div>
 
             {/* Submission Details */}
-            <div className="section">
+          {!editing &&   <div className="section">
               <div className="section-card">
                 <div className="section-head">
                   <div className="section-icon">
@@ -448,69 +540,7 @@ const handleDeny = async () => {
                   <Field label="Last Updated"  value={formatDate(claim.updatedAt)} />
                 </div>
               </div>
-            </div>
-
-
-            {agency && (
-  <div className="section">
-    <div className="section-card">
-      <div className="section-head">
-        <div className="section-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 6v6l4 2"/>
-          </svg>
-        </div>
-        <h2 className="section-title">Claim Quota</h2>
-      </div>
-      <div style={{ padding: '20px 24px' }}>
-
-        {/* Progress bar */}
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-              Monthly Usage
-            </span>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--navy)' }}>
-              {agency.claims_used} / {agency.claim_limit}
-            </span>
-          </div>
-          <div style={{ background: 'var(--border)', borderRadius: '99px', height: '8px', overflow: 'hidden' }}>
-            <div style={{
-              height: '100%',
-              borderRadius: '99px',
-              width: `${Math.min((agency.claims_used / agency.claim_limit) * 100, 100)}%`,
-              background: agency.claims_used >= agency.claim_limit ? '#c0392b' : 'var(--gold)',
-              transition: 'width 0.4s ease',
-            }} />
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-          {[
-            { label: 'Plan', value: agency.plan_type?.charAt(0).toUpperCase() + agency.plan_type?.slice(1) },
-            { label: 'Claims Left', value: Math.max(agency.claim_limit - agency.claims_used, 0) },
-            { label: 'Total Limit', value: agency.claim_limit },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{label}</p>
-              <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--navy)' }}>{value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Warning if at limit */}
-        {agency.claims_used >= agency.claim_limit && (
-          <div style={{ marginTop: '12px', background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b', fontSize: '13px', padding: '10px 14px', borderRadius: '10px' }}>
-            You've reached your monthly claim limit. Upgrade your plan to accept more claims.
-          </div>
-        )}
-
-      </div>
-    </div>
-  </div>
-)}
+            </div>}
 
           
           
@@ -527,117 +557,118 @@ const handleDeny = async () => {
     </div>
 
     <div style={{ padding: '20px 24px' }}>
-      {claim.documents && claim.documents.length > 0 ? (
-        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {claim.documents.map((doc, i) => (
-            <li key={i} style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              background: 'var(--cream)', border: '1px solid var(--border)',
-              borderRadius: '10px', padding: '10px 14px',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <span style={{
-                flex: 1, fontSize: '13px', fontWeight: 500,
-                color: 'var(--navy)', whiteSpace: 'nowrap',
-                overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>
-                {doc.filename}
-              </span>
-              <a
-              href={`https://debtbackend.vercel.app/api/uploads/${doc.path}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontSize: '11.5px', fontWeight: 600, color: 'var(--gold-d)',
-                  textDecoration: 'none', border: '1px solid rgba(168,136,58,0.3)',
-                  borderRadius: '6px', padding: '4px 10px',
-                  flexShrink: 0, transition: 'background 0.15s',
-                }}
-              >
-                View
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          padding: '16px', background: 'var(--cream)',
-          border: '1px dashed var(--border)', borderRadius: '10px',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.8" strokeLinecap="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          <span style={{ fontSize: '13px', color: 'var(--muted)', fontStyle: 'italic' }}>
-            No documents attached to this claim
-          </span>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
 
-
-{claim.status === 'assigned' && (
-  <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-
-    {actionError && (
-      <div className="err-box" style={{ width: '100%' }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+{/* Existing documents */}
+{claim.documents && claim.documents.length > 0 ? (
+  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: editing ? 16 : 0 }}>
+    {claim.documents.map((doc, i) => (
+      <li key={i} style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        background: 'var(--cream)', border: '1px solid var(--border)',
+        borderRadius: '10px', padding: '10px 14px',
+      }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
         </svg>
-        {actionError}
-      </div>
-    )}
+        <span style={{
+          flex: 1, fontSize: '13px', fontWeight: 500,
+          color: 'var(--navy)', whiteSpace: 'nowrap',
+          overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {doc.filename}
+        </span>
+        <a href={`https://debtbackend.vercel.app/uploads/${doc.path}`} target="_blank" rel="noreferrer" style={{
+          fontSize: '11.5px', fontWeight: 600, color: 'var(--gold-d)',
+          textDecoration: 'none', border: '1px solid rgba(168,136,58,0.3)',
+          borderRadius: '6px', padding: '4px 10px', flexShrink: 0,
+        }}>
+          View
+        </a>
+        {editing && (
+          <button
+            onClick={async () => {
+              const token = localStorage.getItem('token');
+              const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}/documents/${doc._id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              const data = await res.json();
+              if (res.ok) setClaim(data.claim);
+            }}
+            style={{
+              background: 'none', border: '1px solid #f1c0bc', borderRadius: 6,
+              padding: '4px 8px', cursor: 'pointer', color: '#c0392b', fontSize: 11.5,
+              fontWeight: 600, flexShrink: 0,
+            }}
+          >
+            Remove
+          </button>
+        )}
+      </li>
+    ))}
+  </ul>
+) : (
+  !editing && (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '10px',
+      padding: '16px', background: 'var(--cream)',
+      border: '1px dashed var(--border)', borderRadius: '10px',
+      marginBottom: 0,
+    }}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <span style={{ fontSize: '13px', color: 'var(--muted)', fontStyle: 'italic' }}>
+        No documents attached to this claim
+      </span>
+    </div>
+  )
+)}
 
-    <button
-      onClick={handleAccept}
-      disabled={!!actionLoading}
-      style={{
-        flex: 1, minWidth: '140px',
-        padding: '13px 24px', borderRadius: '12px', border: 'none',
-        background: actionLoading === 'accept' ? '#b8975e' : 'var(--gold)',
-        color: '#fff', fontSize: '14px', fontWeight: 600,
-        cursor: actionLoading ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        transition: 'background 0.15s',
-      }}
-    >
-      {actionLoading === 'accept' ? (
-        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Accepting…</>
-      ) : (
-        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
-      )}
-    </button>
-
-    <button
-      onClick={handleDeny}
-      disabled={!!actionLoading}
-      style={{
-        flex: 1, minWidth: '140px',
-        padding: '13px 24px', borderRadius: '12px',
-        border: '1px solid #f1c0bc',
-        background: '#fdf0ef', color: '#c0392b',
-        fontSize: '14px', fontWeight: 600,
-        cursor: actionLoading ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        transition: 'background 0.15s',
-      }}
-    >
-      {actionLoading === 'deny' ? (
-        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(192,57,43,0.3)', borderTopColor: '#c0392b', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Denying…</>
-      ) : (
-        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
-      )}
-    </button>
-
+{/* Upload new documents when editing */}
+{editing && (
+  <div style={{ marginTop: 8 }}>
+    <label style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '12px 16px', background: 'var(--cream)',
+      border: '1.5px dashed var(--gold)', borderRadius: 10,
+      cursor: 'pointer', fontSize: 13, color: 'var(--navy)', fontWeight: 500,
+    }}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Click to upload additional documents
+      <input
+        type="file"
+        multiple
+        style={{ display: 'none' }}
+        onChange={async (e) => {
+          const files = Array.from(e.target.files);
+          if (!files.length) return;
+          const formData = new FormData();
+          files.forEach(f => formData.append('documents', f));
+          const token = localStorage.getItem('token');
+          const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}/documents`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          });
+          const data = await res.json();
+          if (res.ok) setClaim(data.claim);
+        }}
+      />
+    </label>
   </div>
 )}
 
+</div>
+
+  </div>
+</div>
           
             <p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed

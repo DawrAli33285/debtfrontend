@@ -91,7 +91,7 @@ export default function AgencyRegister() {
 
     if (res.token) {
       localStorage.setItem('agencyToken', res.token);
-      navigate('/agency/dashboard');
+      navigate('/agency/subscription');
     } else {
       setError(res.message || 'Registration failed');
     }
