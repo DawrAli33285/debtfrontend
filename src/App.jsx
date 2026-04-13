@@ -16,61 +16,63 @@ import Chat from './pages/Chat';
 import AgencyChat from './pages/AgencyChat';
 import Layout from './components/Layout';
 import SubscriptionPlans from './pages/BusinessSubscription';
-
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AgencySubscriptionPlans from './pages/AgencySubscription';
 import AgencyClaimDetail from './pages/Agencyclaimdetails';
 import ClaimEdit from './pages/claimedit';
-
+import SuperAdminLogin from './pages/AdminLogin';
+import SuperAdminRegister from './pages/AdminRegister';
+import SuperAdminReset from './pages/AdminReset';
+import AdminDashboard from './pages/AdminDashboard';
+import UserManagement from './pages/AdminUserManagement';
+import AgencyManagement from './pages/AdminAgencyManagement';
 
 const stripePromise = loadStripe("pk_test_51SRynCPBwgTANTk6OM3ADMEkOYuyTGcfBfz92xAXVsLmm8O6tH7dCVgcwhG4rmi5OH3URGSa6faVFD2WYbI7E8oA00drLGc9l6");
-
-
 
 export default function App() {
   return (
     <BrowserRouter>
-     <Elements stripe={stripePromise}>
+      <Elements stripe={stripePromise}>
+        <Routes>
 
-    <Layout>
+          {/* ── Admin routes (no Layout) ── */}
+          <Route path='/admin/login'            element={<SuperAdminLogin />} />
+          <Route path='/admin/register'         element={<SuperAdminRegister />} />
+          <Route path='/admin/reset'            element={<SuperAdminReset />} />
+          <Route path='/admin/dashboard'        element={<AdminDashboard />} />
+          <Route path='/admin/usermanagement'   element={<UserManagement />} />
+          <Route path='/admin/agencymanagement' element={<AgencyManagement />} />
 
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path='/business-plans' element={<SubscriptionPlans/>}/>
-        <Route path="/dashboard" element={
-          <PrivateRoute><Dashboard /></PrivateRoute>
-        } />
+          {/* ── All other routes (wrapped in Layout) ── */}
+          <Route path="/*" element={
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Navigate to="/login" />} />
+                <Route path="/register"          element={<Register />} />
+                <Route path="/login"             element={<Login />} />
+                <Route path="/business-plans"    element={<SubscriptionPlans />} />
+                <Route path="/dashboard"         element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/claims/create"     element={<PrivateRoute><CreateClaim /></PrivateRoute>} />
+                <Route path="/claims/:id"        element={<PrivateRoute><ClaimDetail /></PrivateRoute>} />
+                <Route path="/edit-claim/:id"    element={<PrivateRoute><ClaimEdit /></PrivateRoute>} />
+                <Route path="/claims"            element={<ClaimsList />} />
+                <Route path="/agencies"          element={<AgencyListing />} />
+                <Route path="/agencies/select"   element={<AgencySelection />} />
+                <Route path="/assignments/confirm" element={<AssignmentConfirmation />} />
+                <Route path="/agency/register"   element={<AgencyRegister />} />
+                <Route path="/agency/login"      element={<AgencyLogin />} />
+                <Route path="/chat"              element={<Chat />} />
+                <Route path="/agency/chat"       element={<AgencyChat />} />
+                <Route path="/agency/subscription" element={<AgencySubscriptionPlans />} />
+                <Route path="/agency/dashboard"  element={<AgencyDashboard />} />
+                <Route path="/agency-claims/:id" element={<AgencyClaimDetail />} />
+              </Routes>
+            </Layout>
+          } />
 
-<Route path="/claims/create" element={
-  <PrivateRoute><CreateClaim /></PrivateRoute>
-} />
-
-<Route path="/claims/:id" element={
-  <PrivateRoute><ClaimDetail /></PrivateRoute>
-} />
-
-<Route path="/edit-claim/:id" element={
-  <PrivateRoute><ClaimEdit /></PrivateRoute>
-} />
-
-<Route path="/claims" element={<ClaimsList />} />
-<Route path="/agencies"            element={<AgencyListing />} />
-<Route path="/agencies/select"     element={<AgencySelection />} />
-<Route path="/assignments/confirm" element={<AssignmentConfirmation />} />
-<Route path="/agency/register" element={<AgencyRegister />} />
-<Route path="/agency/login" element={<AgencyLogin/>} />
-<Route path='/chat' element={<Chat/>}/>
-<Route path='/agency/chat' element={<AgencyChat/>}/>
-<Route path='/agency/subscription' element={<AgencySubscriptionPlans/>}/>
-<Route path="/agency/dashboard" element={<AgencyDashboard />} />
-     
-<Route path="/agency-claims/:id" element={<AgencyClaimDetail/>}/>
-      </Routes>
-</Layout>
-</Elements>
+        </Routes>
+      </Elements>
     </BrowserRouter>
   );
 }

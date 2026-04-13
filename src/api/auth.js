@@ -1,5 +1,5 @@
-const BASE_URL = 'https://debtbackend.vercel.app/api';
-// const BASE_URL = 'http://localhost:5000/api';
+export const BASE_URL = 'https://debtbackend.vercel.app/api';
+// export const BASE_URL = 'http://localhost:5000/api';
 const getToken = () => localStorage.getItem('token');
 const getAgencyToken = () => localStorage.getItem('agencyToken');
 
@@ -257,6 +257,26 @@ export const sendAgencyMessage = async (roomId, text) => {
       Authorization: `Bearer ${getAgencyToken()}`,
     },
     body: JSON.stringify({ text }),
+  });
+  return res.json();
+};
+
+
+
+export const reopenAgencyClaim = async (id) => {
+  const token = localStorage.getItem('agencyToken'); // adjust to your token key
+  const res = await fetch(`${BASE_URL}/agency/claims/${id}/reopen`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+};
+
+export const closeAgencyClaim = async (id) => {
+  const token = localStorage.getItem('agencyToken');
+  const res = await fetch(`${BASE_URL}/agency/claims/${id}/close`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
   });
   return res.json();
 };

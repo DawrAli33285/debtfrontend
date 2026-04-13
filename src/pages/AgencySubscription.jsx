@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { BASE_URL } from '../api/auth';
 
 const plans = [
     {
@@ -152,7 +153,7 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
 
       const token = localStorage.getItem('agencyToken');
 
-      const res = await fetch('https://debtbackend.vercel.app/api/subscription/create', {
+      const res = await fetch(`${BASE_URL}/subscription/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

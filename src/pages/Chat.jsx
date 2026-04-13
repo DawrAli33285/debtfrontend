@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { getChatRooms, getChatMessages, sendMessage } from '../api/auth';
+import { getChatRooms, getChatMessages, sendMessage, BASE_URL } from '../api/auth';
 
 const fmt = (n) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n || 0);
@@ -122,7 +122,7 @@ export default function Chat() {
         const form = new FormData();
         form.append('file', file);
         if (text) form.append('text', text);
-        const r = await fetch(`https://debtbackend.vercel.app/api/chat/${activeRoom._id}/upload`, {
+        const r = await fetch(`${BASE_URL}/chat/${activeRoom._id}/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           body: form,

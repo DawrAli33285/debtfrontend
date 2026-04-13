@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BASE_URL } from '../api/auth';
 
 const TERMS = [
   { id: 'not_agency',    text: 'Pasado is not a collection agency' },
@@ -66,7 +67,7 @@ export default function TermsModal({
     setSubmitting(true);
     setError('');
     try {
-      const res = await fetch(`https://debtbackend.vercel.app/api/auth/accept-terms`, {
+      const res = await fetch(`${BASE_URL}/auth/accept-terms`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getAgencyClaimById, getAgencyMe, acceptAgencyClaim, denyAgencyClaim } from '../api/auth';
-
+import { getAgencyClaimById, getAgencyMe, acceptAgencyClaim, denyAgencyClaim, reopenAgencyClaim, closeAgencyClaim, BASE_URL } from '../api/auth';
 
 const STATUS_META = {
   submitted:   { label: 'Submitted',   cls: 'status-submitted'  },
@@ -39,27 +38,48 @@ export default function AgencyClaimDetail() {
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(true);
   const [agency, setAgency] = useState(null);
-const [actionLoading, setActionLoading] = useState('');
-const [actionError, setActionError] = useState('');
+  const [actionLoading, setActionLoading] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null); // 'close' | 'reopen' | null
 
-const handleAccept = async () => {
-  setActionLoading('accept');
-  setActionError('');
-  const res = await acceptAgencyClaim(id);
-  setActionLoading('');
-  if (res.claim) setClaim(res.claim);
-  else setActionError(res.message || 'Failed to accept claim');
-};
 
-const handleDeny = async () => {
-  setActionLoading('deny');
-  setActionError('');
-  const res = await denyAgencyClaim(id);
-  setActionLoading('');
-  if (res.claim) setClaim(res.claim);
-  else setActionError(res.message || 'Failed to deny claim');
-};
-
+  const handleAccept = async () => {
+    setActionLoading('accept');
+    setActionError('');
+    const res = await acceptAgencyClaim(id);
+    setActionLoading('');
+    if (res.claim) setClaim(res.claim);
+    else setActionError(res.message || 'Failed to accept claim');
+  };
+  
+  const handleDeny = async () => {
+    setActionLoading('deny');
+    setActionError('');
+    const res = await denyAgencyClaim(id);
+    setActionLoading('');
+    if (res.claim) setClaim(res.claim);
+    else setActionError(res.message || 'Failed to deny claim');
+  };
+  
+  const handleReopen = async () => {
+    setConfirmModal(null);
+    setActionLoading('reopen');
+    setActionError('');
+    const res = await reopenAgencyClaim(id);
+    setActionLoading('');
+    if (res.claim) setClaim(res.claim);
+    else setActionError(res.message || 'Failed to reopen claim');
+  };
+  
+  const handleClose = async () => {
+    setConfirmModal(null);
+    setActionLoading('close');
+    setActionError('');
+    const res = await closeAgencyClaim(id);
+    setActionLoading('');
+    if (res.claim) setClaim(res.claim);
+    else setActionError(res.message || 'Failed to close claim');
+  };
 
 
   useEffect(() => {
@@ -547,7 +567,7 @@ const handleDeny = async () => {
                 {doc.filename}
               </span>
               <a
-              href={`https://debtbackend.vercel.app/api/uploads/${doc.path}`}
+              href={`${BASE_URL}/uploads/${doc.path}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -582,7 +602,8 @@ const handleDeny = async () => {
 </div>
 
 
-{claim.status === 'assigned' && (
+{/* Action Buttons — shown for assigned, denied, and in_progress statuses */}
+{(claim.status === 'assigned' || claim.status === 'denied' || claim.status === 'in_progress' || claim.status === 'closed') && (
   <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
 
     {actionError && (
@@ -594,56 +615,248 @@ const handleDeny = async () => {
       </div>
     )}
 
-    <button
-      onClick={handleAccept}
-      disabled={!!actionLoading}
-      style={{
-        flex: 1, minWidth: '140px',
-        padding: '13px 24px', borderRadius: '12px', border: 'none',
-        background: actionLoading === 'accept' ? '#b8975e' : 'var(--gold)',
-        color: '#fff', fontSize: '14px', fontWeight: 600,
-        cursor: actionLoading ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        transition: 'background 0.15s',
-      }}
-    >
-      {actionLoading === 'accept' ? (
-        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Accepting…</>
-      ) : (
-        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
-      )}
-    </button>
+    {/* Accept + Deny — only when assigned */}
+    {claim.status === 'assigned' && (
+      <>
+        <button
+          onClick={handleAccept}
+          disabled={!!actionLoading}
+          style={{
+            flex: 1, minWidth: '140px',
+            padding: '13px 24px', borderRadius: '12px', border: 'none',
+            background: actionLoading === 'accept' ? '#b8975e' : 'var(--gold)',
+            color: '#fff', fontSize: '14px', fontWeight: 600,
+            cursor: actionLoading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            transition: 'background 0.15s',
+          }}
+        >
+          {actionLoading === 'accept' ? (
+            <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Accepting…</>
+          ) : (
+            <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
+          )}
+        </button>
 
-    <button
-      onClick={handleDeny}
-      disabled={!!actionLoading}
+        <button
+          onClick={handleDeny}
+          disabled={!!actionLoading}
+          style={{
+            flex: 1, minWidth: '140px',
+            padding: '13px 24px', borderRadius: '12px',
+            border: '1px solid #f1c0bc',
+            background: '#fdf0ef', color: '#c0392b',
+            fontSize: '14px', fontWeight: 600,
+            cursor: actionLoading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            transition: 'background 0.15s',
+          }}
+        >
+          {actionLoading === 'deny' ? (
+            <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(192,57,43,0.3)', borderTopColor: '#c0392b', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Denying…</>
+          ) : (
+            <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
+          )}
+        </button>
+      </>
+    )}
+
+    {/* Reopen — only when denied */}
+    {(claim.status === 'denied' || claim.status === 'closed') && (
+      <button
+        onClick={() => setConfirmModal('reopen')}
+        disabled={!!actionLoading}
+        style={{
+          flex: 1, minWidth: '140px',
+          padding: '13px 24px', borderRadius: '12px', border: 'none',
+          background: actionLoading === 'reopen' ? '#1a5276' : '#2471a3',
+          color: '#fff', fontSize: '14px', fontWeight: 600,
+          cursor: actionLoading ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          transition: 'background 0.15s',
+        }}
+      >
+        {actionLoading === 'reopen' ? (
+          <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Reopening…</>
+        ) : (
+          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reopen Claim</>
+        )}
+      </button>
+    )}
+
+    {/* Close — only when in_progress */}
+    {claim.status === 'in_progress' && (
+      <button
+        onClick={() => setConfirmModal('close')}
+        disabled={!!actionLoading}
+        style={{
+          flex: 1, minWidth: '140px',
+          padding: '13px 24px', borderRadius: '12px',
+          border: '1px solid #a9dfbf',
+          background: '#eafaf1', color: '#1e8449',
+          fontSize: '14px', fontWeight: 600,
+          cursor: actionLoading ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          transition: 'background 0.15s',
+        }}
+      >
+        {actionLoading === 'close' ? (
+          <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(30,132,73,0.3)', borderTopColor: '#1e8449', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Closing…</>
+        ) : (
+          <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Close Claim</>
+        )}
+      </button>
+    )}
+
+    {/* Chat — always shown for assigned / denied / in_progress */}
+    <Link
+      to={`/agency/chat`}
       style={{
         flex: 1, minWidth: '140px',
         padding: '13px 24px', borderRadius: '12px',
-        border: '1px solid #f1c0bc',
-        background: '#fdf0ef', color: '#c0392b',
+        border: '1px solid var(--border)',
+        background: 'var(--white)', color: 'var(--navy)',
         fontSize: '14px', fontWeight: 600,
-        cursor: actionLoading ? 'not-allowed' : 'pointer',
+        textDecoration: 'none',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
         transition: 'background 0.15s',
       }}
     >
-      {actionLoading === 'deny' ? (
-        <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(192,57,43,0.3)', borderTopColor: '#c0392b', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Denying…</>
-      ) : (
-        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
-      )}
-    </button>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      Chat
+    </Link>
 
   </div>
 )}
 
-          
-            <p className="footer-note">
+
+<p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed
               collection agencies. We do not provide debt collection services, legal advice,
               or contact debtors on your behalf.
             </p>
+
+            {/* Confirmation Modals */}
+            {confirmModal && (
+              <div style={{
+                position: 'fixed', inset: 0, zIndex: 200,
+                background: 'rgba(15,31,61,0.55)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '24px',
+              }}>
+                <div style={{
+                  background: 'var(--white)',
+                  borderRadius: '20px',
+                  border: '1px solid var(--border)',
+                  padding: '32px 28px',
+                  maxWidth: '440px',
+                  width: '100%',
+                  boxShadow: '0 8px 40px rgba(15,31,61,0.18)',
+                  animation: 'fadeUp 0.25s cubic-bezier(.22,1,.36,1) both',
+                }}>
+
+                  {/* Icon */}
+                  <div style={{
+                    width: '44px', height: '44px',
+                    borderRadius: '12px',
+                    background: confirmModal === 'close' ? '#eafaf1' : '#eaf2ff',
+                    border: `1px solid ${confirmModal === 'close' ? '#a9dfbf' : '#aed6f1'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '20px',
+                  }}>
+                    {confirmModal === 'close' ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e8449" strokeWidth="2" strokeLinecap="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a5276" strokeWidth="2" strokeLinecap="round">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontFamily: "'Instrument Serif', serif",
+                    fontSize: '22px', color: 'var(--navy)',
+                    marginBottom: '12px', lineHeight: 1.2,
+                  }}>
+                    {confirmModal === 'close' ? 'Close this claim?' : 'Reopen this claim?'}
+                  </h3>
+
+                  {/* Body */}
+                  {confirmModal === 'close' ? (
+                    <div style={{ fontSize: '14px', color: '#4a5568', lineHeight: 1.65, marginBottom: '8px' }}>
+                      <p style={{ marginBottom: '10px' }}>
+                        Before closing, please confirm the following:
+                      </p>
+                      <ul style={{ paddingLeft: '18px', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <li>The funds for this claim have been <strong style={{ color: 'var(--navy)' }}>successfully recovered</strong>.</li>
+                        <li>You are certain you want to mark this claim as <strong style={{ color: 'var(--navy)' }}>closed</strong>.</li>
+                      </ul>
+                      <div style={{
+                        background: '#fef9e7', border: '1px solid #f9e79f',
+                        borderRadius: '10px', padding: '10px 14px',
+                        fontSize: '13px', color: '#9a7d0a',
+                        display: 'flex', gap: '8px', alignItems: 'flex-start',
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        If this claim is reopened later, <strong>1 claim point</strong> will be deducted from your package balance.
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '14px', color: '#4a5568', lineHeight: 1.65, marginBottom: '8px' }}>
+                      <p style={{ marginBottom: '12px' }}>
+                        You are about to reopen this claim and set it back to <strong style={{ color: 'var(--navy)' }}>In Progress</strong>.
+                      </p>
+                      <div style={{
+                        background: '#fdf0ef', border: '1px solid #f1c0bc',
+                        borderRadius: '10px', padding: '10px 14px',
+                        fontSize: '13px', color: '#c0392b',
+                        display: 'flex', gap: '8px', alignItems: 'flex-start',
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        Reopening this claim will deduct <strong>1 claim point</strong> from your package balance. This cannot be undone.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Buttons */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
+                    <button
+                      onClick={() => setConfirmModal(null)}
+                      style={{
+                        flex: 1, padding: '11px 20px', borderRadius: '10px',
+                        border: '1px solid var(--border)', background: 'var(--cream)',
+                        color: 'var(--navy)', fontSize: '14px', fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmModal === 'close' ? handleClose : handleReopen}
+                      style={{
+                        flex: 1, padding: '11px 20px', borderRadius: '10px', border: 'none',
+                        background: confirmModal === 'close' ? '#27ae60' : '#2471a3',
+                        color: '#fff', fontSize: '14px', fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {confirmModal === 'close' ? 'Yes, close claim' : 'Yes, reopen claim'}
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

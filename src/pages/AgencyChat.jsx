@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { getAgencyChatRooms, getAgencyChatMessages, sendAgencyMessage } from '../api/auth';
+import { getAgencyChatRooms, getAgencyChatMessages, sendAgencyMessage, BASE_URL } from '../api/auth';
 
 const fmt = (n) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n || 0);
@@ -123,7 +123,7 @@ export default function AgencyChat() {
         form.append('file', file);
         if (text) form.append('text', text);
         // Call your upload endpoint — adjust the function/import to match your api/auth setup
-        const r = await fetch(`https://debtbackend.vercel.app/api/chat/agency/${activeRoom._id}/upload`, {
+        const r = await fetch(`${BASE_URL}/chat/agency/${activeRoom._id}/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${localStorage.getItem('agencyToken')}` },
           body: form,

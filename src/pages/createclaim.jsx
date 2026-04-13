@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createClaim } from '../api/auth';
+import { BASE_URL, createClaim } from '../api/auth';
 
 export default function CreateClaim() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function CreateClaim() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    fetch('https://debtbackend.vercel.app/api/auth/getUser', {
+    fetch(`${BASE_URL}/auth/getUser`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.json())

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getClaimById } from '../api/auth';
+import { BASE_URL, getClaimById } from '../api/auth';
 
 
 const STATUS_META = {
@@ -84,7 +84,7 @@ const handleSave = async () => {
     setSaveError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}`, {
+      const res = await fetch(`${BASE_URL}/claims/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -589,7 +589,7 @@ const handleSave = async () => {
           <button
             onClick={async () => {
               const token = localStorage.getItem('token');
-              const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}/documents/${doc._id}`, {
+              const res = await fetch(`${BASE_URL}/claims/${id}/documents/${doc._id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
               });
@@ -652,7 +652,7 @@ const handleSave = async () => {
           const formData = new FormData();
           files.forEach(f => formData.append('documents', f));
           const token = localStorage.getItem('token');
-          const res = await fetch(`https://debtbackend.vercel.app/api/claims/${id}/documents`, {
+          const res = await fetch(`${BASE_URL}/claims/${id}/documents`, {
             method: 'POST',
             headers: { Authorization: `Bearer ${token}` },
             body: formData,
