@@ -428,7 +428,7 @@ export default function Login() {
                 <div className="field">
                   <div className="field-meta">
                     <label htmlFor="password">Password</label>
-                    <a href="#" className="forgot-link">Forgot password?</a>
+                    <a href="/reset" className="forgot-link">Forgot password?</a>
                   </div>
                   <div className="field-input-wrap">
                     <input

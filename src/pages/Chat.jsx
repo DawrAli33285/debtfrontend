@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getChatRooms, getChatMessages, sendMessage, BASE_URL } from '../api/auth';
-
+import { useSocket } from '../components/usesocket'
 const fmt = (n) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n || 0);
 
 const fmtTime = (d) =>
   d ? new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+
+
 
 const fmtDate = (d) => {
   if (!d) return '';
@@ -29,6 +31,17 @@ const STATUS_STYLES = {
   submitted:   { color: '#6b7280', bg: '#f3f4f6', label: 'Submitted' },
 };
 
+const getIdFromToken = (tokenKey) => {
+  const token = localStorage.getItem(tokenKey);
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id || payload._id || payload.userId || payload.agencyId;
+  } catch {
+    return null;
+  }
+};
+
 export default function Chat() {
   const [rooms, setRooms]                     = useState([]);
   const [activeRoom, setActiveRoom]           = useState(null);
@@ -42,6 +55,23 @@ export default function Chat() {
   const [error, setError]                     = useState('');
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
+  const currentUserId = getIdFromToken('token');
+
+  const { sendSocketMessage } = useSocket(
+    activeRoom?._id,
+    (msg) => {
+    
+      setMessages(prev => {
+        const exists = prev.some(m => m._id === msg._id);
+        return exists ? prev : [...prev, msg];
+      });
+      setRooms(prev => prev.map(r =>
+        r._id === msg.room_id
+          ? { ...r, last_message: { text: msg.text || '📎 File', created_at: msg.created_at } }
+          : r
+      ));
+    }
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -109,16 +139,14 @@ export default function Chat() {
     const file = pendingFile;
     setPendingFile(null);
   
-    const optimisticId = `opt_${Date.now()}`;
-    const optimistic = {
-      _id: optimisticId, sender: 'user', text, created_at: new Date(),
-      attachment: file ? { original_name: file.name, url: null } : undefined,
-    };
-    setMessages(prev => [...prev, optimistic]);
-  
-    try {
-      let res;
-      if (file) {
+    if (file) {
+      // File uploads still go through REST (socket handles the broadcast on the backend)
+      const optimisticId = `opt_${Date.now()}`;
+      setMessages(prev => [...prev, {
+        _id: optimisticId, sender: 'user', text, created_at: new Date(),
+        attachment: { original_name: file.name, url: null },
+      }]);
+      try {
         const form = new FormData();
         form.append('file', file);
         if (text) form.append('text', text);
@@ -127,30 +155,27 @@ export default function Chat() {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           body: form,
         });
-        res = await r.json();
-      } else {
-        res = await sendMessage(activeRoom._id, text);
+        const res = await r.json();
+        if (res.message) {
+          // Replace optimistic with real (socket will also fire — dedupe handles it)
+          setMessages(prev => prev.filter(m => m._id !== optimisticId));
+        }
+      } catch {
+        setMessages(prev => prev.filter(m => m._id !== optimisticId));
+        setError('Failed to send file.');
       }
-  
-      if (res.message) {
-        setMessages(prev => prev.map(m =>
-          m._id === optimisticId
-            ? { ...res.message, sender: res.message.sender_type, created_at: res.message.createdAt }
-            : m
-        ));
-        setRooms(prev => prev.map(r =>
-          r._id === activeRoom._id
-            ? { ...r, last_message: { text: text || `📎 ${file?.name}`, created_at: new Date() } }
-            : r
-        ));
-      }
-    } catch {
-      setMessages(prev => prev.filter(m => m._id !== optimisticId));
-      setError('Failed to send message.');
+    } else {
+      // ✅ Use socket instead of REST for text messages
+      sendSocketMessage({
+        roomId:     activeRoom._id,
+        text,
+        senderId:   currentUserId,
+        senderType: 'user',
+      });
     }
+  
     setSending(false);
   };
-
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }

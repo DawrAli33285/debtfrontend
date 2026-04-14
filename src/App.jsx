@@ -27,6 +27,8 @@ import SuperAdminReset from './pages/AdminReset';
 import AdminDashboard from './pages/AdminDashboard';
 import UserManagement from './pages/AdminUserManagement';
 import AgencyManagement from './pages/AdminAgencyManagement';
+import ResetPassword from './pages/reset';
+import AgencyResetPassword from './pages/AgencyReset';
 
 const stripePromise = loadStripe("pk_test_51SRynCPBwgTANTk6OM3ADMEkOYuyTGcfBfz92xAXVsLmm8O6tH7dCVgcwhG4rmi5OH3URGSa6faVFD2WYbI7E8oA00drLGc9l6");
 
@@ -51,6 +53,7 @@ export default function App() {
                 <Route path="/" element={<Navigate to="/login" />} />
                 <Route path="/register"          element={<Register />} />
                 <Route path="/login"             element={<Login />} />
+                <Route path='/reset' element={<ResetPassword/>}/>
                 <Route path="/business-plans"    element={<SubscriptionPlans />} />
                 <Route path="/dashboard"         element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                 <Route path="/claims/create"     element={<PrivateRoute><CreateClaim /></PrivateRoute>} />
@@ -61,6 +64,7 @@ export default function App() {
                 <Route path="/agencies/select"   element={<AgencySelection />} />
                 <Route path="/assignments/confirm" element={<AssignmentConfirmation />} />
                 <Route path="/agency/register"   element={<AgencyRegister />} />
+              <Route path='/agency/reset' element={<AgencyResetPassword/>}/>
                 <Route path="/agency/login"      element={<AgencyLogin />} />
                 <Route path="/chat"              element={<Chat />} />
                 <Route path="/agency/chat"       element={<AgencyChat />} />

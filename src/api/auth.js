@@ -1,5 +1,7 @@
 export const BASE_URL = 'https://debtbackend.vercel.app/api';
 // export const BASE_URL = 'http://localhost:5000/api';
+// export const SOCKET_BASE_URL = 'http://localhost:5000';
+export const SOCKET_BASE_URL = 'https://debtbackend.vercel.app';
 const getToken = () => localStorage.getItem('token');
 const getAgencyToken = () => localStorage.getItem('agencyToken');
 

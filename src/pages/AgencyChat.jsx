@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAgencyChatRooms, getAgencyChatMessages, sendAgencyMessage, BASE_URL } from '../api/auth';
+import { useSocket } from '../components/usesocket';
 
 const fmt = (n) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n || 0);
@@ -29,6 +30,18 @@ const STATUS_STYLES = {
   submitted:   { color: '#6b7280', bg: '#f3f4f6', label: 'Submitted' },
 };
 
+
+const getIdFromToken = (tokenKey) => {
+  const token = localStorage.getItem(tokenKey);
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id || payload._id || payload.userId || payload.agencyId;
+  } catch {
+    return null;
+  }
+};
+
 export default function AgencyChat() {
   const [rooms, setRooms]                     = useState([]);
   const [activeRoom, setActiveRoom]           = useState(null);
@@ -43,6 +56,24 @@ export default function AgencyChat() {
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
 
+
+  const currentAgencyId = getIdFromToken('agencyToken');
+
+
+  const { sendSocketMessage } = useSocket(
+    activeRoom?._id,
+    (msg) => {
+      setMessages(prev => {
+        const exists = prev.some(m => m._id === msg._id);
+        return exists ? prev : [...prev, msg];
+      });
+      setRooms(prev => prev.map(r =>
+        r._id === msg.room_id
+          ? { ...r, last_message: { text: msg.text || '📎 File', created_at: msg.created_at } }
+          : r
+      ));
+    }
+  );
   useEffect(() => {
     const load = async () => {
       setLoadingRooms(true);
@@ -108,47 +139,41 @@ export default function AgencyChat() {
     const file = pendingFile;
     setPendingFile(null);
   
-    const optimisticId = `opt_${Date.now()}`;
-    const optimistic = {
-      _id: optimisticId, sender: 'agency', text,
-      created_at: new Date(),
-      attachment: file ? { original_name: file.name, url: null } : undefined,
-    };
-    setMessages(prev => [...prev, optimistic]);
-  
-    try {
-      let res;
-      if (file) {
+    if (file) {
+      // Files: REST only (backend emits socket after saving)
+      const optimisticId = `opt_${Date.now()}`;
+      setMessages(prev => [...prev, {
+        _id: optimisticId, sender: 'agency', text, created_at: new Date(),
+        attachment: { original_name: file.name, url: null },
+      }]);
+      try {
         const form = new FormData();
         form.append('file', file);
         if (text) form.append('text', text);
-        // Call your upload endpoint — adjust the function/import to match your api/auth setup
         const r = await fetch(`${BASE_URL}/chat/agency/${activeRoom._id}/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${localStorage.getItem('agencyToken')}` },
           body: form,
         });
-        res = await r.json();
-      } else {
-        res = await sendAgencyMessage(activeRoom._id, text);
+        const res = await r.json();
+        if (res.message) {
+          // Remove optimistic — socket broadcast will add the real message
+          setMessages(prev => prev.filter(m => m._id !== optimisticId));
+        }
+      } catch {
+        setMessages(prev => prev.filter(m => m._id !== optimisticId));
+        setError('Failed to send file.');
       }
-  
-      if (res.message) {
-        setMessages(prev => prev.map(m =>
-          m._id === optimisticId
-            ? { ...res.message, sender: res.message.sender_type, created_at: res.message.createdAt }
-            : m
-        ));
-        setRooms(prev => prev.map(r =>
-          r._id === activeRoom._id
-            ? { ...r, last_message: { text: text || `📎 ${file?.name}`, created_at: new Date() } }
-            : r
-        ));
-      }
-    } catch {
-      setMessages(prev => prev.filter(m => m._id !== optimisticId));
-      setError('Failed to send.');
+    } else {
+      
+      sendSocketMessage({
+        roomId:     activeRoom._id,
+        text,
+        senderId:   currentAgencyId,
+        senderType: 'agency',
+      });
     }
+  
     setSending(false);
   };
   

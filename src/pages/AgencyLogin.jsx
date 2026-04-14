@@ -414,7 +414,9 @@ export default function AgencyLogin() {
                 </div>
 
                 <div className="forgot-row">
-                  <button type="button" className="forgot-link">
+                  <button onClick={()=>{
+                    navigate('/agency/reset')
+                  }} type="button" className="forgot-link">
                     Forgot password?
                   </button>
                 </div>
