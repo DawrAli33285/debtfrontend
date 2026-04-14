@@ -9,6 +9,7 @@ export default function Register() {
     contact_name: '',
     email: '',
     password: '',
+    ein: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -398,6 +399,8 @@ export default function Register() {
                       placeholder="Acme Corp"
                     />
                   </div>
+
+                  
                   <div className="field">
                     <label htmlFor="contact_name">Contact Name</label>
                     <input
@@ -412,6 +415,20 @@ export default function Register() {
                   </div>
                 </div>
 
+
+                <div className="field">
+  <label htmlFor="ein">Business EIN</label>
+  <input
+    id="ein"
+    type="text"
+    name="ein"
+    value={form.ein}
+    onChange={handleChange}
+    required
+    placeholder="XX-XXXXXXX"
+    maxLength={10}
+  />
+</div>
                 <div className="field">
                   <label htmlFor="email">Email Address</label>
                   <input

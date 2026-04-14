@@ -33,6 +33,7 @@ export default function AgencyRegister() {
     agency_name:    '',
     fee_percentage: '',
     states_covered: [],
+    ein:            '',
     specialties:    [],
   });
 
@@ -80,6 +81,7 @@ export default function AgencyRegister() {
     setLoading(true);
     const res = await registerAgency({
       agency_name:    agency.agency_name.trim(),
+      ein:            agency.ein.trim(),
       fee_percentage: parseFloat(agency.fee_percentage) || 0,
       states_covered: agency.states_covered,
       specialties:    agency.specialties,
@@ -542,6 +544,20 @@ export default function AgencyRegister() {
                       <p className="field-hint">Your standard contingency rate (can be updated later)</p>
                     </div>
 
+
+                    <div className="field">
+  <label htmlFor="ein">Business EIN</label>
+  <input
+    id="ein"
+    type="text"
+    value={agency.ein}
+    onChange={e => setAgency({...agency, ein: e.target.value})}
+    required
+    placeholder="XX-XXXXXXX"
+    maxLength={10}
+  />
+  <p className="field-hint">Your IRS-issued Employer Identification Number</p>
+</div>
                     {/* Specialties */}
                     <div>
                       <p className="tag-label">Specialties</p>
