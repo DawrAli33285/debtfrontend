@@ -146,7 +146,7 @@ if(e?.response?.data?.error){
           <div className="bg-gradient-to-r from-purple-600 to-purple-800 px-8 py-10 text-center">
           <div className="flex justify-center mb-6">
       <img
-           src="/logo.jpeg"
+           src="/logo.jpg"
         alt="Company Logo"
         className="w-24 h-24 rounded-full shadow-md object-cover ring-4 ring-white bg-white"
       />

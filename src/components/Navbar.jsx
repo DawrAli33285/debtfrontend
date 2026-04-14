@@ -5,7 +5,7 @@ export default function Navbar() {
     <nav className="bg-white shadow-md px-6 py-4 flex items-center">
     <Link to="/">
       <img
-        src="/logo.jpeg"
+        src="/logo.jpg"
         alt="Logo"
         className="h-32 w-auto object-contain"
       />
