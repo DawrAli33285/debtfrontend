@@ -5,7 +5,10 @@ import { BASE_URL } from '../api/auth';
 export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState(null);
-  const [formData, setFormData] = useState({ email: '', password: '', business_name: '', contact_name: '' });
+  const [formData, setFormData] = useState({
+    email: '', password: '', business_name: '', contact_name: '', subscription_plan: ''
+  });
+  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,13 +39,14 @@ export default function UserManagement() {
   );
 
   const handleEdit = (user) => {
-      setSearchTerm('');  
+    setSearchTerm('');
     setEditingUser(user._id);
     setFormData({
       email: user.email || '',
       password: '',
       business_name: user.business_name || '',
       contact_name: user.contact_name || '',
+      subscription_plan: user.subscription_plan || 'starter', // ✅ pre-fill
     });
   };
 
@@ -52,24 +56,22 @@ export default function UserManagement() {
         email: formData.email,
         business_name: formData.business_name,
         contact_name: formData.contact_name,
+        subscription_plan: formData.subscription_plan, // ✅ send plan
       };
-      if (formData.password) {
-        updateData.password = formData.password;
-      }
-
+      if (formData.password) updateData.password = formData.password;
+  
       const response = await fetch(`${BASE_URL}/admin/updateUser/${editingUser}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
       });
-
-      const data = await response.json();
+  
+      await response.json();
       setUsers(users.map(u => u._id === editingUser ? { ...u, ...updateData } : u));
       setEditingUser(null);
-      setFormData({ email: '', password: '', business_name: '', contact_name: '' });
+      setFormData({ email: '', password: '', business_name: '', contact_name: '', subscription_plan: '' });
       alert('User updated successfully');
     } catch (e) {
-      console.error('Error updating user:', e);
       alert('Failed to update user. Please try again.');
     }
   };
@@ -237,11 +239,24 @@ export default function UserManagement() {
                         </td>
 
                         {/* Plan */}
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${planBadgeColor(user.subscription_plan)}`}>
-                            {user.subscription_plan || 'starter'}
-                          </span>
-                        </td>
+                     {/* 3. Replace the Plan <td> */}
+<td className="px-6 py-4">
+  {editingUser === user._id ? (
+    <select
+      value={formData.subscription_plan}
+      onChange={(e) => setFormData({ ...formData, subscription_plan: e.target.value })}
+      className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="starter">Starter (3/mo)</option>
+      <option value="growth">Growth (10/mo)</option>
+      <option value="unlimited">Unlimited</option>
+    </select>
+  ) : (
+    <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${planBadgeColor(user.subscription_plan)}`}>
+      {user.subscription_plan || 'starter'}
+    </span>
+  )}
+</td>
 
                         {/* Joined */}
                         <td className="px-6 py-4">

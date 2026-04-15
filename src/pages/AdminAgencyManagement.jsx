@@ -5,7 +5,10 @@ import { BASE_URL } from '../api/auth';
 export default function AgencyManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingAgency, setEditingAgency] = useState(null);
-  const [formData, setFormData] = useState({ name: '', contact_email: '', contact_phone: '', password: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', contact_email: '', contact_phone: '', password: '', plan_type: '' 
+  });
+
   const [agencies, setAgencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,30 +40,34 @@ export default function AgencyManagement() {
     setSearchTerm('');
     setEditingAgency(agency._id);
     setFormData({
-        name: agency.name || '',
-        contact_email: agency.contact_email || '',
-        contact_phone: agency.contact_phone || '',
-        password: '',
-      });
+      name: agency.name || '',
+      contact_email: agency.contact_email || '',
+      contact_phone: agency.contact_phone || '',
+      password: '',
+      plan_type: agency.plan_type || 'starter', // ✅
+    });
   };
+
 
   const handleSave = async () => {
     try {
-        const updateData = {
-            name: formData.name,
-            contact_email: formData.contact_email,
-            contact_phone: formData.contact_phone,
-          };
-          if (formData.password) updateData.password = formData.password;
-    
-          const response = await fetch(`${BASE_URL}/admin/updateAgency/${editingAgency}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updateData),
-          });
-      const data = await response.json();
-      setAgencies(agencies.map(a => a._id === editingAgency ? { ...a, ...formData } : a));
+      const updateData = {
+        name: formData.name,
+        contact_email: formData.contact_email,
+        contact_phone: formData.contact_phone,
+        plan_type: formData.plan_type, // ✅
+      };
+      if (formData.password) updateData.password = formData.password;
+  
+      await fetch(`${BASE_URL}/admin/updateAgency/${editingAgency}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      });
+  
+      setAgencies(agencies.map(a => a._id === editingAgency ? { ...a, ...updateData } : a));
       setEditingAgency(null);
+      setFormData({ name: '', contact_email: '', contact_phone: '', password: '', plan_type: '' });
       alert('Agency updated successfully');
     } catch (e) {
       alert('Failed to update agency. Please try again.');
@@ -141,7 +148,8 @@ export default function AgencyManagement() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Password</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Joined</th>
-
+{/* 4. Add Plan column to <thead> — after Joined, before Actions */}
+<th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Plan</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
@@ -233,6 +241,28 @@ export default function AgencyManagement() {
                             <span className="text-sm">{formatDate(agency.createdAt)}</span>
                           </div>
                         </td>
+
+
+
+{/* 5. Add Plan <td> in each row — after Joined td, before Actions td */}
+<td className="px-6 py-4">
+  {editingAgency === agency._id ? (
+    <select
+      value={formData.plan_type}
+      onChange={(e) => setFormData({ ...formData, plan_type: e.target.value })}
+      className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="starter">Starter (25/mo)</option>
+      <option value="growth">Growth (100/mo)</option>
+      <option value="professional">Professional (500/mo)</option>
+      <option value="enterprise">Enterprise (Unlimited)</option>
+    </select>
+  ) : (
+    <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${planBadgeColor(agency.plan_type)}`}>
+      {agency.plan_type || 'starter'}
+    </span>
+  )}
+</td>
 
                         {/* Actions */}
                         <td className="px-6 py-4">
