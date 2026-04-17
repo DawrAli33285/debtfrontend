@@ -20,6 +20,7 @@ export default function CreateClaim() {
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [usageInfo, setUsageInfo] = useState(null);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -63,33 +64,33 @@ export default function CreateClaim() {
       .catch(() => {});
   }, []);
 
-
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
-        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--off-white); color: var(--text); }
 
         /* ── NAVBAR ── */
         .navbar {
-          background: var(--navy);
-          border-bottom: 1px solid rgba(201,168,76,0.15);
+          background: var(--blue);
+          border-bottom: 1px solid rgba(255,255,255,0.12);
           padding: 0 40px;
           height: 64px;
           display: flex;
@@ -104,8 +105,8 @@ export default function CreateClaim() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
@@ -115,37 +116,38 @@ export default function CreateClaim() {
         }
         .logo-mark {
           width: 32px; height: 32px;
-          border: 1.5px solid var(--gold);
-          border-radius: 7px;
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
+          border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
         .logo-text {
           font-family: 'Instrument Serif', serif;
-          font-size: 16px; color: #fff; letter-spacing: 0.01em;
+          font-size: 17px; color: #fff; letter-spacing: 0.01em;
         }
         .back-link {
           position: relative; z-index: 1;
           display: inline-flex; align-items: center; gap: 7px;
           font-size: 13px; font-weight: 500;
-          color: rgba(255,255,255,0.5);
+          color: rgba(255,255,255,0.65);
           text-decoration: none;
-          border: 1px solid rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
           border-radius: 8px;
           padding: 7px 14px;
-          transition: color 0.15s, border-color 0.15s;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .back-link:hover { color: #fff; border-color: rgba(255,255,255,0.28); }
+        .back-link:hover { color: #fff; border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); }
 
         /* ── PAGE ── */
         .page {
           max-width: 720px;
           margin: 0 auto;
           padding: 48px 32px 80px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @media (max-width: 600px) {
@@ -154,42 +156,38 @@ export default function CreateClaim() {
         }
 
         /* ── PAGE HEADER ── */
-        .page-header {
-          margin-bottom: 36px;
-        }
+        .page-header { margin-bottom: 32px; }
         .page-eyebrow {
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: var(--gold-d); margin-bottom: 6px;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.12em; text-transform: uppercase;
+          color: var(--blue); margin-bottom: 6px;
         }
         .page-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 34px; color: var(--navy); line-height: 1.1;
+          font-size: 28px; font-weight: 700;
+          color: var(--text); line-height: 1.15;
+          margin-bottom: 4px;
         }
-        .page-title em { color: var(--gold); font-style: italic; }
-        .header-divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 40px; margin: 12px 0 8px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue);
+          border-radius: 2px;
+          margin: 14px 0 10px;
         }
-        .page-sub {
-          font-size: 13px; color: var(--muted);
-        }
+        .page-sub { font-size: 13.5px; color: var(--text-muted); }
 
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
 
         .section-card {
           background: var(--white);
-          border-radius: 18px;
+          border-radius: 12px;
           border: 1px solid var(--border);
           overflow: hidden;
-          box-shadow: 0 2px 16px rgba(15,31,61,0.045);
         }
 
         .section-head {
-          background: var(--navy);
-          padding: 16px 24px;
+          background: var(--blue);
+          padding: 14px 24px;
           display: flex; align-items: center; gap: 12px;
           position: relative; overflow: hidden;
         }
@@ -197,23 +195,24 @@ export default function CreateClaim() {
           content: '';
           position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 32px 32px;
           pointer-events: none;
         }
         .section-icon {
-          width: 30px; height: 30px;
-          border: 1px solid rgba(201,168,76,0.3);
-          border-radius: 8px;
+          width: 28px; height: 28px;
+          background: rgba(255,255,255,0.15);
+          border: 1px solid rgba(255,255,255,0.25);
+          border-radius: 7px;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
           position: relative; z-index: 1;
         }
         .section-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 17px; color: #fff;
+          font-size: 14px; font-weight: 600; color: #fff;
           position: relative; z-index: 1;
+          letter-spacing: 0.01em;
         }
 
         .section-body {
@@ -230,43 +229,35 @@ export default function CreateClaim() {
         .field-item { display: flex; flex-direction: column; gap: 6px; }
 
         .field-label {
-          font-size: 10.5px; font-weight: 600;
+          font-size: 11px; font-weight: 700;
           letter-spacing: 0.09em; text-transform: uppercase;
-          color: var(--muted);
+          color: var(--text-muted);
         }
 
         .field-input,
         .field-select,
         .field-textarea {
-          font-family: 'DM Sans', sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           font-size: 14px;
-          font-weight: 500;
-          color: var(--navy);
-          background: var(--cream);
-          border: 1px solid var(--border);
-          border-radius: 10px;
+          color: var(--text);
+          background: var(--white);
+          border: 1.5px solid var(--border);
+          border-radius: 8px;
           padding: 10px 14px;
           width: 100%;
-          transition: border-color 0.15s, box-shadow 0.15s;
+          transition: border-color 0.18s, box-shadow 0.18s;
           outline: none;
           appearance: none;
         }
         .field-input::placeholder,
-        .field-textarea::placeholder {
-          color: var(--muted);
-          font-weight: 400;
-        }
+        .field-textarea::placeholder { color: #bbb; }
         .field-input:focus,
         .field-select:focus,
         .field-textarea:focus {
-          border-color: var(--gold);
-          box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
-          background: var(--white);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
-        .field-textarea {
-          resize: none;
-          line-height: 1.6;
-        }
+        .field-textarea { resize: none; line-height: 1.6; }
 
         /* Custom select arrow */
         .select-wrap { position: relative; }
@@ -278,36 +269,31 @@ export default function CreateClaim() {
           width: 0; height: 0;
           border-left: 4px solid transparent;
           border-right: 4px solid transparent;
-          border-top: 5px solid var(--muted);
+          border-top: 5px solid var(--text-muted);
           pointer-events: none;
         }
 
         /* Debtor type toggle */
-        .type-toggle {
-          display: flex;
-          gap: 8px;
-        }
+        .type-toggle { display: flex; gap: 8px; }
         .type-btn {
           flex: 1;
           padding: 9px 12px;
-          border-radius: 10px;
-          border: 1px solid var(--border);
-          background: var(--cream);
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--muted);
+          border-radius: 8px;
+          border: 1.5px solid var(--border);
+          background: var(--white);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 13px; font-weight: 500;
+          color: var(--text-muted);
           cursor: pointer;
           transition: all 0.15s;
           display: flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .type-btn:hover { border-color: var(--gold-d); color: var(--navy); }
+        .type-btn:hover { border-color: var(--blue); color: var(--text); }
         .type-btn.active {
-          background: var(--navy);
-          border-color: var(--navy);
+          background: var(--blue);
+          border-color: var(--blue);
           color: #fff;
         }
-        .type-btn.active svg { stroke: var(--gold); }
 
         /* Amount field */
         .amount-wrap { position: relative; }
@@ -315,28 +301,64 @@ export default function CreateClaim() {
           position: absolute;
           left: 14px; top: 50%;
           transform: translateY(-50%);
-          font-family: 'Instrument Serif', serif;
-          font-size: 16px; color: var(--gold-d);
+          font-size: 15px; color: var(--blue);
+          font-weight: 600;
           pointer-events: none;
         }
         .amount-input { padding-left: 26px !important; }
+
+        /* ── USAGE BANNER ── */
+        .usage-banner {
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 16px 20px;
+          margin-bottom: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+        .usage-banner.blocked {
+          background: #fdf0ef;
+          border-color: #f1c0bc;
+        }
+        .usage-banner.warning {
+          border-color: #f9e79f;
+        }
+        .usage-icon {
+          width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .usage-title {
+          font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px;
+        }
+        .usage-sub { font-size: 11.5px; color: var(--text-muted); }
+        .usage-bar-track {
+          height: 5px; border-radius: 99px;
+          background: var(--border); overflow: hidden; width: 100px;
+        }
+        .usage-bar-fill {
+          height: 100%; border-radius: 99px;
+          transition: width 0.4s ease;
+        }
+        .usage-pct { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right; }
 
         /* ── LEGAL CONFIRM ── */
         .legal-wrap {
           display: flex; align-items: flex-start; gap: 12px;
           padding: 18px 24px;
-          background: #f8f7f3;
+          background: var(--off-white);
           border-top: 1px solid var(--border);
         }
         .legal-checkbox {
-          width: 16px; height: 16px;
+          width: 15px; height: 15px;
           flex-shrink: 0; margin-top: 2px;
-          accent-color: var(--gold-d);
+          accent-color: var(--blue);
           cursor: pointer;
         }
-        .legal-text {
-          font-size: 12px; color: var(--muted); line-height: 1.6;
-        }
+        .legal-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
 
         /* ── SUBMIT BUTTON ── */
         .submit-wrap {
@@ -346,32 +368,21 @@ export default function CreateClaim() {
         }
         .submit-btn {
           width: 100%;
-          background: var(--navy);
+          background: var(--blue);
           color: #fff;
-          font-family: 'DM Sans', sans-serif;
+          font-family: inherit;
           font-size: 14px; font-weight: 600;
           letter-spacing: 0.03em;
           border: none;
-          border-radius: 12px;
-          padding: 14px 24px;
+          border-radius: 8px;
+          padding: 13px 24px;
           cursor: pointer;
-          transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+          transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          position: relative;
-          overflow: hidden;
         }
-        .submit-btn::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, transparent 60%);
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-        .submit-btn:hover:not(:disabled)::before { opacity: 1; }
         .submit-btn:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 20px rgba(15,31,61,0.25);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0); }
@@ -380,7 +391,7 @@ export default function CreateClaim() {
         .btn-shimmer {
           display: inline-block;
           width: 14px; height: 14px;
-          border: 2px solid rgba(255,255,255,0.3);
+          border: 2px solid rgba(255,255,255,0.35);
           border-top-color: #fff;
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
@@ -394,8 +405,8 @@ export default function CreateClaim() {
           border: 1px solid #f1c0bc;
           color: var(--error);
           font-size: 13px;
-          padding: 12px 16px;
-          border-radius: 12px;
+          padding: 10px 14px;
+          border-radius: 8px;
           display: flex; align-items: center; gap: 8px;
           margin-bottom: 24px;
         }
@@ -409,79 +420,57 @@ export default function CreateClaim() {
           gap: 6px;
           padding: 28px 20px;
           border: 1.5px dashed var(--border);
-          border-radius: 12px;
-          background: var(--cream);
+          border-radius: 8px;
+          background: var(--off-white);
           cursor: pointer;
           transition: border-color 0.15s, background 0.15s;
           text-align: center;
         }
         .upload-zone:hover {
-          border-color: var(--gold);
-          background: #fdf9f0;
+          border-color: var(--blue);
+          background: var(--blue-light);
         }
-        .upload-label {
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--navy);
-        }
-        .upload-sub {
-          font-size: 11px;
-          color: var(--muted);
-        }
+        .upload-label { font-size: 13px; font-weight: 500; color: var(--text); }
+        .upload-sub { font-size: 11px; color: var(--text-muted); }
 
         /* ── FILE LIST ── */
         .file-list {
           list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
+          display: flex; flex-direction: column; gap: 6px;
           margin-top: 8px;
         }
         .file-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
+          display: flex; align-items: center; gap: 8px;
           background: var(--white);
           border: 1px solid var(--border);
           border-radius: 8px;
-          padding: 8px 12px;
-          font-size: 12px;
+          padding: 8px 12px; font-size: 12px;
         }
         .file-name {
-          flex: 1;
-          color: var(--navy);
-          font-weight: 500;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          flex: 1; color: var(--text); font-weight: 500;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .file-size { color: var(--muted); flex-shrink: 0; }
+        .file-size { color: var(--text-muted); flex-shrink: 0; }
         .file-remove {
-          background: none;
-          border: none;
-          color: var(--muted);
-          font-size: 16px;
-          line-height: 1;
-          cursor: pointer;
-          padding: 0 2px;
-          flex-shrink: 0;
+          background: none; border: none; color: var(--text-muted);
+          font-size: 16px; line-height: 1; cursor: pointer;
+          padding: 0 2px; flex-shrink: 0;
         }
         .file-remove:hover { color: var(--error); }
 
-
         /* ── FOOTER ── */
         .footer-note {
-          text-align: center;
-          margin-top: 40px;
-          font-size: 11.5px;
-          color: #bbb;
-          line-height: 1.6;
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+          margin-top: 36px;
+          padding-top: 24px;
+          border-top: 1px solid var(--border);
+          font-size: 11.5px; color: #bbb; line-height: 1.6; text-align: center;
         }
       `}</style>
 
       {/* NAVBAR */}
       <nav className="navbar">
-      
+     
         <Link to="/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
@@ -504,105 +493,83 @@ export default function CreateClaim() {
           </div>
         )}
 
-{/* CLAIMS USAGE BANNER */}
-{usageInfo && (() => {
-  const isUnlimited = usageInfo.limit >= 999999;
-  const remaining   = isUnlimited ? Infinity : usageInfo.limit - usageInfo.used;
-  const pct         = isUnlimited ? 0 : Math.min((usageInfo.used / usageInfo.limit) * 100, 100);
-  const isWarning   = !isUnlimited && remaining <= 1;
-  const isBlocked   = !isUnlimited && remaining <= 0;
+        {/* USAGE BANNER */}
+        {usageInfo && (() => {
+          const isUnlimited = usageInfo.limit >= 999999;
+          const remaining   = isUnlimited ? Infinity : usageInfo.limit - usageInfo.used;
+          const pct         = isUnlimited ? 0 : Math.min((usageInfo.used / usageInfo.limit) * 100, 100);
+          const isWarning   = !isUnlimited && remaining <= 1;
+          const isBlocked   = !isUnlimited && remaining <= 0;
+          const planLabel   = usageInfo.plan.charAt(0).toUpperCase() + usageInfo.plan.slice(1);
 
-  return (
-    <div style={{
-      background: isBlocked ? '#fdf0ef' : '#fff',
-      border: `1px solid ${isBlocked ? '#f1c0bc' : isWarning ? '#f9e79f' : '#e4e2dd'}`,
-      borderRadius: '14px',
-      padding: '16px 20px',
-      marginBottom: '24px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '16px',
-      flexWrap: 'wrap',
-      boxShadow: '0 2px 12px rgba(15,31,61,0.04)',
-    }}>
-      {/* Left: info */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '36px', height: '36px', borderRadius: '9px', flexShrink: 0,
-          background: isBlocked ? 'rgba(192,57,43,0.08)' : 'rgba(201,168,76,0.1)',
-          border: `1px solid ${isBlocked ? 'rgba(192,57,43,0.2)' : 'rgba(201,168,76,0.25)'}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke={isBlocked ? '#c0392b' : '#a8883a'} strokeWidth="1.8" strokeLinecap="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/>
-            <line x1="9" y1="15" x2="15" y2="15"/>
-          </svg>
-        </div>
-        <div>
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#0f1f3d', marginBottom: '2px' }}>
-            {isBlocked
-              ? 'Monthly claim limit reached'
-              : isUnlimited
-              ? 'Unlimited claims available'
-              : `${remaining} claim${remaining !== 1 ? 's' : ''} remaining this month`}
-          </p>
-          <p style={{ fontSize: '11.5px', color: '#8a95a3' }}>
-            {isUnlimited
-              ? `${usageInfo.plan.charAt(0).toUpperCase() + usageInfo.plan.slice(1)} Plan · Unlimited`
-              : `${usageInfo.used} used of ${usageInfo.limit} · ${usageInfo.plan.charAt(0).toUpperCase() + usageInfo.plan.slice(1)} Plan`}
-          </p>
-        </div>
-      </div>
+          return (
+            <div className={`usage-banner${isBlocked ? ' blocked' : isWarning ? ' warning' : ''}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="usage-icon" style={{
+                  background: isBlocked ? 'rgba(192,57,43,0.08)' : 'var(--blue-light)',
+                  border: `1px solid ${isBlocked ? 'rgba(192,57,43,0.2)' : 'var(--blue-mid)'}`,
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                    stroke={isBlocked ? '#c0392b' : '#1669A9'} strokeWidth="1.8" strokeLinecap="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="usage-title">
+                    {isBlocked
+                      ? 'Monthly claim limit reached'
+                      : isUnlimited
+                      ? 'Unlimited claims available'
+                      : `${remaining} claim${remaining !== 1 ? 's' : ''} remaining this month`}
+                  </p>
+                  <p className="usage-sub">
+                    {isUnlimited
+                      ? `${planLabel} Plan · Unlimited`
+                      : `${usageInfo.used} used of ${usageInfo.limit} · ${planLabel} Plan`}
+                  </p>
+                </div>
+              </div>
 
-      {/* Right: progress bar or upgrade */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-        {!isUnlimited && (
-          <div style={{ width: '100px' }}>
-            <div style={{
-              height: '5px', borderRadius: '99px',
-              background: '#e4e2dd', overflow: 'hidden',
-            }}>
-              <div style={{
-                height: '100%', borderRadius: '99px',
-                width: `${pct}%`,
-                background: isBlocked ? '#c0392b' : isWarning ? '#e67e22' : '#c9a84c',
-                transition: 'width 0.4s ease',
-              }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                {!isUnlimited && (
+                  <div>
+                    <div className="usage-bar-track">
+                      <div className="usage-bar-fill" style={{
+                        width: `${pct}%`,
+                        background: isBlocked ? '#c0392b' : isWarning ? '#e67e22' : '#1669A9',
+                      }} />
+                    </div>
+                    <p className="usage-pct">{Math.round(pct)}%</p>
+                  </div>
+                )}
+                {isBlocked && (
+                  <Link to="/business-plans" style={{
+                    background: 'var(--blue)', color: '#fff',
+                    fontSize: 12, fontWeight: 600,
+                    padding: '7px 14px', borderRadius: 8,
+                    textDecoration: 'none', whiteSpace: 'nowrap',
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                  }}>
+                    Upgrade Plan
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </Link>
+                )}
+              </div>
             </div>
-            <p style={{ fontSize: '10px', color: '#8a95a3', marginTop: '4px', textAlign: 'right' }}>
-              {Math.round(pct)}%
-            </p>
-          </div>
-        )}
-        {isBlocked && (
-          <Link to="/business-plans" style={{
-            background: '#0f1f3d', color: '#fff',
-            fontSize: '12px', fontWeight: 600,
-            padding: '7px 14px', borderRadius: '8px',
-            textDecoration: 'none', whiteSpace: 'nowrap',
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-          }}>
-            Upgrade Plan
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-})()}
+          );
+        })()}
 
         {/* PAGE HEADER */}
         <div className="page-header">
           <p className="page-eyebrow">New Claim</p>
-          <h1 className="page-title">Submit a <em>Claim</em></h1>
-          <div className="header-divider" />
-          <p className="page-sub">Fill in the details below to submit a claim for review</p>
+          <h1 className="page-title">Submit a claim</h1>
+          <div className="header-rule" />
+          <p className="page-sub">Fill in the details below to submit a claim for review.</p>
         </div>
 
         {/* DEBTOR INFORMATION */}
@@ -610,18 +577,17 @@ export default function CreateClaim() {
           <div className="section-card">
             <div className="section-head">
               <div className="section-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round">
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
               </div>
-              <h2 className="section-title">Debtor Information</h2>
+              <h2 className="section-title">Debtor information</h2>
             </div>
             <div className="section-body">
 
-              {/* Debtor Type */}
               <div className="field-item full-width">
-                <p className="field-label">Debtor Type</p>
+                <p className="field-label">Debtor type</p>
                 <div className="type-toggle">
                   <button
                     type="button"
@@ -648,61 +614,28 @@ export default function CreateClaim() {
                 </div>
               </div>
 
-              {/* Debtor Name */}
               <div className="field-item full-width">
-                <label className="field-label" htmlFor="debtor_name">Debtor Name</label>
-                <input
-                  id="debtor_name"
-                  type="text"
-                  name="debtor_name"
-                  value={form.debtor_name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Full name or business name"
-                  className="field-input"
-                />
+                <label className="field-label" htmlFor="debtor_name">Debtor name</label>
+                <input id="debtor_name" type="text" name="debtor_name" value={form.debtor_name}
+                  onChange={handleChange} required placeholder="Full name or business name" className="field-input" />
               </div>
 
-              {/* Email */}
               <div className="field-item">
                 <label className="field-label" htmlFor="debtor_email">Email</label>
-                <input
-                  id="debtor_email"
-                  type="email"
-                  name="debtor_email"
-                  value={form.debtor_email}
-                  onChange={handleChange}
-                  placeholder="debtor@email.com"
-                  className="field-input"
-                />
+                <input id="debtor_email" type="email" name="debtor_email" value={form.debtor_email}
+                  onChange={handleChange} placeholder="debtor@email.com" className="field-input" />
               </div>
 
-              {/* Phone */}
               <div className="field-item">
                 <label className="field-label" htmlFor="debtor_phone">Phone</label>
-                <input
-                  id="debtor_phone"
-                  type="tel"
-                  name="debtor_phone"
-                  value={form.debtor_phone}
-                  onChange={handleChange}
-                  placeholder="+1 234 567 8900"
-                  className="field-input"
-                />
+                <input id="debtor_phone" type="tel" name="debtor_phone" value={form.debtor_phone}
+                  onChange={handleChange} placeholder="+1 234 567 8900" className="field-input" />
               </div>
 
-              {/* Address */}
               <div className="field-item full-width">
                 <label className="field-label" htmlFor="debtor_address">Address</label>
-                <input
-                  id="debtor_address"
-                  type="text"
-                  name="debtor_address"
-                  value={form.debtor_address}
-                  onChange={handleChange}
-                  placeholder="123 Main St, City, State, ZIP"
-                  className="field-input"
-                />
+                <input id="debtor_address" type="text" name="debtor_address" value={form.debtor_address}
+                  onChange={handleChange} placeholder="123 Main St, City, State, ZIP" className="field-input" />
               </div>
 
             </div>
@@ -714,85 +647,56 @@ export default function CreateClaim() {
           <div className="section-card">
             <div className="section-head">
               <div className="section-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round">
                   <line x1="12" y1="1" x2="12" y2="23"/>
                   <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
                 </svg>
               </div>
-              <h2 className="section-title">Debt Information</h2>
+              <h2 className="section-title">Debt information</h2>
             </div>
             <div className="section-body">
 
-              {/* Amount */}
               <div className="field-item">
-                <label className="field-label" htmlFor="amount">Amount Owed</label>
+                <label className="field-label" htmlFor="amount">Amount owed</label>
                 <div className="amount-wrap">
                   <span className="amount-prefix">$</span>
-                  <input
-                    id="amount"
-                    type="number"
-                    name="amount"
-                    value={form.amount}
-                    onChange={handleChange}
-                    required
-                    placeholder="0.00"
-                    min="0"
-                    className="field-input amount-input"
-                  />
+                  <input id="amount" type="number" name="amount" value={form.amount}
+                    onChange={handleChange} required placeholder="0.00" min="0"
+                    className="field-input amount-input" />
                 </div>
               </div>
 
-           {/* Due Date */}
-           <div className="field-item">
-                <label className="field-label" htmlFor="due_date">Due Date</label>
-                <input
-                  id="due_date"
-                  type="date"
-                  name="due_date"
-                  value={form.due_date}
-                  onChange={handleChange}
-                  className="field-input"
-                />
+              <div className="field-item">
+                <label className="field-label" htmlFor="due_date">Due date</label>
+                <input id="due_date" type="date" name="due_date" value={form.due_date}
+                  onChange={handleChange} className="field-input" />
               </div>
 
-              {/* Past Due Period */}
               <div className="field-item">
-                <label className="field-label" htmlFor="past_due_period">Past Due Period</label>
+                <label className="field-label" htmlFor="past_due_period">Past due period</label>
                 <div className="select-wrap">
-                  <select
-                    id="past_due_period"
-                    name="past_due_period"
-                    value={form.past_due_period}
-                    onChange={handleChange}
-                    className="field-select"
-                  >
+                  <select id="past_due_period" name="past_due_period" value={form.past_due_period}
+                    onChange={handleChange} className="field-select">
                     <option value="">Select period…</option>
-                    <option value="3_months">3 Months</option>
-                    <option value="6_months">6 Months</option>
-                    <option value="8_months">8 Months</option>
+                    <option value="3_months">3 months</option>
+                    <option value="6_months">6 months</option>
+                    <option value="8_months">8 months</option>
                   </select>
                 </div>
               </div>
 
-              {/* Description */}
               <div className="field-item full-width">
                 <label className="field-label" htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  rows={4}
+                <textarea id="description" name="description" value={form.description}
+                  onChange={handleChange} rows={4}
                   placeholder="Describe the nature of the debt…"
-                  className="field-textarea"
-                />
+                  className="field-textarea" />
               </div>
 
-              {/* Document Upload */}
               <div className="field-item full-width">
-                <p className="field-label">Supporting Documents</p>
+                <p className="field-label">Supporting documents</p>
                 <label htmlFor="doc_upload" className="upload-zone">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.6" strokeLinecap="round">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1669A9" strokeWidth="1.6" strokeLinecap="round">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
@@ -803,30 +707,22 @@ export default function CreateClaim() {
                       : 'Click to upload or drag & drop'}
                   </span>
                   <span className="upload-sub">PDF, JPG, PNG, DOC — max 10 MB each, up to 5 files</span>
-                  <input
-                    id="doc_upload"
-                    type="file"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  <input id="doc_upload" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                     style={{ display: 'none' }}
-                    onChange={(e) => setFiles(Array.from(e.target.files).slice(0, 5))}
-                  />
+                    onChange={(e) => setFiles(Array.from(e.target.files).slice(0, 5))} />
                 </label>
                 {files.length > 0 && (
                   <ul className="file-list">
                     {files.map((f, i) => (
                       <li key={i} className="file-item">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2" strokeLinecap="round">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1669A9" strokeWidth="2" strokeLinecap="round">
                           <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
                           <polyline points="14 2 14 8 20 8"/>
                         </svg>
                         <span className="file-name">{f.name}</span>
                         <span className="file-size">{(f.size / 1024).toFixed(0)} KB</span>
-                        <button
-                          type="button"
-                          className="file-remove"
-                          onClick={() => setFiles(files.filter((_, j) => j !== i))}
-                        >×</button>
+                        <button type="button" className="file-remove"
+                          onClick={() => setFiles(files.filter((_, j) => j !== i))}>×</button>
                       </li>
                     ))}
                   </ul>
@@ -837,37 +733,23 @@ export default function CreateClaim() {
 
             {/* Legal confirmation */}
             <div className="legal-wrap">
-              <input
-                type="checkbox"
-                id="legal_confirm"
-                required
-                checked={confirmed}
-                onChange={(e) => setConfirmed(e.target.checked)}
-                className="legal-checkbox"
-              />
+              <input type="checkbox" id="legal_confirm" required checked={confirmed}
+                onChange={(e) => setConfirmed(e.target.checked)} className="legal-checkbox" />
               <label htmlFor="legal_confirm" className="legal-text">
                 I confirm that the information provided is accurate and that I am authorized
-                to submit this claim. I understand that Pasado will assign
-                this claim to a licensed collection agency and does not perform collection
-                activities directly.
+                to submit this claim. I understand that Collection Connector will assign this claim to a
+                licensed collection agency and does not perform collection activities directly.
               </label>
             </div>
 
             {/* Submit */}
             <div className="submit-wrap">
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !confirmed}
-                className="submit-btn"
-              >
+              <button onClick={handleSubmit} disabled={loading || !confirmed} className="submit-btn">
                 {loading ? (
-                  <>
-                    <span className="btn-shimmer" />
-                    Submitting Claim…
-                  </>
+                  <><span className="btn-shimmer" /> Submitting claim…</>
                 ) : (
                   <>
-                    Submit Claim for Review
+                    Submit claim for review
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12"/>
                       <polyline points="12 5 19 12 12 19"/>
@@ -880,11 +762,14 @@ export default function CreateClaim() {
           </div>
         </div>
 
-        <p className="footer-note">
+        <div className="footer-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
           We are a technology platform that connects businesses with independent, licensed
           collection agencies. We do not provide debt collection services, legal advice,
           or contact debtors on your behalf.
-        </p>
+        </div>
 
       </div>
     </>

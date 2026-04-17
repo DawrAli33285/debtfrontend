@@ -44,7 +44,6 @@ export default function AgencyResetPassword() {
     }
   };
 
-  // password strength
   const strength = (() => {
     const p = form.password;
     if (!p) return 0;
@@ -61,34 +60,37 @@ export default function AgencyResetPassword() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --error:  #c0392b;
-          --success:#1a7a4a;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
+          --success:    #1a7a4a;
         }
 
         .rp-root {
           min-height: 100vh;
           display: flex;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
         }
 
         /* ── Left panel ── */
         .rp-left {
           display: none;
           width: 42%;
-          background: var(--navy);
+          background: var(--blue);
           padding: 56px 52px;
           flex-direction: column;
           justify-content: space-between;
@@ -102,8 +104,8 @@ export default function AgencyResetPassword() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse 70% 55% at 80% 100%, rgba(201,168,76,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 10%,  rgba(201,168,76,0.07) 0%, transparent 65%);
+            radial-gradient(ellipse 70% 55% at 20% 100%, rgba(255,255,255,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 90% 10%,  rgba(255,255,255,0.05) 0%, transparent 65%);
           pointer-events: none;
         }
         .rp-left::after {
@@ -111,23 +113,24 @@ export default function AgencyResetPassword() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
 
         .left-brand { position: relative; z-index: 1; }
-
         .left-logo {
-          display: flex; align-items: center; gap: 10px; margin-bottom: 72px;
+          display: flex; align-items: center; gap: 10px; margin-bottom: 64px;
         }
         .logo-mark {
           width: 36px; height: 36px;
-          border: 1.5px solid var(--gold);
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
+        .logo-mark svg { width: 18px; height: 18px; }
         .logo-text {
           font-family: 'Instrument Serif', serif;
           font-size: 17px;
@@ -142,30 +145,56 @@ export default function AgencyResetPassword() {
           color: #fff;
           margin-bottom: 20px;
         }
-        .left-headline em { color: var(--gold-l); font-style: italic; }
+        .left-headline em { color: rgba(255,255,255,0.75); font-style: italic; }
+
         .left-sub {
-          font-size: 14px; line-height: 1.7;
-          color: rgba(255,255,255,0.5); font-weight: 300; max-width: 300px;
+          font-size: 14px;
+          line-height: 1.7;
+          color: rgba(255,255,255,0.55);
+          font-weight: 300;
+          max-width: 320px;
         }
 
-        /* steps */
+        /* Steps */
         .steps-list { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0; }
         .step-item {
           display: flex; align-items: flex-start; gap: 16px;
           padding: 18px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.07);
+          border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .step-item:last-child { border-bottom: none; }
         .step-num {
-          width: 28px; height: 28px; border-radius: 50%;
-          border: 1.5px solid var(--gold);
+          width: 32px; height: 32px; border-radius: 50%;
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           display: flex; align-items: center; justify-content: center;
-          font-size: 12px; font-weight: 600; color: var(--gold-l);
+          font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9);
           flex-shrink: 0; margin-top: 1px;
         }
         .step-text { flex: 1; }
         .step-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
-        .step-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+        .step-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+        /* Pills */
+        .left-pills {
+          display: flex; flex-direction: column; gap: 12px;
+          position: relative; z-index: 1;
+        }
+        .pill {
+          display: flex; align-items: center; gap: 12px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 12px;
+          padding: 14px 18px;
+        }
+        .pill-icon {
+          width: 32px; height: 32px; flex-shrink: 0;
+          background: rgba(255,255,255,0.15);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .pill-icon svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .pill-text { font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 400; line-height: 1.4; }
 
         /* ── Right panel ── */
         .rp-right {
@@ -175,44 +204,50 @@ export default function AgencyResetPassword() {
 
         .rp-card {
           width: 100%; max-width: 420px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* Mobile logo */
         .mobile-logo {
           display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
         }
         @media (min-width: 900px) { .mobile-logo { display: none; } }
+        .logo-mark-blue {
+          width: 36px; height: 36px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
 
         .card-eyebrow {
-          font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-          text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+          text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
         }
         .card-title {
-          font-family: 'Instrument Serif', serif; font-size: 28px;
-          color: var(--navy); margin-bottom: 6px;
+          font-size: 28px; font-weight: 700;
+          color: var(--text); margin-bottom: 6px; line-height: 1.15;
         }
-        .divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 36px; margin: 16px 0 10px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue); border-radius: 2px;
+          margin: 14px 0 10px;
         }
-        .card-sub {
-          font-size: 13.5px; color: var(--muted); font-weight: 400; margin-bottom: 32px;
-        }
+        .card-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 32px; }
 
         .err-box {
           background: #fdf0ef; border: 1px solid #f1c0bc;
           color: var(--error); font-size: 13px; padding: 10px 14px;
-          border-radius: 10px; margin-bottom: 20px;
+          border-radius: 8px; margin-bottom: 20px;
           display: flex; align-items: center; gap: 8px;
         }
+
         .success-box {
           background: #edfaf4; border: 1px solid #a8e0c1;
-          color: var(--success); font-size: 13.5px; padding: 16px 18px;
+          color: var(--success); font-size: 13.5px; padding: 24px 18px;
           border-radius: 12px; text-align: center; line-height: 1.6;
         }
         .success-box strong { display: block; font-size: 15px; margin-bottom: 4px; }
@@ -224,30 +259,30 @@ export default function AgencyResetPassword() {
 
         .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
         .field label {
-          display: block; font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          color: var(--navy); margin-bottom: 7px;
+          display: block; font-size: 11px; font-weight: 700;
+          letter-spacing: 0.09em; text-transform: uppercase;
+          color: var(--text-muted); margin-bottom: 7px;
         }
         .field-input-wrap { position: relative; }
         .field input {
           width: 100%; border: 1.5px solid var(--border);
-          border-radius: 10px; padding: 11px 14px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
-          color: var(--navy); background: #fff;
+          border-radius: 8px; padding: 11px 14px;
+          font-size: 14px; font-family: inherit;
+          color: var(--text); background: var(--white);
           transition: border-color 0.18s, box-shadow 0.18s; outline: none;
         }
         .field input::placeholder { color: #bbb; }
         .field input:focus {
-          border-color: var(--navy);
-          box-shadow: 0 0 0 3px rgba(15,31,61,0.07);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
         .pw-toggle {
           position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
           background: none; border: none; cursor: pointer;
-          color: var(--muted); padding: 4px; display: flex; align-items: center;
+          color: var(--text-muted); padding: 4px; display: flex; align-items: center;
           transition: color 0.15s;
         }
-        .pw-toggle:hover { color: var(--navy); }
+        .pw-toggle:hover { color: var(--text); }
         .field input.has-toggle { padding-right: 40px; }
 
         .strength-row {
@@ -258,7 +293,7 @@ export default function AgencyResetPassword() {
           flex: 1; height: 3px; border-radius: 2px;
           background: var(--border); transition: background 0.3s;
         }
-        .strength-label { font-size: 11px; font-weight: 600; min-width: 36px; text-align: right; }
+        .strength-label { font-size: 11px; font-weight: 700; min-width: 36px; text-align: right; }
 
         .match-hint {
           font-size: 11.5px; margin-top: 6px; display: flex;
@@ -266,21 +301,16 @@ export default function AgencyResetPassword() {
         }
 
         .btn-submit {
-          width: 100%; background: var(--navy); color: #fff; border: none;
-          border-radius: 10px; padding: 13px; font-size: 14px;
-          font-family: 'DM Sans', sans-serif; font-weight: 600;
+          width: 100%; background: var(--blue); color: #fff; border: none;
+          border-radius: 8px; padding: 13px; font-size: 14px;
+          font-family: inherit; font-weight: 600;
           letter-spacing: 0.03em; cursor: pointer;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          position: relative; overflow: hidden; margin-bottom: 20px;
-        }
-        .btn-submit::after {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-          pointer-events: none;
+          margin-bottom: 20px;
         }
         .btn-submit:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 16px rgba(15,31,61,0.22);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
         .btn-submit:active:not(:disabled) { transform: translateY(0); }
@@ -295,9 +325,9 @@ export default function AgencyResetPassword() {
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .back-link {
-          text-align: center; font-size: 13px; color: var(--muted);
+          text-align: center; font-size: 13px; color: var(--text-muted);
         }
-        .back-link a { color: var(--navy); font-weight: 600; text-decoration: none; }
+        .back-link a { color: var(--blue); font-weight: 600; text-decoration: none; }
         .back-link a:hover { text-decoration: underline; }
 
         .security-note {
@@ -307,6 +337,10 @@ export default function AgencyResetPassword() {
         }
         .security-note svg { flex-shrink: 0; }
         .security-note span { font-size: 11.5px; color: #bbb; line-height: 1.4; }
+
+        @media (max-width: 600px) {
+          .rp-right { padding: 32px 16px; }
+        }
       `}</style>
 
       <div className="rp-root">
@@ -316,27 +350,27 @@ export default function AgencyResetPassword() {
           <div className="left-brand">
             <div className="left-logo">
               <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:18,height:18}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Pasado</span>
+              <span className="logo-text">Collection Connector</span>
             </div>
 
             <h2 className="left-headline">
-              Reset your<br /><em>agency</em><br />password.
+              Recover your<br /><em>agency</em><br />account.
             </h2>
             <p className="left-sub">
-              Follow the steps on the right to regain access to your agency account. Your data remains safe throughout.
+              Follow the steps on the right to regain access to your agency dashboard. Your data remains safe throughout.
             </p>
           </div>
 
           <div className="steps-list">
             {[
               { n: '1', t: 'Enter your agency email', d: 'Provide the email address linked to your agency account.' },
-              { n: '2', t: 'Set a new password',      d: 'Choose a strong password you haven\'t used before.' },
+              { n: '2', t: 'Set a new password',      d: "Choose a strong password you haven't used before." },
               { n: '3', t: 'Sign back in',            d: 'Use your new credentials to access your agency dashboard.' },
             ].map(s => (
               <div className="step-item" key={s.n}>
@@ -348,26 +382,58 @@ export default function AgencyResetPassword() {
               </div>
             ))}
           </div>
+
+          <div className="left-pills">
+            {[
+              {
+                label: 'Your data stays protected',
+                desc: 'We never store credentials in plaintext',
+                icon: (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+              {
+                label: 'Instant access restored',
+                desc: 'Log back in right after resetting',
+                icon: (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+            ].map((p) => (
+              <div className="pill" key={p.label}>
+                <div className="pill-icon">{p.icon}</div>
+                <div>
+                  <div className="pill-text" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>{p.label}</div>
+                  <div className="pill-text">{p.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </aside>
 
         {/* ── Right form panel ── */}
         <main className="rp-right">
           <div className="rp-card">
 
+            {/* Mobile logo */}
             <div className="mobile-logo">
-              <div className="logo-mark" style={{borderColor:'var(--navy)'}}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
+              <div className="logo-mark-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)', letterSpacing: '-0.01em' }}>Collection Connector</span>
             </div>
 
             <p className="card-eyebrow">Agency account recovery</p>
             <h1 className="card-title">Reset your password</h1>
-            <div className="divider" />
+            <div className="header-rule" />
             <p className="card-sub">Enter your agency email and choose a new password below.</p>
 
             {error && (
@@ -421,7 +487,7 @@ export default function AgencyResetPassword() {
                         value={form.password}
                         onChange={handleChange}
                         required
-                        placeholder="••••••••"
+                        placeholder="Min. 8 characters"
                         autoComplete="new-password"
                         className="has-toggle"
                       />
@@ -456,7 +522,7 @@ export default function AgencyResetPassword() {
                         value={form.confirm}
                         onChange={handleChange}
                         required
-                        placeholder="••••••••"
+                        placeholder="Repeat password"
                         autoComplete="new-password"
                         className="has-toggle"
                       />

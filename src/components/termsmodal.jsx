@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { BASE_URL } from '../api/auth';
 
 const TERMS = [
-  { id: 'not_agency',    text: 'Pasado is not a collection agency' },
-  { id: 'not_collector', text: 'Pasado does not act as a debt collector' },
+  { id: 'not_agency',    text: 'Collection Connector is not a collection agency' },
+  { id: 'not_collector', text: 'Collection Connector does not act as a debt collector' },
   { id: 'independent',   text: 'All collection services are performed by independent agencies' },
   { id: 'valid_claims',  text: 'Submitted claims are valid and enforceable' },
   { id: 'data_share',    text: 'Data may be shared with agencies' },

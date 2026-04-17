@@ -32,8 +32,8 @@ function Field({ label, value }) {
 
 export default function ClaimDetail() {
   const { id } = useParams();
-  const [claim, setClaim]   = useState(null);
-  const [error, setError]   = useState('');
+  const [claim, setClaim]     = useState(null);
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,253 +55,157 @@ export default function ClaimDetail() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
-        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--off-white); color: var(--text); }
 
         /* ── NAVBAR ── */
         .navbar {
-          background: var(--navy);
-          border-bottom: 1px solid rgba(201,168,76,0.15);
-          padding: 0 40px;
-          height: 64px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          position: sticky;
-          top: 0;
-          z-index: 100;
+          background: var(--blue);
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+          padding: 0 40px; height: 64px;
+          display: flex; align-items: center; justify-content: space-between;
+          position: sticky; top: 0; z-index: 100;
         }
         .navbar::after {
-          content: '';
-          position: absolute;
-          inset: 0;
+          content: ''; position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-          background-size: 40px 40px;
-          pointer-events: none;
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+          background-size: 40px 40px; pointer-events: none;
         }
-        .nav-brand {
-          display: flex; align-items: center; gap: 10px;
-          position: relative; z-index: 1;
-        }
-        .logo-mark {
-          width: 32px; height: 32px;
-          border: 1.5px solid var(--gold);
-          border-radius: 7px;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-        }
-        .logo-text {
-          font-family: 'Instrument Serif', serif;
-          font-size: 16px; color: #fff; letter-spacing: 0.01em;
-        }
+        .nav-actions { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
         .back-link {
-          position: relative; z-index: 1;
           display: inline-flex; align-items: center; gap: 7px;
-          font-size: 13px; font-weight: 500;
-          color: rgba(255,255,255,0.5);
-          text-decoration: none;
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 8px;
-          padding: 7px 14px;
-          transition: color 0.15s, border-color 0.15s;
+          font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.65);
+          text-decoration: none; border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px; padding: 7px 14px;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .back-link:hover { color: #fff; border-color: rgba(255,255,255,0.28); }
+        .back-link:hover { color: #fff; border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); }
 
         /* ── PAGE ── */
         .page {
-          max-width: 720px;
-          margin: 0 auto;
+          max-width: 720px; margin: 0 auto;
           padding: 48px 32px 80px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 600px) {
-          .page { padding: 32px 16px 60px; }
-          .navbar { padding: 0 16px; }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .page { padding: 32px 16px 60px; } .navbar { padding: 0 16px; } }
 
         /* ── PAGE HEADER ── */
+        .page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+        .page-title { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.15; margin-bottom: 4px; }
+        .header-rule { width: 48px; height: 3px; background: var(--blue); border-radius: 2px; margin: 14px 0 8px; }
+        .claim-id { font-size: 11.5px; color: var(--text-muted); font-family: monospace; letter-spacing: 0.04em; }
         .page-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 36px;
-          flex-wrap: wrap;
-        }
-        .page-eyebrow {
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: var(--gold-d); margin-bottom: 6px;
-        }
-        .page-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 34px; color: var(--navy); line-height: 1.1;
-        }
-        .page-title em { color: var(--gold); font-style: italic; }
-        .header-divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 40px; margin: 12px 0 8px;
-        }
-        .claim-id {
-          font-size: 11px; color: var(--muted);
-          font-family: 'DM Sans', monospace; letter-spacing: 0.04em;
+          display: flex; align-items: flex-start; justify-content: space-between;
+          gap: 16px; margin-bottom: 32px; flex-wrap: wrap;
         }
 
         /* ── STATUS BADGE ── */
-        .status-badge {
-          display: inline-flex; align-items: center; gap: 5px;
-          padding: 5px 12px; border-radius: 20px;
-          font-size: 11.5px; font-weight: 600; letter-spacing: 0.02em;
-          white-space: nowrap; flex-shrink: 0; margin-top: 6px;
-        }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
         .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-        .status-submitted  { background:#fef9e7; color:#9a7d0a; border:1px solid #f9e79f; }
-        .status-submitted .status-dot  { background:#f4d03f; }
-        .status-assigned   { background:#eaf2ff; color:#1a5276; border:1px solid #aed6f1; }
-        .status-assigned .status-dot   { background:#3498db; }
-        .status-progress   { background:#f4ecf7; color:#6c3483; border:1px solid #d7bde2; }
-        .status-progress .status-dot   { background:#9b59b6; }
-        .status-closed     { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
-        .status-closed .status-dot     { background:#27ae60; }
+        .status-submitted  { background: #fef9e7; color: #9a7d0a; border: 1px solid #f9e79f; }
+        .status-submitted .status-dot  { background: #f4d03f; }
+        .status-assigned   { background: var(--blue-light); color: #0f5189; border: 1px solid var(--blue-mid); }
+        .status-assigned .status-dot   { background: var(--blue); }
+        .status-progress   { background: #f4ecf7; color: #6c3483; border: 1px solid #d7bde2; }
+        .status-progress .status-dot   { background: #9b59b6; }
+        .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+        .status-closed .status-dot     { background: #27ae60; }
 
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
-
         .section-card {
-          background: var(--white);
-          border-radius: 18px;
-          border: 1px solid var(--border);
-          overflow: hidden;
-          box-shadow: 0 2px 16px rgba(15,31,61,0.045);
+          background: var(--white); border-radius: 12px;
+          border: 1px solid var(--border); overflow: hidden;
         }
-
         .section-head {
-          background: var(--navy);
-          padding: 16px 24px;
+          background: var(--blue); padding: 14px 24px;
           display: flex; align-items: center; gap: 12px;
           position: relative; overflow: hidden;
         }
         .section-head::after {
-          content: '';
-          position: absolute; inset: 0;
+          content: ''; position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-          background-size: 32px 32px;
-          pointer-events: none;
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+          background-size: 32px 32px; pointer-events: none;
         }
         .section-icon {
-          width: 30px; height: 30px;
-          border: 1px solid rgba(201,168,76,0.3);
-          border-radius: 8px;
+          width: 28px; height: 28px;
+          background: rgba(255,255,255,0.15);
+          border: 1px solid rgba(255,255,255,0.3);
+          border-radius: 7px;
           display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          position: relative; z-index: 1;
+          flex-shrink: 0; position: relative; z-index: 1;
         }
         .section-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 17px; color: #fff;
-          position: relative; z-index: 1;
+          font-size: 14px; font-weight: 600; color: #fff;
+          position: relative; z-index: 1; letter-spacing: 0.01em;
         }
-
         .section-body {
           padding: 24px;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px 28px;
+          display: grid; grid-template-columns: 1fr 1fr; gap: 20px 28px;
         }
         @media (max-width: 520px) { .section-body { grid-template-columns: 1fr; } }
         .full-width { grid-column: span 2; }
         @media (max-width: 520px) { .full-width { grid-column: span 1; } }
 
-        /* ── FIELD ── */
+        /* ── FIELDS ── */
         .field-item { display: flex; flex-direction: column; gap: 5px; }
-        .field-label {
-          font-size: 10.5px; font-weight: 600;
-          letter-spacing: 0.09em; text-transform: uppercase;
-          color: var(--muted);
-        }
-        .field-value {
-          font-size: 14px; color: var(--navy); font-weight: 500;
-          line-height: 1.5;
-        }
-        .field-empty { color: var(--muted); font-style: italic; font-weight: 400; }
-
-        /* amount highlight */
-        .amount-value {
-          font-family: 'Instrument Serif', serif;
-          font-size: 26px; color: var(--navy); line-height: 1;
-        }
+        .field-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted); }
+        .field-value { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.5; }
+        .field-empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
+        .amount-value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
 
         /* ── LOADING ── */
-        .loading-wrap {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          padding: 80px 24px; gap: 14px;
-        }
+        .loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; gap: 14px; }
         .spinner-ring {
-          width: 36px; height: 36px;
-          border: 2px solid rgba(15,31,61,0.12);
-          border-top-color: var(--gold);
-          border-radius: 50%;
-          animation: spin 0.7s linear infinite;
+          width: 32px; height: 32px;
+          border: 2px solid rgba(22,105,169,0.15);
+          border-top-color: var(--blue);
+          border-radius: 50%; animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { font-size: 13.5px; color: var(--muted); }
+        .loading-text { font-size: 13.5px; color: var(--text-muted); }
 
         /* ── ERROR ── */
         .err-box {
-          background: #fdf0ef;
-          border: 1px solid #f1c0bc;
-          color: var(--error);
-          font-size: 13px;
-          padding: 12px 16px;
-          border-radius: 12px;
+          background: #fdf0ef; border: 1px solid #f1c0bc; color: var(--error);
+          font-size: 13px; padding: 12px 16px; border-radius: 10px;
           display: flex; align-items: center; gap: 8px;
         }
 
         /* ── FOOTER ── */
-        .footer-note {
-          text-align: center;
-          margin-top: 40px;
-          font-size: 11.5px;
-          color: #bbb;
-          line-height: 1.6;
-        }
+        .footer-note { text-align: center; margin-top: 40px; font-size: 11.5px; color: var(--text-muted); line-height: 1.6; }
       `}</style>
 
       {/* NAVBAR */}
       <nav className="navbar">
-      
-        <Link to="/dashboard" className="back-link">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-          Back to Dashboard
-        </Link>
+        <div className="nav-actions">
+          <Link to="/dashboard" className="back-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Back to Dashboard
+          </Link>
+        </div>
       </nav>
 
       <div className="page">
@@ -333,8 +237,8 @@ export default function ClaimDetail() {
             <div className="page-header">
               <div>
                 <p className="page-eyebrow">Claim Record</p>
-                <h1 className="page-title">Claim <em>Details</em></h1>
-                <div className="header-divider" />
+                <h1 className="page-title">Claim Details</h1>
+                <div className="header-rule" />
                 <p className="claim-id">{claim._id}</p>
               </div>
               <StatusBadge status={claim.status} />
@@ -345,7 +249,7 @@ export default function ClaimDetail() {
               <div className="section-card">
                 <div className="section-head">
                   <div className="section-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" strokeLinecap="round">
                       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
                       <circle cx="12" cy="7" r="4"/>
                     </svg>
@@ -369,7 +273,7 @@ export default function ClaimDetail() {
               <div className="section-card">
                 <div className="section-head">
                   <div className="section-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" strokeLinecap="round">
                       <line x1="12" y1="1" x2="12" y2="23"/>
                       <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
                     </svg>
@@ -383,7 +287,7 @@ export default function ClaimDetail() {
                       {formatCurrency(claim.amount) || <span className="field-empty">Not provided</span>}
                     </p>
                   </div>
-                  <Field label="Due Date" value={formatDate(claim.due_date)} />
+                  <Field label="Due Date"    value={formatDate(claim.due_date)} />
                   <div className="full-width">
                     <Field label="Description" value={claim.description} />
                   </div>
@@ -396,7 +300,7 @@ export default function ClaimDetail() {
               <div className="section-card">
                 <div className="section-head">
                   <div className="section-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" strokeLinecap="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                       <line x1="16" y1="2" x2="16" y2="6"/>
                       <line x1="8" y1="2" x2="8" y2="6"/>
@@ -406,81 +310,80 @@ export default function ClaimDetail() {
                   <h2 className="section-title">Submission Details</h2>
                 </div>
                 <div className="section-body">
-                  <Field label="Submitted On"  value={formatDate(claim.createdAt)} />
+                  <Field label="Submitted On" value={formatDate(claim.createdAt)} />
                   <Field label="Last Updated"  value={formatDate(claim.updatedAt)} />
                 </div>
               </div>
             </div>
 
-          
-          
- <div className="section">
-  <div className="section-card">
-    <div className="section-head">
-      <div className="section-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-        </svg>
-      </div>
-      <h2 className="section-title">Supporting Documents</h2>
-    </div>
+            {/* Supporting Documents */}
+            <div className="section">
+              <div className="section-card">
+                <div className="section-head">
+                  <div className="section-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" strokeLinecap="round">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                  </div>
+                  <h2 className="section-title">Supporting Documents</h2>
+                </div>
 
-    <div style={{ padding: '20px 24px' }}>
-      {claim.documents && claim.documents.length > 0 ? (
-        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {claim.documents.map((doc, i) => (
-            <li key={i} style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              background: 'var(--cream)', border: '1px solid var(--border)',
-              borderRadius: '10px', padding: '10px 14px',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <span style={{
-                flex: 1, fontSize: '13px', fontWeight: 500,
-                color: 'var(--navy)', whiteSpace: 'nowrap',
-                overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>
-                {doc.filename}
-              </span>
-              <a
-              href={`https://debtbackend.vercel.app/uploads/${doc.path}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontSize: '11.5px', fontWeight: 600, color: 'var(--gold-d)',
-                  textDecoration: 'none', border: '1px solid rgba(168,136,58,0.3)',
-                  borderRadius: '6px', padding: '4px 10px',
-                  flexShrink: 0, transition: 'background 0.15s',
-                }}
-              >
-                View
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          padding: '16px', background: 'var(--cream)',
-          border: '1px dashed var(--border)', borderRadius: '10px',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.8" strokeLinecap="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          <span style={{ fontSize: '13px', color: 'var(--muted)', fontStyle: 'italic' }}>
-            No documents attached to this claim
-          </span>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-          
+                <div style={{ padding: '20px 24px' }}>
+                  {claim.documents && claim.documents.length > 0 ? (
+                    <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {claim.documents.map((doc, i) => (
+                        <li key={i} style={{
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          background: 'var(--off-white)', border: '1px solid var(--border)',
+                          borderRadius: 10, padding: '10px 14px',
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.8" strokeLinecap="round">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                          </svg>
+                          <span style={{
+                            flex: 1, fontSize: 13, fontWeight: 500,
+                            color: 'var(--text)', whiteSpace: 'nowrap',
+                            overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}>
+                            {doc.filename}
+                          </span>
+                          <a
+                            href={`https://debtbackend.vercel.app/uploads/${doc.path}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              fontSize: 11.5, fontWeight: 600, color: 'var(--blue)',
+                              textDecoration: 'none', border: '1px solid var(--blue-mid)',
+                              borderRadius: 6, padding: '4px 10px', flexShrink: 0,
+                              transition: 'background 0.14s, color 0.14s',
+                            }}
+                          >
+                            View
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: 16, background: 'var(--off-white)',
+                      border: '1px dashed var(--border)', borderRadius: 10,
+                    }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        No documents attached to this claim
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed
               collection agencies. We do not provide debt collection services, legal advice,

@@ -24,11 +24,10 @@ const SPECIALTIES = [
 export default function AgencyRegister() {
   const navigate = useNavigate();
 
-  const [step, setStep]     = useState(1); // 1 = agency info, 2 = owner login
+  const [step, setStep]     = useState(1);
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Step 1 — Agency profile
   const [agency, setAgency] = useState({
     agency_name:    '',
     fee_percentage: '',
@@ -37,7 +36,6 @@ export default function AgencyRegister() {
     specialties:    [],
   });
 
-  // Step 2 — Owner account
   const [owner, setOwner] = useState({
     name:     '',
     email:    '',
@@ -47,7 +45,6 @@ export default function AgencyRegister() {
 
   const [agreed, setAgreed] = useState(false);
 
-  /* ── helpers ── */
   const toggleState = (s) =>
     setAgency(prev => ({
       ...prev,
@@ -102,35 +99,36 @@ export default function AgencyRegister() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
         .ar-root {
           min-height: 100vh;
           display: flex;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
         }
 
         /* ── Left panel ── */
         .ar-left {
           display: none;
           width: 42%;
-          background: var(--navy);
+          background: var(--blue);
           padding: 56px 52px;
           flex-direction: column;
           justify-content: space-between;
@@ -144,8 +142,8 @@ export default function AgencyRegister() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse 70% 55% at 80% 100%, rgba(201,168,76,0.14) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 10%,  rgba(201,168,76,0.07) 0%, transparent 65%);
+            radial-gradient(ellipse 70% 55% at 20% 100%, rgba(255,255,255,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 90% 10%,  rgba(255,255,255,0.05) 0%, transparent 65%);
           pointer-events: none;
         }
         .ar-left::after {
@@ -153,42 +151,56 @@ export default function AgencyRegister() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
 
         .left-brand { position: relative; z-index: 1; }
-        .left-logo  { display: flex; align-items: center; gap: 10px; margin-bottom: 64px; }
-        .logo-mark  {
+        .left-logo {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 64px;
+        }
+        .logo-mark {
           width: 36px; height: 36px;
-          border: 1.5px solid var(--gold);
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
+        .logo-mark svg { width: 18px; height: 18px; }
         .logo-text {
           font-family: 'Instrument Serif', serif;
-          font-size: 17px; color: #fff; letter-spacing: 0.01em;
-        }
-        .left-headline {
-          font-family: 'Instrument Serif', serif;
-          font-size: 36px; line-height: 1.2; color: #fff; margin-bottom: 18px;
-        }
-        .left-headline em { color: var(--gold-l); font-style: italic; }
-        .left-sub {
-          font-size: 14px; line-height: 1.7;
-          color: rgba(255,255,255,0.52); font-weight: 300; max-width: 320px;
+          font-size: 17px;
+          color: #fff;
+          letter-spacing: 0.01em;
         }
 
-        /* step tracker on left */
+        .left-headline {
+          font-family: 'Instrument Serif', serif;
+          font-size: 38px;
+          line-height: 1.18;
+          color: #fff;
+          margin-bottom: 20px;
+        }
+        .left-headline em { color: rgba(255,255,255,0.75); font-style: italic; }
+
+        .left-sub {
+          font-size: 14px;
+          line-height: 1.7;
+          color: rgba(255,255,255,0.55);
+          font-weight: 300;
+          max-width: 320px;
+        }
+
+        /* Step tracker */
         .step-track { position: relative; z-index: 1; }
         .step-track-title {
-          font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em;
-          text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
+          font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em;
+          text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 16px;
         }
         .step-item {
-          display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+          display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
         }
         .step-circle {
           width: 32px; height: 32px; flex-shrink: 0;
@@ -197,45 +209,65 @@ export default function AgencyRegister() {
           font-size: 12px; font-weight: 700;
           transition: all 0.3s;
         }
-        .step-circle.active   { background: var(--gold); color: var(--navy); }
-        .step-circle.done     { background: rgba(201,168,76,0.2); color: var(--gold-l); border: 1.5px solid var(--gold-d); }
-        .step-circle.inactive { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .step-circle.active   { background: rgba(255,255,255,0.95); color: var(--blue); }
+        .step-circle.done     { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.9); border: 1.5px solid rgba(255,255,255,0.4); }
+        .step-circle.inactive { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.15); }
         .step-label { font-size: 13.5px; color: rgba(255,255,255,0.55); }
         .step-label.active { color: #fff; font-weight: 500; }
 
-        /* benefits list */
-        .benefit-list { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
-        .benefit-item {
-          display: flex; align-items: flex-start; gap: 10px;
-          font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5;
+        /* Pills */
+        .left-pills {
+          display: flex; flex-direction: column; gap: 12px;
+          position: relative; z-index: 1;
         }
-        .benefit-dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: var(--gold); flex-shrink: 0; margin-top: 7px;
+        .pill {
+          display: flex; align-items: center; gap: 12px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 12px;
+          padding: 14px 18px;
         }
+        .pill-icon {
+          width: 32px; height: 32px; flex-shrink: 0;
+          background: rgba(255,255,255,0.15);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .pill-icon svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .pill-text { font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 400; line-height: 1.4; }
 
-        /* ── Right ── */
+        /* ── Right panel ── */
         .ar-right {
-          flex: 1; display: flex; align-items: center;
-          justify-content: center; padding: 40px 24px;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 24px;
         }
 
         .ar-card {
-          width: 100%; max-width: 480px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          width: 100%;
+          max-width: 480px;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* mobile logo */
+        /* Mobile logo */
         .mobile-logo {
           display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
         }
         @media (min-width: 900px) { .mobile-logo { display: none; } }
+        .logo-mark-blue {
+          width: 36px; height: 36px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
 
-        /* step indicator (mobile) */
+        /* Mobile step dots */
         .mobile-steps {
           display: flex; align-items: center; gap: 8px; margin-bottom: 28px;
         }
@@ -246,155 +278,149 @@ export default function AgencyRegister() {
           background: var(--border);
           flex: 1;
         }
-        .ms-dot.active { background: var(--navy); }
-        .ms-dot.done   { background: var(--gold); }
+        .ms-dot.active { background: var(--blue); }
+        .ms-dot.done   { background: var(--blue-mid); }
 
         .card-eyebrow {
-          font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em;
-          text-transform: uppercase; color: var(--gold-d); margin-bottom: 7px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+          text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
         }
         .card-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 28px; color: var(--navy); margin-bottom: 6px;
+          font-size: 28px; font-weight: 700;
+          color: var(--text); margin-bottom: 6px; line-height: 1.15;
         }
-        .card-sub { font-size: 13.5px; color: var(--muted); }
-        .divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 36px; margin: 16px 0 28px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue); border-radius: 2px;
+          margin: 14px 0 10px;
         }
+        .card-sub { font-size: 13.5px; color: var(--text-muted); }
 
         .err-box {
-          background: #fdf0ef; border: 1px solid #f1c0bc;
-          color: var(--error); font-size: 13px;
-          padding: 10px 14px; border-radius: 10px; margin-bottom: 20px;
+          background: #fdf0ef;
+          border: 1px solid #f1c0bc;
+          color: var(--error);
+          font-size: 13px;
+          padding: 10px 14px;
+          border-radius: 8px;
+          margin-bottom: 20px;
         }
 
         /* fields */
-        .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 24px; }
+        .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 24px; margin-top: 28px; }
         .field-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
 
         .field label {
-          display: block; font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          color: var(--navy); margin-bottom: 7px;
+          display: block;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.09em; text-transform: uppercase;
+          color: var(--text-muted); margin-bottom: 7px;
         }
         .field input {
-          width: 100%; border: 1.5px solid var(--border);
-          border-radius: 10px; padding: 11px 14px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
-          color: var(--navy); background: var(--white);
-          transition: border-color 0.18s, box-shadow 0.18s; outline: none;
+          width: 100%;
+          border: 1.5px solid var(--border);
+          border-radius: 8px;
+          padding: 11px 14px;
+          font-size: 14px;
+          font-family: inherit;
+          color: var(--text);
+          background: var(--white);
+          transition: border-color 0.18s, box-shadow 0.18s;
+          outline: none;
         }
         .field input::placeholder { color: #bbb; }
         .field input:focus {
-          border-color: var(--navy);
-          box-shadow: 0 0 0 3px rgba(15,31,61,0.07);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
-        .field-hint {
-          font-size: 11.5px; color: var(--muted); margin-top: 5px;
-        }
+        .field-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
 
-        /* input with suffix */
-        .input-suffix-wrap {
-          position: relative;
-        }
+        .input-suffix-wrap { position: relative; }
         .input-suffix-wrap input { padding-right: 36px; }
         .input-suffix {
           position: absolute; right: 13px; top: 50%;
           transform: translateY(-50%);
-          font-size: 13px; color: var(--muted); pointer-events: none;
+          font-size: 13px; color: var(--text-muted); pointer-events: none;
         }
 
         /* tag pickers */
         .tag-label {
-          font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: var(--navy); margin-bottom: 10px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.09em;
+          text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
         }
-        .tag-grid {
-          display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 4px;
-        }
+        .tag-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 4px; }
         .tag {
           padding: 5px 11px; border-radius: 20px;
           font-size: 12px; font-weight: 500;
           border: 1.5px solid var(--border);
-          background: var(--white); color: var(--muted);
+          background: var(--white); color: var(--text-muted);
           cursor: pointer; transition: all 0.14s; user-select: none;
         }
-        .tag:hover   { border-color: rgba(201,168,76,0.4); color: var(--navy); }
-        .tag.selected {
-          background: var(--navy); border-color: var(--navy);
-          color: var(--white);
-        }
+        .tag:hover   { border-color: var(--blue-mid); color: var(--text); }
+        .tag.selected { background: var(--blue); border-color: var(--blue); color: var(--white); }
 
-        /* states grid — more compact */
         .states-grid {
           display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px;
           margin-bottom: 4px;
         }
         @media (max-width: 480px) { .states-grid { grid-template-columns: repeat(6, 1fr); } }
         .state-btn {
-          padding: 5px 0; border-radius: 7px; text-align: center;
+          padding: 5px 0; border-radius: 6px; text-align: center;
           font-size: 11px; font-weight: 600;
           border: 1.5px solid var(--border);
-          background: var(--white); color: var(--muted);
+          background: var(--white); color: var(--text-muted);
           cursor: pointer; transition: all 0.12s; user-select: none;
         }
-        .state-btn:hover   { border-color: rgba(201,168,76,0.45); color: var(--navy); }
-        .state-btn.selected { background: var(--navy); border-color: var(--navy); color: var(--white); }
+        .state-btn:hover   { border-color: var(--blue-mid); color: var(--text); }
+        .state-btn.selected { background: var(--blue); border-color: var(--blue); color: var(--white); }
 
         .select-all-btn {
-          font-size: 11.5px; font-weight: 600; color: var(--gold-d);
+          font-size: 11.5px; font-weight: 600; color: var(--blue);
           background: none; border: none; cursor: pointer;
           padding: 0; text-decoration: underline; text-underline-offset: 2px;
-          margin-bottom: 8px;
+          margin-bottom: 8px; font-family: inherit;
         }
-        .select-all-btn:hover { color: var(--navy); }
+        .select-all-btn:hover { color: var(--blue-dark); }
 
-        /* agree row */
+        /* agree */
         .agree-row {
           display: flex; align-items: flex-start; gap: 10px; margin-bottom: 26px;
         }
         .agree-row input[type="checkbox"] {
           width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;
-          accent-color: var(--navy); cursor: pointer;
+          accent-color: var(--blue); cursor: pointer;
         }
-        .agree-row label { font-size: 12px; line-height: 1.6; color: var(--muted); cursor: pointer; }
-        .agree-row label a { color: var(--navy); text-decoration: underline; }
+        .agree-row label { font-size: 12px; line-height: 1.6; color: var(--text-muted); cursor: pointer; }
+        .agree-row label a { color: var(--blue); text-decoration: underline; }
 
         /* buttons */
         .btn-row { display: flex; gap: 10px; }
         .btn-back {
           flex: 0 0 auto;
           background: transparent; border: 1.5px solid var(--border);
-          border-radius: 10px; padding: 12px 18px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
-          font-weight: 600; color: var(--muted);
+          border-radius: 8px; padding: 12px 18px;
+          font-size: 14px; font-family: inherit;
+          font-weight: 600; color: var(--text-muted);
           cursor: pointer; transition: border-color 0.15s, color 0.15s;
         }
-        .btn-back:hover { border-color: var(--navy); color: var(--navy); }
+        .btn-back:hover { border-color: var(--blue); color: var(--blue); }
 
         .btn-submit {
           flex: 1;
-          background: var(--navy); color: #fff; border: none;
-          border-radius: 10px; padding: 13px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
+          background: var(--blue); color: #fff; border: none;
+          border-radius: 8px; padding: 13px;
+          font-size: 14px; font-family: inherit;
           font-weight: 600; letter-spacing: 0.03em;
           cursor: pointer; transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          position: relative; overflow: hidden;
-        }
-        .btn-submit::after {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-          pointer-events: none;
         }
         .btn-submit:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 16px rgba(15,31,61,0.22);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
 
         .btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
         .spinner {
@@ -406,10 +432,14 @@ export default function AgencyRegister() {
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .signin-link {
-          text-align: center; font-size: 13px; color: var(--muted); margin-top: 22px;
+          text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 22px;
         }
-        .signin-link a { color: var(--navy); font-weight: 600; text-decoration: none; }
+        .signin-link a { color: var(--blue); font-weight: 600; text-decoration: none; }
         .signin-link a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+          .ar-right { padding: 32px 16px; }
+        }
       `}</style>
 
       <div className="ar-root">
@@ -419,13 +449,13 @@ export default function AgencyRegister() {
           <div className="left-brand">
             <div className="left-logo">
               <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:18,height:18}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Pasado</span>
+              <span className="logo-text">Collection Connector</span>
             </div>
             <h2 className="left-headline">
               Grow your agency<br />with <em>qualified claims.</em>
@@ -454,17 +484,43 @@ export default function AgencyRegister() {
             ))}
           </div>
 
-          {/* Benefits */}
-          <div className="benefit-list">
+          {/* Pills */}
+          <div className="left-pills">
             {[
-              'Receive pre-qualified, matched claims automatically',
-              'Dashboard to track every assignment in real time',
-              'Transparent fee structure — no hidden costs',
-              'Verified badge builds client trust instantly',
-            ].map(b => (
-              <div className="benefit-item" key={b}>
-                <span className="benefit-dot" />
-                {b}
+              {
+                label: 'Pre-qualified claim matching',
+                desc: 'Receive cases matched to your specialties',
+                icon: (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+              {
+                label: 'Transparent fee structure',
+                desc: 'No hidden costs, no bidding wars',
+                icon: (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+              {
+                label: 'Real-time assignment dashboard',
+                desc: 'Track every active case instantly',
+                icon: (
+                  <svg viewBox="0 0 24 24">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+            ].map((p) => (
+              <div className="pill" key={p.label}>
+                <div className="pill-icon">{p.icon}</div>
+                <div>
+                  <div className="pill-text" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>{p.label}</div>
+                  <div className="pill-text">{p.desc}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -476,14 +532,14 @@ export default function AgencyRegister() {
 
             {/* Mobile logo */}
             <div className="mobile-logo">
-              <div className="logo-mark" style={{borderColor:'var(--navy)'}}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
+              <div className="logo-mark-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)', letterSpacing: '-0.01em' }}>Collection Connector</span>
             </div>
 
             {/* Mobile step dots */}
@@ -500,15 +556,15 @@ export default function AgencyRegister() {
             <h1 className="card-title">
               {step === 1 ? 'Register your agency' : 'Create your login'}
             </h1>
-            <div className="divider" />
+            <div className="header-rule" />
             <p className="card-sub">
               {step === 1
                 ? 'Tell us about your agency so we can match you with the right claims.'
-                : 'Set up the owner account you\'ll use to access the agency dashboard.'
+                : "Set up the owner account you'll use to access the agency dashboard."
               }
             </p>
 
-            <div style={{marginTop: 28}}>
+            <div>
               {error && <div className="err-box">{error}</div>}
 
               {/* ── STEP 1 ── */}
@@ -544,20 +600,20 @@ export default function AgencyRegister() {
                       <p className="field-hint">Your standard contingency rate (can be updated later)</p>
                     </div>
 
-
                     <div className="field">
-  <label htmlFor="ein">Business EIN</label>
-  <input
-    id="ein"
-    type="text"
-    value={agency.ein}
-    onChange={e => setAgency({...agency, ein: e.target.value})}
-    required
-    placeholder="XX-XXXXXXX"
-    maxLength={10}
-  />
-  <p className="field-hint">Your IRS-issued Employer Identification Number</p>
-</div>
+                      <label htmlFor="ein">Business EIN</label>
+                      <input
+                        id="ein"
+                        type="text"
+                        value={agency.ein}
+                        onChange={e => setAgency({...agency, ein: e.target.value})}
+                        required
+                        placeholder="XX-XXXXXXX"
+                        maxLength={10}
+                      />
+                      <p className="field-hint">Your IRS-issued Employer Identification Number</p>
+                    </div>
+
                     {/* Specialties */}
                     <div>
                       <p className="tag-label">Specialties</p>
@@ -615,7 +671,7 @@ export default function AgencyRegister() {
 
                   </div>
 
-                  <button type="submit" className="btn-submit">
+                  <button type="submit" className="btn-submit" style={{width:'100%'}}>
                     <span className="btn-inner">
                       Continue
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">

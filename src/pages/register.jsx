@@ -36,33 +36,36 @@ export default function Register() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
         .reg-root {
           min-height: 100vh;
           display: flex;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
         }
 
         /* ── Left panel ── */
         .reg-left {
           display: none;
           width: 42%;
-          background: var(--navy);
+          background: var(--blue);
           padding: 56px 52px;
           flex-direction: column;
           justify-content: space-between;
@@ -76,19 +79,17 @@ export default function Register() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse 70% 55% at 20% 100%, rgba(201,168,76,0.13) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 90% 10%,  rgba(201,168,76,0.07) 0%, transparent 65%);
+            radial-gradient(ellipse 70% 55% at 20% 100%, rgba(255,255,255,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 90% 10%,  rgba(255,255,255,0.05) 0%, transparent 65%);
           pointer-events: none;
         }
-
-        /* decorative grid lines */
         .reg-left::after {
           content: '';
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
@@ -99,7 +100,8 @@ export default function Register() {
         }
         .logo-mark {
           width: 36px; height: 36px;
-          border: 1.5px solid var(--gold);
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
@@ -118,34 +120,35 @@ export default function Register() {
           color: #fff;
           margin-bottom: 20px;
         }
-        .left-headline em { color: var(--gold-l); font-style: italic; }
+        .left-headline em { color: rgba(255,255,255,0.75); font-style: italic; }
 
         .left-sub {
           font-size: 14px;
           line-height: 1.7;
-          color: rgba(255,255,255,0.52);
+          color: rgba(255,255,255,0.55);
           font-weight: 300;
           max-width: 320px;
         }
 
+        /* feature pills */
         .left-pills {
           display: flex; flex-direction: column; gap: 12px;
           position: relative; z-index: 1;
         }
         .pill {
           display: flex; align-items: center; gap: 12px;
-          background: rgba(255,255,255,0.055);
-          border: 1px solid rgba(255,255,255,0.09);
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
           border-radius: 12px;
           padding: 14px 18px;
         }
         .pill-icon {
           width: 32px; height: 32px; flex-shrink: 0;
-          background: rgba(201,168,76,0.15);
+          background: rgba(255,255,255,0.15);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
-        .pill-icon svg { width: 15px; height: 15px; stroke: var(--gold-l); fill: none; stroke-width: 1.8; }
+        .pill-icon svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 1.8; }
         .pill-text { font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 400; line-height: 1.4; }
 
         /* ── Right panel ── */
@@ -160,36 +163,43 @@ export default function Register() {
         .reg-card {
           width: 100%;
           max-width: 440px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
 
         .card-header { margin-bottom: 36px; }
+
         .mobile-logo {
           display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
         }
         @media (min-width: 900px) { .mobile-logo { display: none; } }
-        .mobile-logo .logo-mark { border-color: var(--navy); }
-        .mobile-logo .logo-text { color: var(--navy); }
+        .mobile-logo .logo-mark-blue {
+          width: 36px; height: 36px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .mobile-logo .logo-text-blue {
+          font-size: 20px; font-weight: 700; color: var(--blue); letter-spacing: -0.01em;
+        }
 
+        .card-eyebrow {
+          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+          text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
+        }
         .card-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 28px;
-          color: var(--navy);
-          margin-bottom: 6px;
+          font-size: 28px; font-weight: 700;
+          color: var(--text); margin-bottom: 6px; line-height: 1.15;
         }
-        .card-sub { font-size: 13.5px; color: var(--muted); font-weight: 400; }
-
-        /* divider */
-        .divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 36px;
-          margin: 16px 0 28px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue); border-radius: 2px;
+          margin: 14px 0 10px;
         }
+        .card-sub { font-size: 13.5px; color: var(--text-muted); font-weight: 400; }
 
         /* error */
         .err-box {
@@ -198,7 +208,7 @@ export default function Register() {
           color: var(--error);
           font-size: 13px;
           padding: 10px 14px;
-          border-radius: 10px;
+          border-radius: 8px;
           margin-bottom: 20px;
         }
 
@@ -209,30 +219,26 @@ export default function Register() {
 
         .field label {
           display: block;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: var(--navy);
-          margin-bottom: 7px;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.09em; text-transform: uppercase;
+          color: var(--text-muted); margin-bottom: 7px;
         }
-
         .field input {
           width: 100%;
           border: 1.5px solid var(--border);
-          border-radius: 10px;
+          border-radius: 8px;
           padding: 11px 14px;
           font-size: 14px;
-          font-family: 'DM Sans', sans-serif;
-          color: var(--navy);
-          background: #fff;
+          font-family: inherit;
+          color: var(--text);
+          background: var(--white);
           transition: border-color 0.18s, box-shadow 0.18s;
           outline: none;
         }
         .field input::placeholder { color: #bbb; }
         .field input:focus {
-          border-color: var(--navy);
-          box-shadow: 0 0 0 3px rgba(15,31,61,0.07);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
 
         /* checkbox */
@@ -242,41 +248,32 @@ export default function Register() {
         }
         .agree-row input[type="checkbox"] {
           width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;
-          accent-color: var(--navy); cursor: pointer;
+          accent-color: var(--blue); cursor: pointer;
         }
         .agree-row label {
           font-size: 12px; line-height: 1.6;
-          color: var(--muted); cursor: pointer;
+          color: var(--text-muted); cursor: pointer;
         }
-        .agree-row label a { color: var(--navy); text-decoration: underline; }
+        .agree-row label a { color: var(--blue); text-decoration: underline; }
 
         /* submit */
         .btn-submit {
           width: 100%;
-          background: var(--navy);
+          background: var(--blue);
           color: #fff;
           border: none;
-          border-radius: 10px;
+          border-radius: 8px;
           padding: 13px;
           font-size: 14px;
-          font-family: 'DM Sans', sans-serif;
+          font-family: inherit;
           font-weight: 600;
           letter-spacing: 0.03em;
           cursor: pointer;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          position: relative;
-          overflow: hidden;
-        }
-        .btn-submit::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-          pointer-events: none;
         }
         .btn-submit:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 16px rgba(15,31,61,0.22);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
         .btn-submit:active:not(:disabled) { transform: translateY(0); }
@@ -293,10 +290,49 @@ export default function Register() {
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .signin-link {
-          text-align: center; font-size: 13px; color: var(--muted); margin-top: 22px;
+          text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 22px;
         }
-        .signin-link a { color: var(--navy); font-weight: 600; text-decoration: none; }
+        .signin-link a { color: var(--blue); font-weight: 600; text-decoration: none; }
         .signin-link a:hover { text-decoration: underline; }
+
+        /* agency card */
+        .agency-divider {
+          display: flex; align-items: center; gap: 10px;
+          margin: 24px 0 12px;
+          font-size: 11px; color: var(--text-muted);
+          letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .agency-divider span { flex: 1; height: 1px; background: var(--border); }
+
+        .agency-card {
+          display: flex; align-items: center; gap: 14px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 14px 16px;
+        }
+        .agency-logo-mark {
+          width: 34px; height: 34px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .agency-card-title {
+          font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 2px;
+        }
+        .agency-card-sub {
+          font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;
+        }
+        .agency-signup-link {
+          font-size: 12px; font-weight: 600; color: var(--blue);
+          text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
+        }
+        .agency-signup-link:hover { color: var(--blue-dark); }
+
+        @media (max-width: 600px) {
+          .reg-right { padding: 32px 16px; }
+        }
       `}</style>
 
       <div className="reg-root">
@@ -306,13 +342,13 @@ export default function Register() {
           <div className="left-brand">
             <div className="left-logo">
               <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Pasado</span>
+              <span className="logo-text">Collection Connector</span>
             </div>
             <h2 className="left-headline">
               Smarter debt recovery,<br /><em>without the friction.</em>
@@ -327,29 +363,23 @@ export default function Register() {
               {
                 label: 'Licensed agency network',
                 desc: 'Every partner is verified and compliant',
-                icon: (
-                  <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                ),
+                icon: <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               },
               {
                 label: 'Secure claim submission',
                 desc: 'Bank-grade encryption on every transfer',
-                icon: (
-                  <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                ),
+                icon: <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               },
               {
                 label: 'Real-time status tracking',
                 desc: 'Know exactly where every claim stands',
-                icon: (
-                  <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                ),
+                icon: <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               },
             ].map((p) => (
               <div className="pill" key={p.label}>
                 <div className="pill-icon">{p.icon}</div>
                 <div>
-                  <div className="pill-text" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.88)', marginBottom: 2 }}>{p.label}</div>
+                  <div className="pill-text" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>{p.label}</div>
                   <div className="pill-text">{p.desc}</div>
                 </div>
               </div>
@@ -362,23 +392,20 @@ export default function Register() {
           <div className="reg-card">
 
             <div className="card-header">
-              {/* shown only on mobile */}
               <div className="mobile-logo">
-                <div className="logo-mark">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
+                <div className="agency-logo-mark" style={{ width: 36, height: 36 }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                     <path d="M2 17l10 5 10-5"/>
                     <path d="M2 12l10 5 10-5"/>
                   </svg>
                 </div>
-                <span className="logo-text">Pasado</span>
+                <span className="mobile-logo-text" style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)', letterSpacing: '-0.01em' }}>Collection Connector</span>
               </div>
 
-              <p style={{fontSize:11,fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--gold)',marginBottom:8}}>
-                Get started
-              </p>
+              <p className="card-eyebrow">Get started</p>
               <h1 className="card-title">Create your account</h1>
-              <div className="divider" />
+              <div className="header-rule" />
               <p className="card-sub">Set up your business profile to start submitting claims.</p>
             </div>
 
@@ -399,8 +426,6 @@ export default function Register() {
                       placeholder="Acme Corp"
                     />
                   </div>
-
-                  
                   <div className="field">
                     <label htmlFor="contact_name">Contact Name</label>
                     <input
@@ -415,20 +440,20 @@ export default function Register() {
                   </div>
                 </div>
 
-
                 <div className="field">
-  <label htmlFor="ein">Business EIN</label>
-  <input
-    id="ein"
-    type="text"
-    name="ein"
-    value={form.ein}
-    onChange={handleChange}
-    required
-    placeholder="XX-XXXXXXX"
-    maxLength={10}
-  />
-</div>
+                  <label htmlFor="ein">Business EIN</label>
+                  <input
+                    id="ein"
+                    type="text"
+                    name="ein"
+                    value={form.ein}
+                    onChange={handleChange}
+                    required
+                    placeholder="XX-XXXXXXX"
+                    maxLength={10}
+                  />
+                </div>
+
                 <div className="field">
                   <label htmlFor="email">Email Address</label>
                   <input
@@ -465,7 +490,7 @@ export default function Register() {
                   required
                 />
                 <label htmlFor="auth_check">
-                  I authorize Pasado to submit claims on my behalf to licensed
+                  I authorize Collection Connector to submit claims on my behalf to licensed
                   collection agencies. I understand this platform does not perform debt
                   collection or contact debtors directly.
                 </label>
@@ -484,47 +509,25 @@ export default function Register() {
               <Link to="/login">Sign in</Link>
             </p>
 
-            {/* ── Agency sign-up prompt ── */}
-<div style={{ margin: '24px 0 0' }}>
-  <div style={{
-    display: 'flex', alignItems: 'center', gap: 10,
-    margin: '0 0 12px',
-    fontSize: 11, color: 'var(--muted)',
-    letterSpacing: '0.08em', textTransform: 'uppercase',
-  }}>
-    <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-    Are you a collection agency?
-    <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-  </div>
+            <div className="agency-divider">
+              <span />&nbsp;Are you a collection agency?&nbsp;<span />
+            </div>
 
-  <div style={{
-    display: 'flex', alignItems: 'center', gap: 14,
-    background: 'var(--cream)', border: '1px solid var(--border)',
-    borderRadius: 12, padding: '14px 16px',
-  }}>
-    <div className="logo-mark" style={{ flexShrink: 0 }}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-    <div style={{ flex: 1 }}>
-      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)', margin: '0 0 2px' }}>
-        Register your agency
-      </p>
-      <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
-        Join our vetted network and receive matched claims.
-      </p>
-    </div>
-    <Link to="/agency/register" style={{
-      fontSize: 12, fontWeight: 600, color: 'var(--gold-d)',
-      textDecoration: 'underline', textUnderlineOffset: 2, whiteSpace: 'nowrap',
-    }}>
-      Sign up ›
-    </Link>
-  </div>
-</div>
+            <div className="agency-card">
+              <div className="agency-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <p className="agency-card-title">Register your agency</p>
+                <p className="agency-card-sub">Join our vetted network and receive matched claims.</p>
+              </div>
+              <Link to="/agency/register" className="agency-signup-link">Sign up ›</Link>
+            </div>
+
           </div>
         </main>
       </div>

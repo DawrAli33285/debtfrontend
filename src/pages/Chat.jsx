@@ -2,13 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getChatRooms, getChatMessages, sendMessage, BASE_URL } from '../api/auth';
 import { useSocket } from '../components/usesocket'
+
 const fmt = (n) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n || 0);
 
 const fmtTime = (d) =>
   d ? new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-
-
 
 const fmtDate = (d) => {
   if (!d) return '';
@@ -26,7 +25,7 @@ const getInitials = (name = '') =>
 
 const STATUS_STYLES = {
   in_progress: { color: '#2563eb', bg: '#eff6ff', label: 'In Progress' },
-  assigned:    { color: '#a8883a', bg: '#fefce8', label: 'Assigned' },
+  assigned:    { color: '#0f5189', bg: '#e8f2fa', label: 'Assigned' },
   closed:      { color: '#16a34a', bg: '#f0fdf4', label: 'Closed' },
   submitted:   { color: '#6b7280', bg: '#f3f4f6', label: 'Submitted' },
 };
@@ -48,7 +47,7 @@ export default function Chat() {
   const [messages, setMessages]               = useState([]);
   const [input, setInput]                     = useState('');
   const [sending, setSending]                 = useState(false);
-  const [pendingFile, setPendingFile] = useState(null);
+  const [pendingFile, setPendingFile]         = useState(null);
   const [sidebarOpen, setSidebarOpen]         = useState(false);
   const [loadingRooms, setLoadingRooms]       = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -60,7 +59,6 @@ export default function Chat() {
   const { sendSocketMessage } = useSocket(
     activeRoom?._id,
     (msg) => {
-    
       setMessages(prev => {
         const exists = prev.some(m => m._id === msg._id);
         return exists ? prev : [...prev, msg];
@@ -90,7 +88,6 @@ export default function Chat() {
               description: r?.claim_id?.description || '',
               amount:      r.claim_id?.amount      || 0,
               status:      r.claim_id?.status      || 'submitted',
-            
             },
             last_message: r.last_message || null,
             unread:       r.unread       || 0,
@@ -138,9 +135,8 @@ export default function Chat() {
     setSending(true);
     const file = pendingFile;
     setPendingFile(null);
-  
+
     if (file) {
-      // File uploads still go through REST (socket handles the broadcast on the backend)
       const optimisticId = `opt_${Date.now()}`;
       setMessages(prev => [...prev, {
         _id: optimisticId, sender: 'user', text, created_at: new Date(),
@@ -157,7 +153,6 @@ export default function Chat() {
         });
         const res = await r.json();
         if (res.message) {
-          // Replace optimistic with real (socket will also fire — dedupe handles it)
           setMessages(prev => prev.filter(m => m._id !== optimisticId));
         }
       } catch {
@@ -165,7 +160,6 @@ export default function Chat() {
         setError('Failed to send file.');
       }
     } else {
-      // ✅ Use socket instead of REST for text messages
       sendSocketMessage({
         roomId:     activeRoom._id,
         text,
@@ -173,7 +167,7 @@ export default function Chat() {
         senderType: 'user',
       });
     }
-  
+
     setSending(false);
   };
 
@@ -193,59 +187,56 @@ export default function Chat() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
-        body { font-family: 'DM Sans', sans-serif; background: var(--cream); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--off-white); }
 
-        .chat-root { display: flex; flex-direction: column; height: 100vh; background: var(--cream); overflow: hidden; }
+        .chat-root { display: flex; flex-direction: column; height: 100vh; background: var(--off-white); overflow: hidden; }
 
-        /* Navbar */
+        /* ── Navbar ── */
         .chat-nav {
-          background: var(--navy); height: 58px; padding: 0 24px;
+          background: var(--blue); height: 64px; padding: 0 24px;
           display: flex; align-items: center; justify-content: space-between;
           flex-shrink: 0; z-index: 50; position: relative;
         }
         .chat-nav::after {
           content: ''; position: absolute; inset: 0; pointer-events: none;
-          background-image: linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+          background-image:
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
         }
-        .nav-brand { display: flex; align-items: center; gap: 9px; position: relative; z-index: 1; }
-        .logo-mark {
-          width: 30px; height: 30px; border: 1.5px solid var(--gold); border-radius: 7px;
-          display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .logo-text { font-family: 'Instrument Serif', serif; font-size: 15px; color: #fff; letter-spacing: .01em; }
         .nav-right { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
         .nav-back {
           display: inline-flex; align-items: center; gap: 6px;
-          font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.5);
-          text-decoration: none; border: 1px solid rgba(255,255,255,.1);
-          border-radius: 7px; padding: 6px 12px; transition: color .15s, border-color .15s;
+          font-size: 13px; font-weight: 500; color: rgba(255,255,255,.65);
+          text-decoration: none; border: 1px solid rgba(255,255,255,.2);
+          border-radius: 8px; padding: 7px 14px;
+          transition: color .15s, border-color .15s, background .15s;
         }
-        .nav-back:hover { color: #fff; border-color: rgba(255,255,255,.28); }
+        .nav-back:hover { color: #fff; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.08); }
         .menu-btn {
           display: none; background: none; border: none; cursor: pointer;
-          color: rgba(255,255,255,.6); padding: 4px;
+          color: rgba(255,255,255,.65); padding: 4px;
         }
         @media (max-width: 700px) { .menu-btn { display: flex; } }
 
-        /* Body */
+        /* ── Body ── */
         .chat-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
-        /* Sidebar */
+        /* ── Sidebar ── */
         .chat-sidebar {
           width: 300px; flex-shrink: 0;
           background: var(--white); border-right: 1px solid var(--border);
@@ -254,56 +245,59 @@ export default function Chat() {
         }
         @media (max-width: 700px) {
           .chat-sidebar {
-            position: absolute; left: 0; top: 58px; bottom: 0; z-index: 40;
-            transform: translateX(-100%); box-shadow: 4px 0 24px rgba(15,31,61,.12);
+            position: absolute; left: 0; top: 64px; bottom: 0; z-index: 40;
+            transform: translateX(-100%); box-shadow: 4px 0 24px rgba(22,105,169,.12);
           }
           .chat-sidebar.open { transform: translateX(0); }
         }
-        .sidebar-head { padding: 18px 18px 14px; border-bottom: 1px solid var(--border); }
-        .sidebar-title { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--navy); margin-bottom: 2px; }
-        .sidebar-sub { font-size: 12px; color: var(--muted); }
+        .sidebar-head {
+          padding: 18px 18px 14px; border-bottom: 1px solid var(--border);
+          background: var(--white);
+        }
+        .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .sidebar-sub { font-size: 12px; color: var(--text-muted); }
         .room-list { flex: 1; overflow-y: auto; }
         .room-item {
           padding: 14px 18px; cursor: pointer; border-bottom: 1px solid var(--border);
           transition: background .12s; position: relative;
         }
-        .room-item:hover { background: var(--cream); }
-        .room-item.active { background: #f0f4fb; border-left: 3px solid var(--navy); }
-        .room-item.active .room-agency { color: var(--navy); font-weight: 600; }
+        .room-item:hover { background: var(--off-white); }
+        .room-item.active { background: var(--blue-light); border-left: 3px solid var(--blue); }
+        .room-item.active .room-agency { color: var(--blue-dark); font-weight: 700; }
         .room-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
         .room-avatar {
           width: 34px; height: 34px; border-radius: 10px;
-          background: var(--navy); color: var(--gold);
+          background: var(--blue); color: #fff;
           font-size: 11px; font-weight: 700; letter-spacing: .03em;
           display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         .room-meta { flex: 1; min-width: 0; }
-        .room-agency { font-size: 13px; font-weight: 600; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .room-debtor { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .room-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-        .room-preview { font-size: 12px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .room-agency { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .room-debtor { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .room-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+        .room-preview { font-size: 12px; color: var(--text-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .unread-dot {
           position: absolute; top: 14px; right: 14px;
           width: 18px; height: 18px; border-radius: 99px;
-          background: var(--navy); color: #fff;
+          background: var(--blue); color: #fff;
           font-size: 10px; font-weight: 700;
           display: flex; align-items: center; justify-content: center;
         }
 
-        /* Skeleton */
+        /* ── Skeleton ── */
         .skel {
           border-radius: 6px;
-          background: linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%);
+          background: linear-gradient(90deg, var(--off-white) 25%, var(--border) 50%, var(--off-white) 75%);
           background-size: 200% 100%;
           animation: shimmer 1.4s infinite;
         }
         @keyframes shimmer { to { background-position: -200% 0; } }
         .room-skel { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
 
-        /* Main */
+        /* ── Main ── */
         .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-        /* Claim bar */
+        /* ── Claim bar ── */
         .claim-bar {
           background: var(--white); border-bottom: 1px solid var(--border);
           padding: 12px 22px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
@@ -311,25 +305,25 @@ export default function Chat() {
         }
         @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
         .claim-bar-avatar {
-          width: 38px; height: 38px; border-radius: 11px; background: var(--navy);
-          color: var(--gold); font-size: 12px; font-weight: 700;
+          width: 38px; height: 38px; border-radius: 11px; background: var(--blue);
+          color: #fff; font-size: 12px; font-weight: 700;
           display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .claim-bar-name { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
-        .claim-bar-sub { font-size: 12px; color: var(--muted); }
+        .claim-bar-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .claim-bar-sub { font-size: 12px; color: var(--text-muted); }
         .claim-bar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .claim-amount { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--gold-d); }
+        .claim-amount { font-size: 17px; font-weight: 700; color: var(--blue-dark); }
         .status-chip {
           display: inline-flex; align-items: center; padding: 3px 10px;
           border-radius: 99px; font-size: 11px; font-weight: 600; letter-spacing: .04em;
         }
         .mobile-menu-btn {
           display: none; background: none; border: none; cursor: pointer;
-          color: var(--muted); padding: 4px; margin-right: 4px;
+          color: var(--text-muted); padding: 4px; margin-right: 4px;
         }
         @media (max-width: 700px) { .mobile-menu-btn { display: flex; } }
 
-        /* Messages */
+        /* ── Messages ── */
         .messages-area {
           flex: 1; overflow-y: auto; padding: 24px 22px;
           display: flex; flex-direction: column;
@@ -339,7 +333,7 @@ export default function Chat() {
         .messages-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
         .date-divider {
           display: flex; align-items: center; gap: 12px;
-          margin: 20px 0 16px; font-size: 11px; color: var(--muted);
+          margin: 20px 0 16px; font-size: 11px; color: var(--text-muted);
           letter-spacing: .07em; text-transform: uppercase;
         }
         .date-divider::before, .date-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -355,65 +349,67 @@ export default function Chat() {
           font-size: 13.5px; line-height: 1.55;
         }
         .msg-row.user .msg-bubble {
-          background: var(--navy); color: #fff; border-bottom-right-radius: 4px;
+          background: var(--blue); color: #fff; border-bottom-right-radius: 4px;
         }
         .msg-row.agency .msg-bubble {
-          background: var(--white); color: var(--navy);
+          background: var(--white); color: var(--text);
           border: 1px solid var(--border); border-bottom-left-radius: 4px;
-          box-shadow: 0 1px 4px rgba(15,31,61,.06);
+          box-shadow: 0 1px 4px rgba(22,105,169,.06);
         }
         .msg-time { font-size: 10.5px; margin-top: 4px; display: block; }
-        .msg-row.user  .msg-time { color: rgba(255,255,255,.45); text-align: right; }
-        .msg-row.agency .msg-time { color: var(--muted); }
-        .agency-label { font-size: 11px; font-weight: 600; color: var(--gold-d); margin-bottom: 4px; letter-spacing: .04em; }
+        .msg-row.user  .msg-time { color: rgba(255,255,255,.5); text-align: right; }
+        .msg-row.agency .msg-time { color: var(--text-muted); }
+        .agency-label { font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 4px; letter-spacing: .04em; }
 
-        /* Input */
+        /* ── Input bar ── */
         .input-bar {
           background: var(--white); border-top: 1px solid var(--border);
-          padding: 14px 18px; display: flex; align-items: flex-end; gap: 10px; flex-shrink: 0;
+          padding: 14px 18px; display: flex; align-items: flex-end; gap: 10px;
+          flex-shrink: 0; position: relative;
         }
         .input-wrap { flex: 1; position: relative; }
         .chat-input {
-          width: 100%; background: var(--cream); border: 1.5px solid var(--border);
+          width: 100%; background: var(--off-white); border: 1.5px solid var(--border);
           border-radius: 12px; padding: 11px 46px 11px 14px;
-          font-size: 13.5px; font-family: 'DM Sans', sans-serif; color: var(--navy);
+          font-size: 13.5px; font-family: inherit; color: var(--text);
           outline: none; resize: none; line-height: 1.5; max-height: 120px;
           transition: border-color .15s, box-shadow .15s;
         }
-        .chat-input::placeholder { color: var(--muted); }
-        .chat-input:focus { border-color: var(--navy); background: var(--white); box-shadow: 0 0 0 3px rgba(15,31,61,.06); }
+        .chat-input::placeholder { color: var(--text-muted); }
+        .chat-input:focus { border-color: var(--blue); background: var(--white); box-shadow: 0 0 0 3px rgba(22,105,169,.08); }
         .send-btn {
           position: absolute; right: 8px; bottom: 8px;
           width: 32px; height: 32px; border-radius: 9px;
-          background: var(--navy); border: none; cursor: pointer;
+          background: var(--blue); border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           transition: background .15s, transform .1s;
         }
-        .send-btn:hover:not(:disabled) { background: var(--navy-2); transform: scale(1.05); }
+        .send-btn:hover:not(:disabled) { background: var(--blue-dark); transform: scale(1.05); }
         .send-btn:disabled { opacity: .4; cursor: not-allowed; }
-        .input-hint { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 8px; }
+        .input-hint { font-size: 11px; color: var(--text-muted); text-align: center; padding-bottom: 8px; background: var(--white); }
 
-        /* Center states */
+        /* ── Center states ── */
         .center-state {
           flex: 1; display: flex; flex-direction: column;
           align-items: center; justify-content: center;
-          gap: 10px; color: var(--muted); padding: 40px; text-align: center;
+          gap: 10px; color: var(--text-muted); padding: 40px; text-align: center;
         }
         .center-icon {
           width: 52px; height: 52px; border-radius: 16px;
-          background: var(--cream); border: 1px solid var(--border);
+          background: var(--blue-light); border: 1px solid var(--blue-mid);
           display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
         }
-        .center-state p { font-size: 14px; font-weight: 600; color: var(--navy); }
+        .center-state p { font-size: 14px; font-weight: 600; color: var(--text); }
         .center-state span { font-size: 13px; max-width: 260px; line-height: 1.5; }
         .spinner {
-          width: 22px; height: 22px; border: 2.5px solid var(--border);
-          border-top-color: var(--navy); border-radius: 50%;
+          width: 22px; height: 22px;
+          border: 2.5px solid rgba(22,105,169,.15);
+          border-top-color: var(--blue); border-radius: 50%;
           animation: spin .7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Error bar */
+        /* ── Error bar ── */
         .err-bar {
           background: #fdf0ef; border-bottom: 1px solid #f1c0bc;
           color: var(--error); font-size: 12.5px; padding: 8px 22px;
@@ -426,7 +422,6 @@ export default function Chat() {
 
         {/* Navbar */}
         <nav className="chat-nav">
-        
           <div className="nav-right">
             <Link to="/dashboard" className="nav-back">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -466,18 +461,18 @@ export default function Chat() {
               {loadingRooms ? (
                 [...Array(4)].map((_, i) => (
                   <div className="room-skel" key={i}>
-                    <div style={{display:'flex', gap:10, alignItems:'center'}}>
-                      <div className="skel" style={{width:34,height:34,borderRadius:10,flexShrink:0}}/>
-                      <div style={{flex:1, display:'flex', flexDirection:'column', gap:6}}>
-                        <div className="skel" style={{height:12,width:'70%'}}/>
-                        <div className="skel" style={{height:10,width:'50%'}}/>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <div className="skel" style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0 }}/>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="skel" style={{ height: 12, width: '70%' }}/>
+                        <div className="skel" style={{ height: 10, width: '50%' }}/>
                       </div>
                     </div>
-                    <div className="skel" style={{height:10,width:'85%'}}/>
+                    <div className="skel" style={{ height: 10, width: '85%' }}/>
                   </div>
                 ))
               ) : rooms.length === 0 ? (
-                <div style={{padding:'32px 18px', textAlign:'center', color:'var(--muted)', fontSize:13, lineHeight:1.6}}>
+                <div style={{ padding: '32px 18px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.6 }}>
                   No conversations yet.<br/>They appear when a claim is assigned to an agency.
                 </div>
               ) : (
@@ -510,7 +505,7 @@ export default function Chat() {
             {!activeRoom && !loadingRooms && (
               <div className="center-state">
                 <div className="center-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a95a3" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
                   </svg>
                 </div>
@@ -522,36 +517,35 @@ export default function Chat() {
             {activeRoom && (
               <>
                 {/* Claim bar */}
-              {/* Claim bar */}
-<div className="claim-bar">
-  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-  </button>
+                <div className="claim-bar">
+                  <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                  </button>
 
-  <div className="claim-bar-avatar">{activeRoom.agency.initials}</div>
+                  <div className="claim-bar-avatar">{activeRoom.agency.initials}</div>
 
-  <div style={{ flex: 1, minWidth: 0 }}>
-    <div className="claim-bar-name">{activeRoom.agency.name}</div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-      <div className="claim-bar-sub">vs {activeRoom.claim.debtor_name}</div>
-      {activeRoom.claim.description && (
-        <>
-          <span style={{ color: 'var(--border)', fontSize: 12 }}>·</span>
-          <div className="claim-bar-sub" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>
-            {activeRoom.claim.description}
-          </div>
-        </>
-      )}
-    </div>
-  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="claim-bar-name">{activeRoom.agency.name}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <div className="claim-bar-sub">vs {activeRoom.claim.debtor_name}</div>
+                      {activeRoom.claim.description && (
+                        <>
+                          <span style={{ color: 'var(--border)', fontSize: 12 }}>·</span>
+                          <div className="claim-bar-sub" style={{ fontStyle: 'italic' }}>
+                            {activeRoom.claim.description}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
-  <div className="claim-bar-right">
-    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
-    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
-  </div>
-</div>
+                  <div className="claim-bar-right">
+                    <span className="claim-amount">{fmt(activeRoom.claim.amount)}</span>
+                    <span className="status-chip" style={{ background: st.bg, color: st.color }}>{st.label}</span>
+                  </div>
+                </div>
 
                 {/* Messages area */}
                 <div className="messages-area">
@@ -578,30 +572,29 @@ export default function Chat() {
                                   {!isUser && !prevSame && (
                                     <p className="agency-label">{activeRoom.agency.name}</p>
                                   )}
-                               <div className="msg-bubble">
-  {msg.text && <span>{msg.text}</span>}
-  {msg.attachment?.url && (
-    <a
-      href={msg.attachment.url}
-      target="_blank"
-      rel="noreferrer"
-      style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        marginTop: msg.text ? 8 : 0,
-        color: 'inherit', textDecoration: 'none',
-        background: 'rgba(255,255,255,0.12)', borderRadius: 8,
-        padding: '6px 10px', fontSize: 12,
-      }}
-    >
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
-      </svg>
-      {msg.attachment.original_name}
-    </a>
-  )}
-  <span className="msg-time">{fmtTime(msg.created_at)}</span>
-</div>
-
+                                  <div className="msg-bubble">
+                                    {msg.text && <span>{msg.text}</span>}
+                                    {msg.attachment?.url && (
+                                      <a
+                                        href={msg.attachment.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                          display: 'flex', alignItems: 'center', gap: 6,
+                                          marginTop: msg.text ? 8 : 0,
+                                          color: 'inherit', textDecoration: 'none',
+                                          background: 'rgba(255,255,255,0.15)', borderRadius: 8,
+                                          padding: '6px 10px', fontSize: 12,
+                                        }}
+                                      >
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                                        </svg>
+                                        {msg.attachment.original_name}
+                                      </a>
+                                    )}
+                                    <span className="msg-time">{fmtTime(msg.created_at)}</span>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -612,7 +605,7 @@ export default function Chat() {
                       {messages.length === 0 && (
                         <div className="center-state">
                           <div className="center-icon">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a95a3" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
                             </svg>
                           </div>
@@ -626,48 +619,47 @@ export default function Chat() {
                 </div>
 
                 {/* Input bar */}
-               {/* Input bar — replace entirely */}
-<div className="input-bar" style={{ position: 'relative' }}>
-  {pendingFile && (
-    <div style={{
-      position: 'absolute', bottom: '80px', left: '18px', right: '18px',
-      background: 'var(--white)', border: '1px solid var(--border)',
-      borderRadius: '10px', padding: '10px 14px',
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      fontSize: '12.5px', color: 'var(--navy)', boxShadow: '0 2px 8px rgba(15,31,61,.08)',
-    }}>
-      <span>📎 {pendingFile.name}</span>
-      <button onClick={() => setPendingFile(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '16px', lineHeight: 1 }}>×</button>
-    </div>
-  )}
-  <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--muted)', flexShrink: 0 }} title="Attach file">
-    <input type="file" style={{ display: 'none' }} onChange={e => setPendingFile(e.target.files[0] || null)} />
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
-    </svg>
-  </label>
-  <div className="input-wrap">
-    <textarea
-      ref={inputRef}
-      className="chat-input"
-      placeholder="Type a message…"
-      value={input}
-      onChange={e => setInput(e.target.value)}
-      onKeyDown={handleKey}
-      rows={1}
-    />
-    <button
-      className="send-btn"
-      onClick={handleSend}
-      disabled={(!input.trim() && !pendingFile) || sending}
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"/>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
-    </button>
-  </div>
-</div>
+                <div className="input-bar">
+                  {pendingFile && (
+                    <div style={{
+                      position: 'absolute', bottom: '80px', left: '18px', right: '18px',
+                      background: 'var(--white)', border: '1px solid var(--blue-mid)',
+                      borderRadius: '10px', padding: '10px 14px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      fontSize: '12.5px', color: 'var(--text)', boxShadow: '0 2px 8px rgba(22,105,169,.08)',
+                    }}>
+                      <span>📎 {pendingFile.name}</span>
+                      <button onClick={() => setPendingFile(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '16px', lineHeight: 1 }}>×</button>
+                    </div>
+                  )}
+                  <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--text-muted)', flexShrink: 0 }} title="Attach file">
+                    <input type="file" style={{ display: 'none' }} onChange={e => setPendingFile(e.target.files[0] || null)} />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                  </label>
+                  <div className="input-wrap">
+                    <textarea
+                      ref={inputRef}
+                      className="chat-input"
+                      placeholder="Type a message…"
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyDown={handleKey}
+                      rows={1}
+                    />
+                    <button
+                      className="send-btn"
+                      onClick={handleSend}
+                      disabled={(!input.trim() && !pendingFile) || sending}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
                 <p className="input-hint">Press Enter to send · Shift+Enter for new line</p>
               </>
             )}

@@ -35,159 +35,186 @@ export default function ClaimsList() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root {
-          --navy:#0f1f3d; --navy-2:#162847; --gold:#c9a84c; --gold-l:#e2c97e;
-          --gold-d:#a8883a; --cream:#faf8f4; --muted:#8a95a3; --border:#e4e2dd; --white:#ffffff;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
         }
-        body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--navy); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--off-white); color: var(--text); }
 
         /* NAVBAR */
         .navbar {
-          background:var(--navy); border-bottom:1px solid rgba(201,168,76,0.15);
-          padding:0 40px; height:64px;
-          display:flex; align-items:center; justify-content:space-between;
-          position:sticky; top:0; z-index:100;
+          background: var(--blue);
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+          padding: 0 40px; height: 64px;
+          display: flex; align-items: center; justify-content: space-between;
+          position: sticky; top: 0; z-index: 100;
         }
         .navbar::after {
-          content:''; position:absolute; inset:0;
-          background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-          background-size:40px 40px; pointer-events:none;
+          content: ''; position: absolute; inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+          background-size: 40px 40px; pointer-events: none;
         }
-        .nav-brand { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
-        .logo-mark { width:32px; height:32px; border:1.5px solid var(--gold); border-radius:7px; display:flex; align-items:center; justify-content:center; }
-        .logo-text { font-family:'Instrument Serif',serif; font-size:16px; color:#fff; }
-        .nav-actions { display:flex; align-items:center; gap:12px; position:relative; z-index:1; }
+        .nav-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+        .logo-mark {
+          width: 32px; height: 32px;
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .nav-actions { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
         .back-link {
-          display:inline-flex; align-items:center; gap:7px;
-          font-size:13px; font-weight:500; color:rgba(255,255,255,0.5);
-          text-decoration:none; border:1px solid rgba(255,255,255,0.1);
-          border-radius:8px; padding:7px 14px; transition:color 0.15s,border-color 0.15s;
+          display: inline-flex; align-items: center; gap: 7px;
+          font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.65);
+          text-decoration: none; border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px; padding: 7px 14px;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .back-link:hover { color:#fff; border-color:rgba(255,255,255,0.28); }
-        .btn-gold {
-          background:var(--gold); color:var(--navy);
-          border:none; border-radius:8px; padding:8px 16px;
-          font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600;
-          cursor:pointer; text-decoration:none;
-          display:inline-flex; align-items:center; gap:6px;
-          transition:background 0.15s;
+        .back-link:hover { color: #fff; border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); }
+        .btn-primary {
+          background: rgba(255,255,255,0.15); color: #fff;
+          border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; padding: 8px 16px;
+          font-size: 13px; font-family: inherit; font-weight: 600;
+          cursor: pointer; text-decoration: none;
+          display: inline-flex; align-items: center; gap: 6px;
+          transition: background 0.15s, border-color 0.15s;
         }
-        .btn-gold:hover { background:var(--gold-l); }
+        .btn-primary:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.55); }
 
         /* PAGE */
-        .page { max-width:1000px; margin:0 auto; padding:48px 32px 80px; animation:fadeUp 0.5s cubic-bezier(.22,1,.36,1) both; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        @media(max-width:600px){ .page{padding:32px 16px 60px;} .navbar{padding:0 16px;} }
+        .page { max-width: 1000px; margin: 0 auto; padding: 48px 32px 80px; animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media(max-width:600px) { .page { padding: 32px 16px 60px; } .navbar { padding: 0 16px; } }
 
         /* HEADER */
-        .page-eyebrow { font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-d); margin-bottom:6px; }
-        .page-title { font-family:'Instrument Serif',serif; font-size:34px; color:var(--navy); line-height:1.1; }
-        .page-title em { color:var(--gold); font-style:italic; }
-        .header-divider { height:1px; background:linear-gradient(90deg,var(--gold) 0%,transparent 100%); width:40px; margin:12px 0 16px; }
+        .page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+        .page-title { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.15; margin-bottom: 4px; }
+        .header-rule { width: 48px; height: 3px; background: var(--blue); border-radius: 2px; margin: 14px 0 10px; }
+        .page-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 28px; }
 
         /* FILTER TABS */
-        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
         .filter-btn {
-          padding:6px 14px; border-radius:20px; font-size:12.5px; font-weight:600;
-          border:1px solid var(--border); background:var(--white); color:var(--muted);
-          cursor:pointer; transition:all 0.15s; text-transform:capitalize;
-          font-family:'DM Sans',sans-serif;
+          padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+          border: 1px solid var(--border); background: var(--white); color: var(--text-muted);
+          cursor: pointer; transition: all 0.15s; text-transform: capitalize;
+          font-family: inherit;
         }
-        .filter-btn:hover { border-color:var(--gold); color:var(--navy); }
-        .filter-btn-active { background:var(--navy); color:#fff; border-color:var(--navy); }
+        .filter-btn:hover { border-color: var(--blue); color: var(--text); }
+        .filter-btn-active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
         /* PANEL */
-        .panel { background:var(--white); border-radius:20px; border:1px solid var(--border); overflow:hidden; box-shadow:0 2px 20px rgba(15,31,61,0.05); }
+        .panel { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
         .panel-header {
-          padding:18px 28px; background:var(--navy);
-          display:flex; align-items:center; justify-content:space-between;
-          position:relative; overflow:hidden;
+          padding: 14px 24px; background: var(--blue);
+          display: flex; align-items: center; justify-content: space-between;
+          position: relative; overflow: hidden;
         }
         .panel-header::after {
-          content:''; position:absolute; inset:0;
-          background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
-          background-size:32px 32px; pointer-events:none;
+          content: ''; position: absolute; inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+          background-size: 32px 32px; pointer-events: none;
         }
-        .panel-title { font-family:'Instrument Serif',serif; font-size:18px; color:#fff; position:relative; z-index:1; }
+        .panel-title { font-size: 14px; font-weight: 600; color: #fff; position: relative; z-index: 1; letter-spacing: 0.01em; }
         .panel-count {
-          font-size:11.5px; color:rgba(255,255,255,0.35);
-          background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.08);
-          border-radius:20px; padding:3px 12px; position:relative; z-index:1;
+          font-size: 11.5px; color: rgba(255,255,255,0.65);
+          background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 20px; padding: 3px 12px; position: relative; z-index: 1;
         }
 
         /* TABLE */
-        .table-wrap { overflow-x:auto; }
-        table { width:100%; border-collapse:collapse; font-size:13.5px; }
-        thead tr { background:var(--cream); border-bottom:1px solid var(--border); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        thead tr { background: var(--off-white); border-bottom: 1px solid var(--border); }
         thead th {
-          padding:12px 24px; text-align:left;
-          font-size:10.5px; font-weight:600; letter-spacing:0.08em;
-          text-transform:uppercase; color:var(--muted); white-space:nowrap;
+          padding: 12px 24px; text-align: left;
+          font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em;
+          text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
         }
-        tbody tr { border-bottom:1px solid #f3f1ed; transition:background 0.12s; }
-        tbody tr:last-child { border-bottom:none; }
-        tbody tr:hover { background:#faf8f4; }
-        td { padding:16px 24px; }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--blue-light); }
+        td { padding: 16px 24px; }
 
-        .debtor-name { font-weight:600; color:var(--navy); margin-bottom:2px; }
-        .debtor-type { font-size:11.5px; color:var(--muted); text-transform:capitalize; }
-        .amount { font-family:'Instrument Serif',serif; font-size:17px; color:var(--navy); }
-        .date-text { color:var(--muted); font-size:13px; }
+        .debtor-name { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .debtor-type { font-size: 11.5px; color: var(--text-muted); text-transform: capitalize; }
+        .amount { font-size: 15px; font-weight: 600; color: var(--text); }
+        .date-text { color: var(--text-muted); font-size: 13px; }
 
         /* STATUS */
-        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:600; }
-        .status-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-        .status-submitted  { background:#fef9e7; color:#9a7d0a; border:1px solid #f9e79f; }
-        .status-submitted .status-dot  { background:#f4d03f; }
-        .status-assigned   { background:#eaf2ff; color:#1a5276; border:1px solid #aed6f1; }
-        .status-assigned .status-dot   { background:#3498db; }
-        .status-progress   { background:#f4ecf7; color:#6c3483; border:1px solid #d7bde2; }
-        .status-progress .status-dot   { background:#9b59b6; }
-        .status-closed     { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
-        .status-closed .status-dot     { background:#27ae60; }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+        .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+        .status-submitted  { background: #fef9e7; color: #9a7d0a; border: 1px solid #f9e79f; }
+        .status-submitted .status-dot  { background: #f4d03f; }
+        .status-assigned   { background: var(--blue-light); color: #0f5189; border: 1px solid var(--blue-mid); }
+        .status-assigned .status-dot   { background: var(--blue); }
+        .status-progress   { background: #f4ecf7; color: #6c3483; border: 1px solid #d7bde2; }
+        .status-progress .status-dot   { background: #9b59b6; }
+        .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+        .status-closed .status-dot     { background: #27ae60; }
 
         .view-link {
-          color:var(--gold-d); font-weight:600; font-size:12.5px;
-          text-decoration:none; border:1px solid rgba(201,168,76,0.25);
-          padding:5px 12px; border-radius:7px; transition:background 0.14s,color 0.14s;
-          white-space:nowrap;
+          color: var(--blue); font-weight: 600; font-size: 12.5px;
+          text-decoration: none; border: 1px solid var(--blue-mid);
+          padding: 5px 12px; border-radius: 7px;
+          transition: background 0.14s, color 0.14s, border-color 0.14s;
+          white-space: nowrap;
         }
-        .view-link:hover { background:var(--navy); color:var(--gold-l); border-color:transparent; }
+        .view-link:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-        /* ASSIGN LINK */
         .assign-link {
-          color:var(--muted); font-weight:600; font-size:12px;
-          text-decoration:none; border:1px solid var(--border);
-          padding:5px 10px; border-radius:7px; transition:all 0.14s;
-          white-space:nowrap; margin-left:6px;
+          color: var(--text-muted); font-weight: 600; font-size: 12px;
+          text-decoration: none; border: 1px solid var(--border);
+          padding: 5px 10px; border-radius: 7px; transition: all 0.14s;
+          white-space: nowrap; margin-left: 6px;
         }
-        .assign-link:hover { background:var(--navy); color:#fff; border-color:transparent; }
+        .assign-link:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
 
         /* EMPTY */
-        .empty-state { padding:72px 24px; text-align:center; }
-        .empty-icon { width:52px; height:52px; border:1.5px solid var(--border); border-radius:14px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; color:var(--muted); }
-        .empty-title { font-family:'Instrument Serif',serif; font-size:20px; color:var(--navy); margin-bottom:6px; }
-        .empty-sub { font-size:13.5px; color:var(--muted); margin-bottom:24px; }
-        .btn-cta {
-          background:var(--navy); color:#fff; border:none; border-radius:10px;
-          padding:11px 22px; font-size:13.5px; font-family:'DM Sans',sans-serif;
-          font-weight:600; cursor:pointer; text-decoration:none;
-          display:inline-flex; align-items:center; gap:7px; transition:background 0.15s;
+        .empty-state { padding: 72px 24px; text-align: center; }
+        .empty-icon {
+          width: 52px; height: 52px; border: 1px solid var(--border);
+          border-radius: 12px; display: inline-flex; align-items: center;
+          justify-content: center; margin-bottom: 18px; color: var(--text-muted);
+          background: var(--off-white);
         }
-        .btn-cta:hover { background:var(--navy-2); }
+        .empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .empty-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 24px; }
+        .btn-cta {
+          background: var(--blue); color: #fff; border: none; border-radius: 8px;
+          padding: 11px 22px; font-size: 13.5px; font-family: inherit;
+          font-weight: 600; cursor: pointer; text-decoration: none;
+          display: inline-flex; align-items: center; gap: 7px;
+          transition: background 0.15s;
+        }
+        .btn-cta:hover { background: var(--blue-dark); }
 
         /* SKELETON */
-        .skel { border-radius:6px; background:linear-gradient(90deg,#f0ede8 25%,#e8e4de 50%,#f0ede8 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
-        @keyframes shimmer { to{background-position:-200% 0} }
+        .skel {
+          border-radius: 6px;
+          background: linear-gradient(90deg, var(--off-white) 25%, var(--border) 50%, var(--off-white) 75%);
+          background-size: 200% 100%; animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer { to { background-position: -200% 0; } }
 
-        .footer-note { text-align:center; margin-top:40px; font-size:11.5px; color:#bbb; line-height:1.6; }
+        .footer-note { text-align: center; margin-top: 40px; font-size: 11.5px; color: var(--text-muted); line-height: 1.6; }
       `}</style>
 
       {/* NAVBAR */}
       <nav className="navbar">
-       
         <div className="nav-actions">
           <Link to="/agencies" className="back-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -196,7 +223,7 @@ export default function ClaimsList() {
             </svg>
             Agencies
           </Link>
-          <Link to="/claims/create" className="btn-gold">
+          <Link to="/claims/create" className="btn-primary">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
@@ -215,8 +242,9 @@ export default function ClaimsList() {
 
         {/* HEADER */}
         <p className="page-eyebrow">Claims</p>
-        <h1 className="page-title">My <em>Claims</em></h1>
-        <div className="header-divider" />
+        <h1 className="page-title">My Claims</h1>
+        <div className="header-rule" />
+        <p className="page-sub">Track and manage all your submitted claims.</p>
 
         {/* FILTER TABS */}
         <div className="filter-bar">
@@ -226,7 +254,9 @@ export default function ClaimsList() {
               onClick={() => setFilter(f)}
               className={`filter-btn ${filter === f ? 'filter-btn-active' : ''}`}
             >
-              {f === 'all' ? `All (${claims.length})` : `${f.replace('_', ' ')} (${claims.filter(c => c.status === f).length})`}
+              {f === 'all'
+                ? `All (${claims.length})`
+                : `${f.replace('_', ' ')} (${claims.filter(c => c.status === f).length})`}
             </button>
           ))}
         </div>
@@ -251,7 +281,7 @@ export default function ClaimsList() {
                   {[...Array(5)].map((_, i) => (
                     <tr key={i}>
                       <td><div className="skel" style={{height:13,width:120,marginBottom:6}}/><div className="skel" style={{height:10,width:70}}/></td>
-                      <td><div className="skel" style={{height:16,width:80}}/></td>
+                      <td><div className="skel" style={{height:15,width:80}}/></td>
                       <td><div className="skel" style={{height:13,width:90}}/></td>
                       <td><div className="skel" style={{height:22,width:90,borderRadius:20}}/></td>
                       <td><div className="skel" style={{height:13,width:80}}/></td>
@@ -275,7 +305,7 @@ export default function ClaimsList() {
                 </svg>
               </div>
               <h3 className="empty-title">
-                {filter === 'all' ? 'No claims yet' : `No ${filter.replace('_',' ')} claims`}
+                {filter === 'all' ? 'No claims yet' : `No ${filter.replace('_', ' ')} claims`}
               </h3>
               <p className="empty-sub">
                 {filter === 'all'
@@ -349,7 +379,7 @@ export default function ClaimsList() {
         </div>
 
         <p className="footer-note">
-        Pasado is a technology platform that connects businesses with
+          Collection Connector is a technology platform that connects businesses with
           independent, licensed collection agencies. We do not provide debt collection
           services, legal advice, or contact debtors on your behalf.
         </p>

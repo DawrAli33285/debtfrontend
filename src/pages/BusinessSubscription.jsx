@@ -326,15 +326,7 @@ export default function SubscriptionPlans() {
       {/* NAVBAR */}
       <nav className="navbar-grid sticky top-0 z-40 flex items-center justify-between px-10 h-16 relative overflow-hidden"
         style={{ background: 'var(--navy)', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
-        <div className="relative z-10 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[7px] flex items-center justify-center flex-shrink-0"
-            style={{ border: '1.5px solid var(--gold)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2" strokeLinecap="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
-          <span className="serif text-white text-base tracking-wide">Pasado</span>
-        </div>
+        
         <Link to="/dashboard"
           className="relative z-10 flex items-center gap-1.5 text-[13px] font-medium no-underline rounded-lg px-3.5 py-1.5 transition-all"
           style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}

@@ -7,14 +7,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [claims, setClaims]             = useState([]);
   const [loading, setLoading]           = useState(true);
-  const [termsAccepted, setTermsAccepted] = useState(true); // true by default prevents flash
+  const [termsAccepted, setTermsAccepted] = useState(true);
   const [currentUser, setCurrentUser]   = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return navigate('/login');
 
-    // Check terms status — only show modal if terms_accept is false
     getMe().then(({ user }) => {
       if (!user) return;
       setCurrentUser(user);
@@ -55,90 +54,93 @@ export default function Dashboard() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --navy-3: #1e3259;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
+          --blue:      #1669A9;
+          --blue-dark: #0f5189;
+          --blue-light:#e8f2fa;
+          --blue-mid:  #c5ddf0;
+          --white:     #ffffff;
+          --off-white: #f5f7fa;
+          --border:    #e0e7ef;
+          --text:      #1a2a3a;
+          --text-mid:  #4a6070;
+          --text-muted:#7a96a8;
         }
 
         body {
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
-          color: var(--navy);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
+          color: var(--text);
         }
 
         /* ── NAVBAR ── */
         .navbar {
-          background: var(--navy);
-          border-bottom: 1px solid rgba(201,168,76,0.15);
+          background: var(--white);
+          border-bottom: 2px solid var(--blue);
           padding: 0 40px;
-          height: 64px;
+          height: 68px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           position: sticky;
           top: 0;
           z-index: 100;
-        }
-        .navbar::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-          background-size: 40px 40px;
-          pointer-events: none;
+          box-shadow: 0 2px 8px rgba(22,105,169,0.08);
         }
 
         .nav-brand {
           display: flex;
           align-items: center;
           gap: 10px;
-          position: relative;
-          z-index: 1;
         }
         .logo-mark {
-          width: 32px; height: 32px;
-          border: 1.5px solid var(--gold);
-          border-radius: 7px;
+          width: 34px; height: 34px;
+          background: var(--blue);
+          border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
         .logo-text {
-          font-family: 'Instrument Serif', serif;
-          font-size: 16px;
-          color: #fff;
-          letter-spacing: 0.01em;
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--blue);
+          letter-spacing: -0.01em;
         }
 
         .nav-actions {
           display: flex;
           align-items: center;
-          gap: 16px;
-          position: relative;
-          z-index: 1;
+          gap: 8px;
+        }
+
+        .nav-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 14px;
+          border-radius: 6px;
+          font-size: 13.5px;
+          font-weight: 500;
+          color: var(--text-mid);
+          text-decoration: none;
+          border: 1px solid transparent;
+          transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .nav-link:hover {
+          background: var(--blue-light);
+          color: var(--blue);
+          border-color: var(--blue-mid);
         }
 
         .btn-submit-nav {
-          background: var(--gold);
-          color: var(--navy);
+          background: var(--blue);
+          color: var(--white);
           border: none;
-          border-radius: 8px;
-          padding: 8px 16px;
-          font-size: 13px;
-          font-family: 'DM Sans', sans-serif;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-size: 13.5px;
           font-weight: 600;
           cursor: pointer;
           text-decoration: none;
@@ -146,27 +148,28 @@ export default function Dashboard() {
           align-items: center;
           gap: 6px;
           transition: background 0.15s, transform 0.1s;
-          letter-spacing: 0.01em;
+          margin-left: 4px;
         }
         .btn-submit-nav:hover {
-          background: var(--gold-l);
+          background: var(--blue-dark);
           transform: translateY(-1px);
         }
 
         .btn-logout {
           background: transparent;
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 8px;
+          border: 1px solid var(--border);
+          border-radius: 6px;
           padding: 7px 14px;
           font-size: 13px;
-          font-family: 'DM Sans', sans-serif;
-          color: rgba(255,255,255,0.55);
+          font-family: inherit;
+          color: var(--text-muted);
           cursor: pointer;
-          transition: color 0.15s, border-color 0.15s;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
         .btn-logout:hover {
-          color: #fff;
-          border-color: rgba(255,255,255,0.3);
+          color: var(--text);
+          border-color: var(--text-muted);
+          background: var(--off-white);
         }
 
         /* ── PAGE WRAP ── */
@@ -174,48 +177,44 @@ export default function Dashboard() {
           max-width: 1100px;
           margin: 0 auto;
           padding: 48px 32px 80px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
 
         /* ── PAGE HEADER ── */
         .page-header {
-          margin-bottom: 40px;
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
+          margin-bottom: 36px;
         }
         .page-eyebrow {
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          font-weight: 700;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: var(--gold-d);
-          margin-bottom: 6px;
+          color: var(--blue);
+          margin-bottom: 8px;
         }
         .page-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 36px;
-          color: var(--navy);
-          line-height: 1.1;
+          font-size: 34px;
+          font-weight: 700;
+          color: var(--text);
+          line-height: 1.15;
+          margin-bottom: 8px;
         }
-        .page-title em { color: var(--gold); font-style: italic; }
+        .page-title span { color: var(--blue); }
+        .header-rule {
+          width: 48px;
+          height: 3px;
+          background: var(--blue);
+          border-radius: 2px;
+          margin: 14px 0 8px;
+        }
         .page-sub {
-          font-size: 13.5px;
-          color: var(--muted);
+          font-size: 14px;
+          color: var(--text-muted);
           font-weight: 400;
-          margin-top: 6px;
-        }
-        .header-divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 40px;
-          margin: 12px 0 8px;
         }
 
         /* ── STAT CARDS ── */
@@ -223,148 +222,113 @@ export default function Dashboard() {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 16px;
-          margin-bottom: 40px;
+          margin-bottom: 36px;
         }
         @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 480px) { .stat-grid { grid-template-columns: 1fr; } }
 
         .stat-card {
-          background: var(--navy);
-          border-radius: 16px;
+          background: var(--white);
+          border-radius: 12px;
           padding: 22px 24px;
+          border: 1px solid var(--border);
+          border-top: 3px solid var(--blue);
           position: relative;
           overflow: hidden;
-          border: 1px solid rgba(201,168,76,0.1);
         }
-        .stat-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-          background-size: 28px 28px;
-          pointer-events: none;
-        }
-        .stat-card::after {
-          content: '';
-          position: absolute;
-          bottom: -20px; right: -20px;
-          width: 80px; height: 80px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
-          pointer-events: none;
-        }
+        .stat-card.accent-total  { border-top-color: var(--blue); }
+        .stat-card.accent-submit { border-top-color: #f59e0b; }
+        .stat-card.accent-prog   { border-top-color: #8b5cf6; }
+        .stat-card.accent-closed { border-top-color: #10b981; }
 
         .stat-label {
-          font-size: 10.5px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.09em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.4);
+          color: var(--text-muted);
           margin-bottom: 10px;
-          position: relative;
-          z-index: 1;
         }
         .stat-value {
-          font-family: 'Instrument Serif', serif;
-          font-size: 38px;
+          font-size: 40px;
+          font-weight: 700;
           line-height: 1;
-          position: relative;
-          z-index: 1;
+          color: var(--text);
         }
-        .val-white  { color: #fff; }
-        .val-gold   { color: var(--gold-l); }
-        .val-purple { color: #b39ddb; }
-        .val-green  { color: #80cbc4; }
-
         .stat-icon {
           position: absolute;
-          top: 18px; right: 20px;
-          opacity: 0.12;
-          z-index: 1;
+          top: 16px; right: 18px;
+          opacity: 0.08;
+          color: var(--blue);
         }
 
-        /* ── CLAIMS TABLE PANEL ── */
+        /* ── PANEL ── */
         .panel {
           background: var(--white);
-          border-radius: 20px;
+          border-radius: 12px;
           border: 1px solid var(--border);
           overflow: hidden;
-          box-shadow: 0 2px 20px rgba(15,31,61,0.05);
         }
 
         .panel-header {
-          padding: 20px 28px;
+          padding: 18px 28px;
           border-bottom: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: var(--navy);
-          position: relative;
-          overflow: hidden;
-        }
-        .panel-header::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 32px 32px;
-          pointer-events: none;
+          background: var(--blue);
         }
         .panel-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 20px;
-          color: #fff;
-          position: relative;
-          z-index: 1;
+          font-size: 16px;
+          font-weight: 700;
+          color: var(--white);
+          letter-spacing: 0.01em;
         }
         .panel-count {
-          font-size: 11.5px;
-          color: rgba(255,255,255,0.35);
-          background: rgba(255,255,255,0.07);
-          border: 1px solid rgba(255,255,255,0.08);
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(255,255,255,0.6);
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
           border-radius: 20px;
           padding: 3px 12px;
-          position: relative;
-          z-index: 1;
         }
 
+        /* ── EMPTY STATE ── */
         .empty-state {
           padding: 72px 24px;
           text-align: center;
         }
         .empty-icon {
-          width: 52px; height: 52px;
-          border: 1.5px solid var(--border);
-          border-radius: 14px;
+          width: 56px; height: 56px;
+          background: var(--blue-light);
+          border: 1px solid var(--blue-mid);
+          border-radius: 12px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 18px;
-          color: var(--muted);
+          color: var(--blue);
         }
         .empty-title {
-          font-family: 'Instrument Serif', serif;
           font-size: 20px;
-          color: var(--navy);
+          font-weight: 700;
+          color: var(--text);
           margin-bottom: 6px;
         }
         .empty-sub {
-          font-size: 13.5px;
-          color: var(--muted);
+          font-size: 14px;
+          color: var(--text-muted);
           margin-bottom: 24px;
         }
         .btn-cta {
-          background: var(--navy);
+          background: var(--blue);
           color: #fff;
           border: none;
-          border-radius: 10px;
+          border-radius: 8px;
           padding: 11px 22px;
-          font-size: 13.5px;
-          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          font-family: inherit;
           font-weight: 600;
           cursor: pointer;
           text-decoration: none;
@@ -374,10 +338,11 @@ export default function Dashboard() {
           transition: background 0.15s, transform 0.1s;
         }
         .btn-cta:hover {
-          background: var(--navy-2);
+          background: var(--blue-dark);
           transform: translateY(-1px);
         }
 
+        /* ── TABLE ── */
         .table-wrap { overflow-x: auto; }
 
         table {
@@ -386,45 +351,46 @@ export default function Dashboard() {
           font-size: 13.5px;
         }
         thead tr {
-          background: var(--cream);
+          background: var(--off-white);
           border-bottom: 1px solid var(--border);
         }
         thead th {
           padding: 12px 24px;
           text-align: left;
           font-size: 10.5px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 700;
+          letter-spacing: 0.09em;
           text-transform: uppercase;
-          color: var(--muted);
+          color: var(--text-muted);
           white-space: nowrap;
         }
         tbody tr {
-          border-bottom: 1px solid #f3f1ed;
-          transition: background 0.12s;
+          border-bottom: 1px solid var(--border);
+          transition: background 0.1s;
         }
         tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #faf8f4; }
+        tbody tr:hover { background: var(--blue-light); }
 
-        td { padding: 16px 24px; }
+        td { padding: 16px 24px; vertical-align: middle; }
 
         .debtor-name {
           font-weight: 600;
-          color: var(--navy);
+          color: var(--text);
           margin-bottom: 2px;
         }
         .debtor-type {
           font-size: 11.5px;
-          color: var(--muted);
+          color: var(--text-muted);
           text-transform: capitalize;
         }
         .amount {
-          font-family: 'Instrument Serif', serif;
-          font-size: 16px;
-          color: var(--navy);
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--blue);
         }
-        .date-text { color: var(--muted); font-size: 13px; }
+        .date-text { color: var(--text-muted); font-size: 13px; }
 
+        /* ── STATUS BADGES ── */
         .status-badge {
           display: inline-flex;
           align-items: center;
@@ -440,63 +406,85 @@ export default function Dashboard() {
           border-radius: 50%;
           flex-shrink: 0;
         }
-        .status-submitted  { background: #fef9e7; color: #9a7d0a; border: 1px solid #f9e79f; }
-        .status-submitted .status-dot { background: #f4d03f; }
-        .status-assigned   { background: #eaf2ff; color: #1a5276; border: 1px solid #aed6f1; }
-        .status-assigned .status-dot { background: #3498db; }
-        .status-progress   { background: #f4ecf7; color: #6c3483; border: 1px solid #d7bde2; }
-        .status-progress .status-dot { background: #9b59b6; }
-        .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
-        .status-closed .status-dot { background: #27ae60; }
-        .status-default    { background: #f2f3f4; color: var(--muted); border: 1px solid var(--border); }
-        .status-default .status-dot { background: var(--muted); }
+        .status-submitted  { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+        .status-submitted .status-dot { background: #f59e0b; }
+        .status-assigned   { background: var(--blue-light); color: #0f5189; border: 1px solid var(--blue-mid); }
+        .status-assigned .status-dot { background: var(--blue); }
+        .status-progress   { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
+        .status-progress .status-dot { background: #8b5cf6; }
+        .status-closed     { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .status-closed .status-dot { background: #10b981; }
+        .status-default    { background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border); }
+        .status-default .status-dot { background: var(--text-muted); }
 
+        /* ── ACTION LINKS ── */
         .view-link {
-          color: var(--gold-d);
+          color: var(--blue);
           font-weight: 600;
           font-size: 12.5px;
           text-decoration: none;
-          border: 1px solid rgba(201,168,76,0.25);
+          border: 1px solid var(--blue-mid);
           padding: 5px 12px;
-          border-radius: 7px;
-          transition: background 0.14s, color 0.14s;
+          border-radius: 6px;
+          background: var(--blue-light);
+          transition: background 0.14s, color 0.14s, border-color 0.14s;
           white-space: nowrap;
         }
         .view-link:hover {
-          background: var(--navy);
-          color: var(--gold-l);
-          border-color: transparent;
+          background: var(--blue);
+          color: #fff;
+          border-color: var(--blue);
+        }
+        .edit-link {
+          color: var(--text-mid);
+          font-weight: 600;
+          font-size: 12.5px;
+          text-decoration: none;
+          border: 1px solid var(--border);
+          padding: 5px 12px;
+          border-radius: 6px;
+          background: var(--white);
+          transition: background 0.14s, color 0.14s, border-color 0.14s;
+          white-space: nowrap;
+        }
+        .edit-link:hover {
+          background: var(--off-white);
+          border-color: var(--text-muted);
+          color: var(--text);
         }
 
+        /* ── SKELETON ── */
         .skeleton-row td { padding: 16px 24px; }
         .skel {
           border-radius: 6px;
-          background: linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%);
+          background: linear-gradient(90deg, #edf0f4 25%, #e2e6eb 50%, #edf0f4 75%);
           background-size: 200% 100%;
           animation: shimmer 1.4s infinite;
         }
         @keyframes shimmer { to { background-position: -200% 0; } }
 
-        .footer-note {
+        /* ── LEGAL FOOTER ── */
+        .legal-note {
           text-align: center;
           margin-top: 40px;
-          font-size: 11.5px;
-          color: #bbb;
-          line-height: 1.6;
-          max-width: 560px;
-          margin-left: auto;
-          margin-right: auto;
+          padding: 20px 24px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-left: 3px solid var(--blue);
+          border-radius: 8px;
+          font-size: 12px;
+          color: var(--text-muted);
+          line-height: 1.7;
         }
+        .legal-note strong { color: var(--blue); font-weight: 600; }
 
         @media (max-width: 600px) {
           .page { padding: 32px 16px 60px; }
           .navbar { padding: 0 16px; }
-          .page-title { font-size: 28px; }
-          .page-header { flex-direction: column; align-items: flex-start; }
+          .page-title { font-size: 26px; }
         }
       `}</style>
 
-      {/* ── TERMS MODAL — only renders if terms_accept is false ── */}
       <TermsModal
         isOpen={!termsAccepted}
         onClose={null}
@@ -506,26 +494,23 @@ export default function Dashboard() {
 
       {/* ── NAVBAR ── */}
       <nav className="navbar">
-       
+        <div className="nav-brand">
+        
+        
+        </div>
+
         <div className="nav-actions">
-          <Link
-            to="/claims"
-            className="inline-flex items-center gap-1.5 text-white/70 border border-white/10 hover:text-white hover:border-white/30 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 no-underline"
-          >
+          <Link to="/claims" className="nav-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
               <line x1="16" y1="13" x2="8" y2="13"/>
               <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
             </svg>
             My Claims
           </Link>
 
-          <Link
-            to="/agencies"
-            className="inline-flex items-center gap-1.5 text-white/70 border border-white/10 hover:text-white hover:border-white/30 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 no-underline"
-          >
+          <Link to="/agencies" className="nav-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
@@ -535,30 +520,21 @@ export default function Dashboard() {
             Agencies
           </Link>
 
+          <Link to="/business-plans" className="nav-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            Plans
+          </Link>
 
-          <Link
-  to="/business-plans"
-  className="inline-flex items-center gap-1.5 text-white/70 border border-white/10 hover:text-white hover:border-white/30 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 no-underline"
->
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <rect x="2" y="3" width="20" height="14" rx="2"/>
-    <line x1="8" y1="21" x2="16" y2="21"/>
-    <line x1="12" y1="17" x2="12" y2="21"/>
-  </svg>
-  Plans
-</Link>
-
-
-          <Link
-  to="/chat"
-  className="inline-flex items-center gap-1.5 text-white/70 border border-white/10 hover:text-white hover:border-white/30 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 no-underline"
->
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-  </svg>
-  Messages
-</Link>
-
+          <Link to="/chat" className="nav-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            Messages
+          </Link>
 
           <Link to="/claims/create" className="btn-submit-nav">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -575,51 +551,49 @@ export default function Dashboard() {
       <div className="page">
 
         <div className="page-header">
-          <div>
-            <p className="page-eyebrow">Overview</p>
-            <h1 className="page-title">Your <em>Dashboard</em></h1>
-            <div className="header-divider" />
-            <p className="page-sub">Track and manage your entire recovery pipeline.</p>
-          </div>
+          <p className="page-eyebrow">Overview</p>
+          <h1 className="page-title">Recovery <span>Dashboard</span></h1>
+          <div className="header-rule" />
+          <p className="page-sub">Track and manage your entire recovery pipeline.</p>
         </div>
 
         {/* Stat Cards */}
         <div className="stat-grid">
-          <div className="stat-card">
+          <div className="stat-card accent-total">
             <div className="stat-label">Total Claims</div>
-            <div className="stat-value val-white">{stats.total}</div>
+            <div className="stat-value">{stats.total}</div>
             <div className="stat-icon">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1669A9" strokeWidth="1.2">
                 <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
               </svg>
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card accent-submit">
             <div className="stat-label">Submitted</div>
-            <div className="stat-value val-gold">{stats.submitted}</div>
+            <div className="stat-value">{stats.submitted}</div>
             <div className="stat-icon">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e2c97e" strokeWidth="1.2">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.2">
                 <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
               </svg>
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card accent-prog">
             <div className="stat-label">In Progress</div>
-            <div className="stat-value val-purple">{stats.in_progress}</div>
+            <div className="stat-value">{stats.in_progress}</div>
             <div className="stat-icon">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#b39ddb" strokeWidth="1.2">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.2">
                 <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
               </svg>
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card accent-closed">
             <div className="stat-label">Closed</div>
-            <div className="stat-value val-green">{stats.closed}</div>
+            <div className="stat-value">{stats.closed}</div>
             <div className="stat-icon">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#80cbc4" strokeWidth="1.2">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.2">
                 <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
             </div>
@@ -650,7 +624,7 @@ export default function Dashboard() {
                       <td><div className="skel" style={{height:13,width:90}}/></td>
                       <td><div className="skel" style={{height:22,width:90,borderRadius:20}}/></td>
                       <td><div className="skel" style={{height:13,width:80}}/></td>
-                      <td><div className="skel" style={{height:28,width:52,borderRadius:7}}/></td>
+                      <td><div className="skel" style={{height:28,width:52,borderRadius:6}}/></td>
                     </tr>
                   ))}
                 </tbody>
@@ -660,9 +634,11 @@ export default function Dashboard() {
           ) : claims.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                   <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
                 </svg>
               </div>
               <h3 className="empty-title">No claims yet</h3>
@@ -717,14 +693,11 @@ export default function Dashboard() {
                           </span>
                         </td>
                         <td>
-  <div style={{ display: 'flex', gap: 8 }}>
-    <Link to={`/claims/${claim._id}`} className="view-link">View →</Link>
-    <Link to={`/edit-claim/${claim._id}`} className="view-link" style={{
-      color: 'var(--navy)',
-      borderColor: 'rgba(15,31,61,0.2)',
-    }}>Edit</Link>
-  </div>
-</td>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <Link to={`/claims/${claim._id}`} className="view-link">View →</Link>
+                            <Link to={`/edit-claim/${claim._id}`} className="edit-link">Edit</Link>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
@@ -734,11 +707,12 @@ export default function Dashboard() {
           )}
         </div>
 
-        <p className="footer-note">
-        Pasado is a technology platform that connects businesses with
+        {/* Legal note matching site's disclaimer style */}
+        <div className="legal-note">
+          <strong>Platform notice:</strong> Collection Connector is a technology platform that connects businesses with
           independent, licensed collection agencies. We do not provide debt collection
           services, legal advice, or contact debtors on your behalf.
-        </p>
+        </div>
 
       </div>
     </>

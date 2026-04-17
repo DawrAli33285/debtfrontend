@@ -30,25 +30,31 @@ export default function AgencyListing() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-          --navy:#0f1f3d; --navy-2:#162847; --gold:#c9a84c; --gold-l:#e2c97e;
-          --gold-d:#a8883a; --cream:#faf8f4; --muted:#8a95a3; --border:#e4e2dd;
-          --white:#ffffff;
-        }
+       :root {
+  --navy:   #1669A9;
+  --navy-2: #0f5189;
+  --gold:   #1669A9;
+  --gold-l: #4a8fc4;
+  --gold-d: #0f5189;
+  --cream:  #f5f7fa;
+  --muted:  #7a96a8;
+  --border: #e0e7ef;
+  --white:  #ffffff;
+}
         body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--navy); }
 
         .navbar {
           background: var(--navy);
-          border-bottom: 1px solid rgba(201,168,76,0.15);
+          border-bottom: 1px solid rgba(22,105,169,0.2);
           padding: 0 40px; height: 64px;
           display: flex; align-items: center; justify-content: space-between;
           position: sticky; top: 0; z-index: 100;
         }
         .navbar::after {
-          content: ''; position: absolute; inset: 0;
-          background-image: linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-          background-size: 40px 40px; pointer-events: none;
-        }
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+}
         .nav-brand { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
         .logo-mark {
           width:32px; height:32px; border:1.5px solid var(--gold);
@@ -68,11 +74,14 @@ export default function AgencyListing() {
         .page { max-width:960px; margin:0 auto; padding:48px 32px 80px; animation:fadeUp 0.5s cubic-bezier(.22,1,.36,1) both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @media(max-width:600px){ .page{padding:32px 16px 60px;} .navbar{padding:0 16px;} }
+.page-eyebrow { color: var(--navy); }
 
-        .page-eyebrow { font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-d); margin-bottom:6px; }
         .page-title { font-family:'Instrument Serif',serif; font-size:34px; color:var(--navy); line-height:1.1; }
         .page-title em { color:var(--gold); font-style:italic; }
-        .header-divider { height:1px; background:linear-gradient(90deg,var(--gold) 0%,transparent 100%); width:40px; margin:12px 0 8px; }
+.header-divider {
+  background: linear-gradient(90deg, #1669A9 0%, transparent 100%);
+}
+
         .page-sub { font-size:13.5px; color:var(--muted); }
 
         .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:36px; }
@@ -85,26 +94,25 @@ export default function AgencyListing() {
           overflow:hidden;
           transition:box-shadow 0.2s, transform 0.2s;
         }
-        .agency-card:hover { box-shadow:0 6px 28px rgba(15,31,61,0.1); transform:translateY(-2px); }
-
+    .agency-card:hover { box-shadow: 0 6px 28px rgba(22,105,169,0.15); }
         .card-head {
           background:var(--navy); padding:16px 20px;
           display:flex; align-items:center; justify-content:space-between;
           position:relative; overflow:hidden;
         }
-        .card-head::after {
-          content:''; position:absolute; inset:0;
-          background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-          background-size:32px 32px; pointer-events:none;
-        }
+       .card-head::after {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+}
+
         .card-name { font-family:'Instrument Serif',serif; font-size:18px; color:#fff; position:relative; z-index:1; }
-        .verified-badge {
-          position:relative; z-index:1;
-          font-size:10.5px; font-weight:600;
-          background:rgba(201,168,76,0.15); color:var(--gold-l);
-          border:1px solid rgba(201,168,76,0.3);
-          padding:3px 10px; border-radius:20px;
-        }
+      .verified-badge {
+  background: rgba(22,105,169,0.15);
+  color: #4a8fc4;
+  border: 1px solid rgba(22,105,169,0.3);
+}
+        
 
         .card-body { padding:20px; }
 
@@ -119,7 +127,7 @@ export default function AgencyListing() {
         .capacity-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:5px; }
         .capacity-track { width:100%; height:5px; background:rgba(15,31,61,0.08); border-radius:99px; overflow:hidden; margin-bottom:16px; }
         .capacity-fill { height:100%; border-radius:99px; transition:width 0.4s; }
-        .fill-ok   { background:linear-gradient(90deg,var(--gold-d),var(--gold)); }
+.fill-ok { background: linear-gradient(90deg, #0f5189, #1669A9); }
         .fill-full { background:#e74c3c; }
 
         .select-btn {
@@ -136,7 +144,7 @@ export default function AgencyListing() {
         }
 
         .loading-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 24px; gap:14px; }
-        .spinner-ring { width:36px; height:36px; border:2px solid rgba(15,31,61,0.12); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; }
+.spinner-ring { border-top-color: #1669A9; }
         @keyframes spin { to{transform:rotate(360deg)} }
         .loading-text { font-size:13.5px; color:var(--muted); }
 

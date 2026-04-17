@@ -27,96 +27,116 @@ export default function AssignmentConfirmation() {
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root {
-          --navy:#0f1f3d; --navy-2:#162847; --gold:#c9a84c; --gold-l:#e2c97e;
-          --gold-d:#a8883a; --cream:#faf8f4; --muted:#8a95a3; --border:#e4e2dd; --white:#ffffff;
+          --blue:#1669A9; --blue-dark:#0f5189; --blue-light:#e8f2fa; --blue-mid:#c5ddf0;
+          --white:#ffffff; --off-white:#f5f7fa; --border:#e0e7ef;
+          --text:#1a2a3a; --text-mid:#4a6070; --text-muted:#7a96a8;
         }
-        body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--navy); }
+        body { font-family:'DM Sans',sans-serif; background:var(--off-white); color:var(--text); }
 
         .navbar {
-          background:var(--navy); border-bottom:1px solid rgba(201,168,76,0.15);
+          background:var(--blue); border-bottom:1px solid rgba(255,255,255,0.12);
           padding:0 40px; height:64px;
           display:flex; align-items:center; justify-content:space-between;
           position:sticky; top:0; z-index:100;
         }
         .navbar::after {
           content:''; position:absolute; inset:0;
-          background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+          background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),
+                           linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);
           background-size:40px 40px; pointer-events:none;
         }
         .nav-brand { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
-        .logo-mark { width:32px; height:32px; border:1.5px solid var(--gold); border-radius:7px; display:flex; align-items:center; justify-content:center; }
-        .logo-text { font-family:'Instrument Serif',serif; font-size:16px; color:#fff; }
+        .logo-mark {
+          width:36px; height:36px;
+          background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35);
+          border-radius:8px; display:flex; align-items:center; justify-content:center;
+        }
+        .logo-text { font-family:'Instrument Serif',serif; font-size:17px; color:#fff; }
         .back-link {
           position:relative; z-index:1;
           display:inline-flex; align-items:center; gap:7px;
-          font-size:13px; font-weight:500; color:rgba(255,255,255,0.5);
-          text-decoration:none; border:1px solid rgba(255,255,255,0.1);
+          font-size:13px; font-weight:500; color:rgba(255,255,255,0.6);
+          text-decoration:none; border:1px solid rgba(255,255,255,0.2);
           border-radius:8px; padding:7px 14px; transition:color 0.15s,border-color 0.15s;
         }
-        .back-link:hover { color:#fff; border-color:rgba(255,255,255,0.28); }
+        .back-link:hover { color:#fff; border-color:rgba(255,255,255,0.45); }
 
-        .page { max-width:560px; margin:0 auto; padding:48px 32px 80px; animation:fadeUp 0.5s cubic-bezier(.22,1,.36,1) both; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .page { max-width:520px; margin:0 auto; padding:48px 24px 80px; animation:fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @media(max-width:600px){ .page{padding:32px 16px 60px;} .navbar{padding:0 16px;} }
 
-        .success-hero { display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:36px; }
+        .success-hero { display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:32px; }
         .success-ring {
-          width:68px; height:68px; border-radius:50%;
-          border:1.5px solid rgba(201,168,76,0.3);
-          background:rgba(201,168,76,0.08);
+          width:64px; height:64px; border-radius:50%;
+          background:var(--blue-light); border:1.5px solid var(--blue-mid);
           display:flex; align-items:center; justify-content:center; margin-bottom:16px;
         }
-        .success-title { font-family:'Instrument Serif',serif; font-size:30px; color:var(--navy); }
-        .success-title em { color:var(--gold); font-style:italic; }
-        .success-sub { font-size:13.5px; color:var(--muted); margin-top:6px; }
+        .card-eyebrow {
+          font-size:11px; font-weight:700; letter-spacing:0.12em;
+          text-transform:uppercase; color:var(--blue); margin-bottom:6px;
+        }
+        .success-title { font-size:28px; font-weight:700; color:var(--text); line-height:1.15; }
+        .header-rule { width:48px; height:3px; background:var(--blue); border-radius:2px; margin:12px auto 10px; }
+        .success-sub { font-size:13.5px; color:var(--text-muted); font-weight:400; }
 
         .summary-card {
-          background:var(--white); border-radius:18px;
-          border:1px solid var(--border);
-          box-shadow:0 2px 16px rgba(15,31,61,0.045);
-          overflow:hidden; margin-bottom:20px;
+          background:var(--white); border-radius:16px;
+          border:1px solid var(--border); overflow:hidden; margin-bottom:16px;
         }
         .summary-head {
-          background:var(--navy); padding:14px 20px;
-          position:relative; overflow:hidden;
+          background:var(--blue); padding:14px 20px; position:relative; overflow:hidden;
         }
         .summary-head::after {
           content:''; position:absolute; inset:0;
-          background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+          background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),
+                           linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);
           background-size:32px 32px; pointer-events:none;
         }
         .summary-head-title { font-family:'Instrument Serif',serif; font-size:16px; color:#fff; position:relative; z-index:1; }
 
         .summary-body { padding:20px; display:flex; flex-direction:column; gap:12px; }
         .summary-row { display:flex; justify-content:space-between; align-items:center; font-size:13.5px; }
-        .summary-label { color:var(--muted); }
-        .summary-value { font-weight:600; color:var(--navy); }
+        .summary-label { color:var(--text-muted); }
+        .summary-value { font-weight:600; color:var(--text); }
         .summary-divider { height:1px; background:var(--border); }
 
-        .status-chip { background:#eaf2ff; color:#1a5276; border:1px solid #aed6f1; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; }
-        .fee-value { color:var(--gold-d); font-weight:700; }
+        .status-chip { background:#eaf2ff; color:#1a5276; border:1px solid #aed6f1; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:0.05em; }
+        .fee-value { color:var(--blue-dark); font-weight:700; }
 
-        .actions { display:flex; gap:10px; }
+        .actions { display:flex; gap:10px; margin-bottom:24px; }
         .btn-outline {
-          flex:1; padding:11px; border-radius:10px;
-          border:1px solid var(--border); background:var(--white);
+          flex:1; padding:12px; border-radius:8px;
+          border:1.5px solid var(--border); background:var(--white);
           font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
-          color:var(--navy); cursor:pointer; transition:border-color 0.15s;
+          color:var(--text); cursor:pointer; transition:border-color 0.15s;
         }
-        .btn-outline:hover { border-color:var(--gold); }
+        .btn-outline:hover { border-color:var(--blue); }
         .btn-primary {
-          flex:1; padding:11px; border-radius:10px;
-          border:none; background:var(--navy); color:#fff;
+          flex:1; padding:12px; border-radius:8px;
+          border:none; background:var(--blue); color:#fff;
           font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
-          cursor:pointer; transition:background 0.15s;
+          cursor:pointer; transition:background 0.15s,transform 0.12s,box-shadow 0.15s;
         }
-        .btn-primary:hover { background:var(--navy-2); }
+        .btn-primary:hover { background:var(--blue-dark); box-shadow:0 4px 16px rgba(22,105,169,0.25); transform:translateY(-1px); }
 
-        .footer-note { text-align:center; margin-top:32px; font-size:11.5px; color:#bbb; line-height:1.6; }
+        .security-note {
+          display:flex; align-items:center; justify-content:center; gap:6px;
+          padding-top:20px; border-top:1px solid var(--border);
+        }
+        .security-note span { font-size:11.5px; color:#bbb; line-height:1.5; text-align:center; }
       `}</style>
 
       <nav className="navbar">
-        
+        <div className="nav-brand">
+          <div className="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:18,height:18}}>
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <span className="logo-text">Collection Connector</span>
+        </div>
         <Link to="/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6"/>
@@ -128,12 +148,14 @@ export default function AssignmentConfirmation() {
       <div className="page">
         <div className="success-hero">
           <div className="success-ring">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1669A9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
-          <h1 className="success-title">Claim <em>Assigned!</em></h1>
-          <p className="success-sub">Your claim has been successfully assigned to the agency</p>
+          <p className="card-eyebrow">Assignment complete</p>
+          <h1 className="success-title">Claim Assigned!</h1>
+          <div className="header-rule" />
+          <p className="success-sub">Your claim has been successfully assigned to the agency.</p>
         </div>
 
         <div className="summary-card">
@@ -178,11 +200,16 @@ export default function AssignmentConfirmation() {
           <button onClick={() => navigate('/agencies')} className="btn-primary">Assign Another →</button>
         </div>
 
-        <p className="footer-note">
-          We are a technology platform that connects businesses with independent, licensed
-          collection agencies. We do not provide debt collection services, legal advice,
-          or contact debtors on your behalf.
-        </p>
+        <div className="security-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>
+            We are a technology platform that connects businesses with independent, licensed
+            collection agencies. We do not provide debt collection services, legal advice,
+            or contact debtors on your behalf.
+          </span>
+        </div>
       </div>
     </>
   );

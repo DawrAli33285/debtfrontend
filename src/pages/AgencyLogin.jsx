@@ -29,35 +29,36 @@ export default function AgencyLogin() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
         .al-root {
           min-height: 100vh;
           display: flex;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
         }
 
         /* ── Left panel ── */
         .al-left {
           display: none;
           width: 42%;
-          background: var(--navy);
+          background: var(--blue);
           padding: 56px 52px;
           flex-direction: column;
           justify-content: space-between;
@@ -71,8 +72,8 @@ export default function AgencyLogin() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse 70% 55% at 80% 100%, rgba(201,168,76,0.14) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 10%,  rgba(201,168,76,0.07) 0%, transparent 65%);
+            radial-gradient(ellipse 70% 55% at 20% 100%, rgba(255,255,255,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 90% 10%,  rgba(255,255,255,0.05) 0%, transparent 65%);
           pointer-events: none;
         }
         .al-left::after {
@@ -80,378 +81,409 @@ export default function AgencyLogin() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
 
         .left-brand { position: relative; z-index: 1; }
-        .left-logo  { display: flex; align-items: center; gap: 10px; margin-bottom: 64px; }
-        .logo-mark  {
+        .left-logo {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 64px;
+        }
+        .logo-mark {
           width: 36px; height: 36px;
-          border: 1.5px solid var(--gold);
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
+        .logo-mark svg { width: 18px; height: 18px; }
         .logo-text {
           font-family: 'Instrument Serif', serif;
-          font-size: 17px; color: #fff; letter-spacing: 0.01em;
+          font-size: 17px;
+          color: #fff;
+          letter-spacing: 0.01em;
         }
+
         .left-headline {
           font-family: 'Instrument Serif', serif;
-          font-size: 36px; line-height: 1.2; color: #fff; margin-bottom: 18px;
+          font-size: 38px;
+          line-height: 1.18;
+          color: #fff;
+          margin-bottom: 20px;
         }
-        .left-headline em { color: var(--gold-l); font-style: italic; }
+        .left-headline em { color: rgba(255,255,255,0.75); font-style: italic; }
+
         .left-sub {
-          font-size: 14px; line-height: 1.7;
-          color: rgba(255,255,255,0.52); font-weight: 300; max-width: 320px;
+          font-size: 14px;
+          line-height: 1.7;
+          color: rgba(255,255,255,0.55);
+          font-weight: 300;
+          max-width: 320px;
         }
 
-        /* stat cards */
-        .stat-cards { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
-        .stat-card {
-          background: rgba(255,255,255,0.055);
-          border: 1px solid rgba(255,255,255,0.09);
-          border-radius: 14px;
-          padding: 16px 20px;
-          display: flex; align-items: center; gap: 16px;
+        /* feature pills */
+        .left-pills {
+          display: flex; flex-direction: column; gap: 12px;
+          position: relative; z-index: 1;
         }
-        .stat-icon {
-          width: 38px; height: 38px; flex-shrink: 0;
-          background: rgba(201,168,76,0.13);
-          border-radius: 10px;
+        .pill {
+          display: flex; align-items: center; gap: 12px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 12px;
+          padding: 14px 18px;
+        }
+        .pill-icon {
+          width: 32px; height: 32px; flex-shrink: 0;
+          background: rgba(255,255,255,0.15);
+          border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
-        .stat-icon svg { width: 17px; height: 17px; stroke: var(--gold-l); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-        .stat-value { font-family: 'Instrument Serif', serif; font-size: 22px; color: #fff; line-height: 1; margin-bottom: 3px; }
-        .stat-label { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 400; }
+        .pill-icon svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .pill-text { font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 400; line-height: 1.4; }
 
-        /* benefit list */
-        .benefit-list { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
-        .benefit-item {
-          display: flex; align-items: flex-start; gap: 10px;
-          font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5;
-        }
-        .benefit-dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: var(--gold); flex-shrink: 0; margin-top: 7px;
-        }
-
-        /* ── Right ── */
+        /* ── Right panel ── */
         .al-right {
-          flex: 1; display: flex; align-items: center;
-          justify-content: center; padding: 40px 24px;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 24px;
         }
 
         .al-card {
-          width: 100%; max-width: 420px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          width: 100%;
+          max-width: 440px;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
+        .card-header { margin-bottom: 0; }
 
         /* mobile logo */
         .mobile-logo {
           display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
         }
         @media (min-width: 900px) { .mobile-logo { display: none; } }
+        .mobile-logo .logo-mark-blue {
+          width: 36px; height: 36px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
 
         .card-eyebrow {
-          font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em;
-          text-transform: uppercase; color: var(--gold-d); margin-bottom: 7px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+          text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
         }
         .card-title {
-          font-family: 'Instrument Serif', serif;
-          font-size: 28px; color: var(--navy); margin-bottom: 6px;
+          font-size: 28px; font-weight: 700;
+          color: var(--text); margin-bottom: 6px; line-height: 1.15;
         }
-        .card-sub { font-size: 13.5px; color: var(--muted); }
-        .divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 36px; margin: 16px 0 28px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue); border-radius: 2px;
+          margin: 14px 0 10px;
         }
+        .card-sub { font-size: 13.5px; color: var(--text-muted); font-weight: 400; }
 
+        /* error */
         .err-box {
-          background: #fdf0ef; border: 1px solid #f1c0bc;
-          color: var(--error); font-size: 13px;
-          padding: 10px 14px; border-radius: 10px; margin-bottom: 20px;
+          background: #fdf0ef;
+          border: 1px solid #f1c0bc;
+          color: var(--error);
+          font-size: 13px;
+          padding: 10px 14px;
+          border-radius: 8px;
+          margin-bottom: 20px;
         }
 
         /* fields */
-        .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 10px; }
+        .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 10px; margin-top: 28px; }
 
         .field label {
-          display: block; font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          color: var(--navy); margin-bottom: 7px;
+          display: block;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.09em; text-transform: uppercase;
+          color: var(--text-muted); margin-bottom: 7px;
         }
         .field input {
-          width: 100%; border: 1.5px solid var(--border);
-          border-radius: 10px; padding: 11px 14px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
-          color: var(--navy); background: var(--white);
-          transition: border-color 0.18s, box-shadow 0.18s; outline: none;
+          width: 100%;
+          border: 1.5px solid var(--border);
+          border-radius: 8px;
+          padding: 11px 14px;
+          font-size: 14px;
+          font-family: inherit;
+          color: var(--text);
+          background: var(--white);
+          transition: border-color 0.18s, box-shadow 0.18s;
+          outline: none;
         }
         .field input::placeholder { color: #bbb; }
         .field input:focus {
-          border-color: var(--navy);
-          box-shadow: 0 0 0 3px rgba(15,31,61,0.07);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
 
-        /* forgot link */
+        /* forgot */
         .forgot-row {
-          display: flex; justify-content: flex-end; margin-bottom: 24px; margin-top: 6px;
+          display: flex; justify-content: flex-end;
+          margin: 8px 0 24px;
         }
         .forgot-link {
-          font-size: 12px; color: var(--gold-d); font-weight: 600;
+          font-size: 12px; color: var(--blue); font-weight: 600;
           text-decoration: underline; text-underline-offset: 2px;
           background: none; border: none; cursor: pointer;
-          font-family: 'DM Sans', sans-serif; padding: 0;
+          font-family: inherit; padding: 0;
         }
-        .forgot-link:hover { color: var(--navy); }
+        .forgot-link:hover { color: var(--blue-dark); }
 
         /* submit */
         .btn-submit {
           width: 100%;
-          background: var(--navy); color: #fff; border: none;
-          border-radius: 10px; padding: 13px;
-          font-size: 14px; font-family: 'DM Sans', sans-serif;
-          font-weight: 600; letter-spacing: 0.03em;
-          cursor: pointer; transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          position: relative; overflow: hidden;
-        }
-        .btn-submit::after {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-          pointer-events: none;
+          background: var(--blue);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 13px;
+          font-size: 14px;
+          font-family: inherit;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          cursor: pointer;
+          transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
         }
         .btn-submit:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 16px rgba(15,31,61,0.22);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
 
         .btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
         .spinner {
           width: 14px; height: 14px;
           border: 2px solid rgba(255,255,255,0.35);
-          border-top-color: #fff; border-radius: 50%;
+          border-top-color: #fff;
+          border-radius: 50%;
           animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* bottom links */
         .signin-link {
-          text-align: center; font-size: 13px; color: var(--muted); margin-top: 22px;
+          text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 22px;
         }
-        .signin-link a { color: var(--navy); font-weight: 600; text-decoration: none; }
+        .signin-link a { color: var(--blue); font-weight: 600; text-decoration: none; }
         .signin-link a:hover { text-decoration: underline; }
 
-        /* business CTA */
-        .biz-cta {
-          display: flex; align-items: center; gap: 14px;
-          background: var(--cream); border: 1px solid var(--border);
-          border-radius: 12px; padding: 14px 16px; margin-top: 24px;
-        }
-        .biz-cta-text { flex: 1; }
-        .biz-cta-label { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
-        .biz-cta-sub   { font-size: 12px; color: var(--muted); line-height: 1.4; }
-        .biz-cta-link  {
-          font-size: 12px; font-weight: 600; color: var(--gold-d);
-          text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
-        }
-        .biz-cta-link:hover { color: var(--navy); }
-
-        .divider-label {
+        /* business CTA card */
+        .agency-divider {
           display: flex; align-items: center; gap: 10px;
-          margin: 22px 0 0;
-          font-size: 11px; color: var(--muted);
+          margin: 24px 0 12px;
+          font-size: 11px; color: var(--text-muted);
           letter-spacing: 0.08em; text-transform: uppercase;
         }
-        .divider-label::before, .divider-label::after {
-          content: ''; flex: 1; height: 1px; background: var(--border);
+        .agency-divider span { flex: 1; height: 1px; background: var(--border); }
+
+        .agency-card {
+          display: flex; align-items: center; gap: 14px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 14px 16px;
+        }
+        .agency-logo-mark {
+          width: 34px; height: 34px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .agency-card-title {
+          font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 2px;
+        }
+        .agency-card-sub {
+          font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;
+        }
+        .biz-signup-link {
+          font-size: 12px; font-weight: 600; color: var(--blue);
+          text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
+        }
+        .biz-signup-link:hover { color: var(--blue-dark); }
+
+        @media (max-width: 600px) {
+          .al-right { padding: 32px 16px; }
         }
       `}</style>
 
       <div className="al-root">
 
-        {/* ── Left panel ── */}
+        {/* ── Left decorative panel ── */}
         <aside className="al-left">
           <div className="left-brand">
             <div className="left-logo">
               <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:18,height:18}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Pasado</span>
+              <span className="logo-text">Collection Connector</span>
             </div>
             <h2 className="left-headline">
-              Welcome back to<br />your <em>agency portal.</em>
+              Welcome back to<br /><em>your agency portal.</em>
             </h2>
             <p className="left-sub">
-              Manage your matched claims, track assignments, and grow your recovery pipeline — all in one place.
+              Manage matched claims, track assignments, and grow your recovery pipeline — all in one place.
             </p>
           </div>
 
-          {/* Stat cards */}
-          <div className="stat-cards">
+          <div className="left-pills">
             {[
               {
-                value: '2,400+',
-                label: 'Claims matched monthly',
+                label: '2,400+ claims matched monthly',
+                desc: 'High-volume, pre-qualified pipeline',
                 icon: (
                   <svg viewBox="0 0 24 24">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
               },
               {
-                value: '98%',
-                label: 'Agency satisfaction rate',
+                label: '98% agency satisfaction rate',
+                desc: 'Verified, compliant claim submissions',
                 icon: (
                   <svg viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
               },
               {
-                value: '$0',
-                label: 'No monthly fees or bidding',
+                label: 'Real-time dashboard',
+                desc: 'Track every active assignment instantly',
                 icon: (
                   <svg viewBox="0 0 24 24">
-                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
               },
-            ].map(s => (
-              <div className="stat-card" key={s.label}>
-                <div className="stat-icon">{s.icon}</div>
+            ].map((p) => (
+              <div className="pill" key={p.label}>
+                <div className="pill-icon">{p.icon}</div>
                 <div>
-                  <div className="stat-value">{s.value}</div>
-                  <div className="stat-label">{s.label}</div>
+                  <div className="pill-text" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>{p.label}</div>
+                  <div className="pill-text">{p.desc}</div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Benefits */}
-          <div className="benefit-list">
-            {[
-              'Real-time dashboard for every active assignment',
-              'Instant notifications when new claims are matched',
-              'Secure document exchange with submitting businesses',
-            ].map(b => (
-              <div className="benefit-item" key={b}>
-                <span className="benefit-dot" />
-                {b}
               </div>
             ))}
           </div>
         </aside>
 
-        {/* ── Right panel ── */}
+        {/* ── Right form panel ── */}
         <main className="al-right">
           <div className="al-card">
 
             {/* Mobile logo */}
             <div className="mobile-logo">
-              <div className="logo-mark" style={{borderColor:'var(--navy)'}}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
+              <div className="logo-mark-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)', letterSpacing: '-0.01em' }}>Collection Connector</span>
             </div>
 
-            <p className="card-eyebrow">Agency Portal</p>
-            <h1 className="card-title">Sign in to your agency</h1>
-            <div className="divider" />
-            <p className="card-sub">Enter your credentials to access your agency dashboard.</p>
+            <div className="card-header">
+              <p className="card-eyebrow">Agency Portal</p>
+              <h1 className="card-title">Sign in to your agency</h1>
+              <div className="header-rule" />
+              <p className="card-sub">Enter your credentials to access your agency dashboard.</p>
+            </div>
 
-            <div style={{marginTop: 28}}>
-              {error && <div className="err-box">{error}</div>}
+            {error && <div className="err-box">{error}</div>}
 
-              <form onSubmit={handleSubmit}>
-                <div className="field-group">
-
-                  <div className="field">
-                    <label htmlFor="email">Work Email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                      autoComplete="email"
-                      placeholder="jane@premierco.com"
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label htmlFor="password">Password</label>
-                    <input
-                      id="password"
-                      type="password"
-                      name="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      required
-                      autoComplete="current-password"
-                      placeholder="Your password"
-                    />
-                  </div>
-
+            <form onSubmit={handleSubmit}>
+              <div className="field-group">
+                <div className="field">
+                  <label htmlFor="email">Work Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    autoComplete="email"
+                    placeholder="jane@premierco.com"
+                  />
                 </div>
 
-                <div className="forgot-row">
-                  <button onClick={()=>{
-                    navigate('/agency/reset')
-                  }} type="button" className="forgot-link">
-                    Forgot password?
-                  </button>
+                <div className="field">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Your password"
+                  />
                 </div>
-
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  <span className="btn-inner">
-                    {loading && <span className="spinner" />}
-                    {loading ? 'Signing in…' : 'Sign In'}
-                  </span>
-                </button>
-              </form>
-
-              <p className="signin-link" style={{marginTop: 18}}>
-                New agency?{' '}
-                <Link to="/agency/register">Create an account</Link>
-              </p>
-
-              <div className="divider-label">Not an agency?</div>
-
-              <div className="biz-cta">
-                <div className="logo-mark" style={{borderColor:'var(--navy)', flexShrink:0}}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                  </svg>
-                </div>
-                <div className="biz-cta-text">
-                  <div className="biz-cta-label">Business sign in</div>
-                  <div className="biz-cta-sub">Submit and track claims for your business.</div>
-                </div>
-                <Link to="/login" className="biz-cta-link">Sign in ›</Link>
               </div>
 
+              <div className="forgot-row">
+                <button
+                  type="button"
+                  className="forgot-link"
+                  onClick={() => navigate('/agency/reset')}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              <button type="submit" className="btn-submit" disabled={loading}>
+                <span className="btn-inner">
+                  {loading && <span className="spinner" />}
+                  {loading ? 'Signing in…' : 'Sign In'}
+                </span>
+              </button>
+            </form>
+
+            <p className="signin-link">
+              New agency?{' '}
+              <Link to="/agency/register">Create an account</Link>
+            </p>
+
+            <div className="agency-divider">
+              <span />&nbsp;Not an agency?&nbsp;<span />
             </div>
+
+            <div className="agency-card">
+              <div className="agency-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <p className="agency-card-title">Business sign in</p>
+                <p className="agency-card-sub">Submit and track claims for your business.</p>
+              </div>
+              <Link to="/login" className="biz-signup-link">Sign in ›</Link>
+            </div>
+
           </div>
         </main>
       </div>

@@ -29,33 +29,36 @@ export default function Login() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --error:  #c0392b;
+          --blue:       #1669A9;
+          --blue-dark:  #0f5189;
+          --blue-light: #e8f2fa;
+          --blue-mid:   #c5ddf0;
+          --white:      #ffffff;
+          --off-white:  #f5f7fa;
+          --border:     #e0e7ef;
+          --text:       #1a2a3a;
+          --text-mid:   #4a6070;
+          --text-muted: #7a96a8;
+          --error:      #c0392b;
         }
 
         .login-root {
           min-height: 100vh;
           display: flex;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--cream);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--off-white);
         }
 
         /* ── Left panel ── */
         .login-left {
           display: none;
           width: 42%;
-          background: var(--navy);
+          background: var(--blue);
           padding: 56px 52px;
           flex-direction: column;
           justify-content: space-between;
@@ -69,8 +72,8 @@ export default function Login() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse 70% 55% at 80% 100%, rgba(201,168,76,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 10% 10%,  rgba(201,168,76,0.07) 0%, transparent 65%);
+            radial-gradient(ellipse 70% 55% at 80% 100%, rgba(255,255,255,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 10% 10%,  rgba(255,255,255,0.05) 0%, transparent 65%);
           pointer-events: none;
         }
         .login-left::after {
@@ -78,8 +81,8 @@ export default function Login() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
@@ -91,7 +94,8 @@ export default function Login() {
         }
         .logo-mark {
           width: 36px; height: 36px;
-          border: 1.5px solid var(--gold);
+          background: rgba(255,255,255,0.15);
+          border: 1.5px solid rgba(255,255,255,0.35);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
         }
@@ -109,12 +113,12 @@ export default function Login() {
           color: #fff;
           margin-bottom: 20px;
         }
-        .left-headline em { color: var(--gold-l); font-style: italic; }
+        .left-headline em { color: rgba(255,255,255,0.75); font-style: italic; }
 
         .left-sub {
           font-size: 14px;
           line-height: 1.7;
-          color: rgba(255,255,255,0.5);
+          color: rgba(255,255,255,0.55);
           font-weight: 300;
           max-width: 300px;
         }
@@ -128,8 +132,8 @@ export default function Login() {
           z-index: 1;
         }
         .stat-card {
-          background: rgba(255,255,255,0.055);
-          border: 1px solid rgba(255,255,255,0.09);
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.15);
           border-radius: 14px;
           padding: 18px 20px;
         }
@@ -137,13 +141,13 @@ export default function Login() {
         .stat-value {
           font-family: 'Instrument Serif', serif;
           font-size: 30px;
-          color: var(--gold-l);
+          color: #fff;
           line-height: 1;
           margin-bottom: 6px;
         }
         .stat-label {
           font-size: 12.5px;
-          color: rgba(255,255,255,0.5);
+          color: rgba(255,255,255,0.55);
           font-weight: 400;
           line-height: 1.4;
         }
@@ -160,10 +164,10 @@ export default function Login() {
         .login-card {
           width: 100%;
           max-width: 400px;
-          animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+          animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;
         }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
 
@@ -172,32 +176,36 @@ export default function Login() {
           display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
         }
         @media (min-width: 900px) { .mobile-logo { display: none; } }
-        .mobile-logo .logo-mark { border-color: var(--navy); }
-        .mobile-logo .logo-text { color: var(--navy); }
+        .mobile-logo .logo-mark {
+          background: var(--blue);
+          border-color: var(--blue);
+        }
+        .mobile-logo .logo-text { color: var(--blue); }
 
         .card-eyebrow {
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          font-weight: 700;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: var(--gold);
+          color: var(--blue);
           margin-bottom: 8px;
         }
         .card-title {
-          font-family: 'Instrument Serif', serif;
           font-size: 28px;
-          color: var(--navy);
+          font-weight: 700;
+          color: var(--text);
           margin-bottom: 6px;
+          line-height: 1.15;
         }
-        .divider {
-          height: 1px;
-          background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
-          width: 36px;
-          margin: 16px 0 10px;
+        .header-rule {
+          width: 48px; height: 3px;
+          background: var(--blue);
+          border-radius: 2px;
+          margin: 14px 0 10px;
         }
         .card-sub {
           font-size: 13.5px;
-          color: var(--muted);
+          color: var(--text-muted);
           font-weight: 400;
           margin-bottom: 32px;
         }
@@ -209,7 +217,7 @@ export default function Login() {
           color: var(--error);
           font-size: 13px;
           padding: 10px 14px;
-          border-radius: 10px;
+          border-radius: 8px;
           margin-bottom: 20px;
           display: flex;
           align-items: center;
@@ -221,30 +229,30 @@ export default function Login() {
 
         .field label {
           display: block;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.06em;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.09em;
           text-transform: uppercase;
-          color: var(--navy);
+          color: var(--text-muted);
           margin-bottom: 7px;
         }
         .field-input-wrap { position: relative; }
         .field input {
           width: 100%;
           border: 1.5px solid var(--border);
-          border-radius: 10px;
+          border-radius: 8px;
           padding: 11px 14px;
           font-size: 14px;
-          font-family: 'DM Sans', sans-serif;
-          color: var(--navy);
-          background: #fff;
+          font-family: inherit;
+          color: var(--text);
+          background: var(--white);
           transition: border-color 0.18s, box-shadow 0.18s;
           outline: none;
         }
         .field input::placeholder { color: #bbb; }
         .field input:focus {
-          border-color: var(--navy);
-          box-shadow: 0 0 0 3px rgba(15,31,61,0.07);
+          border-color: var(--blue);
+          box-shadow: 0 0 0 3px rgba(22,105,169,0.1);
         }
 
         .field-meta {
@@ -253,46 +261,35 @@ export default function Login() {
           justify-content: space-between;
           margin-bottom: 7px;
         }
-        .field-meta label {
-          margin-bottom: 0;
-        }
+        .field-meta label { margin-bottom: 0; }
         .forgot-link {
           font-size: 12px;
-          color: var(--muted);
+          color: var(--text-muted);
           text-decoration: none;
           font-weight: 500;
           transition: color 0.15s;
         }
-        .forgot-link:hover { color: var(--navy); }
+        .forgot-link:hover { color: var(--blue); }
 
         /* submit */
         .btn-submit {
           width: 100%;
-          background: var(--navy);
+          background: var(--blue);
           color: #fff;
           border: none;
-          border-radius: 10px;
+          border-radius: 8px;
           padding: 13px;
           font-size: 14px;
-          font-family: 'DM Sans', sans-serif;
+          font-family: inherit;
           font-weight: 600;
           letter-spacing: 0.03em;
           cursor: pointer;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
-          position: relative;
-          overflow: hidden;
           margin-bottom: 20px;
         }
-        .btn-submit::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-          pointer-events: none;
-        }
         .btn-submit:hover:not(:disabled) {
-          background: var(--navy-2);
-          box-shadow: 0 4px 16px rgba(15,31,61,0.22);
+          background: var(--blue-dark);
+          box-shadow: 0 4px 16px rgba(22,105,169,0.25);
           transform: translateY(-1px);
         }
         .btn-submit:active:not(:disabled) { transform: translateY(0); }
@@ -311,14 +308,51 @@ export default function Login() {
         .register-link {
           text-align: center;
           font-size: 13px;
-          color: var(--muted);
+          color: var(--text-muted);
         }
         .register-link a {
-          color: var(--navy);
+          color: var(--blue);
           font-weight: 600;
           text-decoration: none;
         }
         .register-link a:hover { text-decoration: underline; }
+
+        /* agency divider */
+        .agency-divider {
+          display: flex; align-items: center; gap: 10px;
+          margin: 24px 0 12px;
+          font-size: 11px; color: var(--text-muted);
+          letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .agency-divider span { flex: 1; height: 1px; background: var(--border); }
+
+        /* agency card */
+        .agency-card {
+          display: flex; align-items: center; gap: 14px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 14px 16px;
+        }
+        .agency-logo-mark {
+          width: 34px; height: 34px;
+          background: var(--blue);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .agency-card-text { flex: 1; }
+        .agency-card-title {
+          font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 2px;
+        }
+        .agency-card-sub {
+          font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;
+        }
+        .agency-signin-link {
+          font-size: 12px; font-weight: 600; color: var(--blue);
+          text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
+        }
+        .agency-signin-link:hover { color: var(--blue-dark); }
 
         /* security note */
         .security-note {
@@ -330,7 +364,6 @@ export default function Login() {
           padding-top: 20px;
           border-top: 1px solid var(--border);
         }
-        .security-note svg { flex-shrink: 0; }
         .security-note span {
           font-size: 11.5px;
           color: #bbb;
@@ -345,13 +378,13 @@ export default function Login() {
           <div className="left-brand">
             <div className="left-logo">
               <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.8" style={{width:18,height:18}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:18,height:18}}>
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text">Pasado</span>
+              <span className="logo-text">Collection Connector</span>
             </div>
 
             <h2 className="left-headline">
@@ -383,19 +416,19 @@ export default function Login() {
           <div className="login-card">
 
             <div className="mobile-logo">
-              <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{width:18,height:18}}>
+              <div className="logo-mark agency-logo-mark" style={{width:36,height:36}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:18,height:18}}>
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                   <path d="M2 17l10 5 10-5"/>
                   <path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span className="logo-text" style={{color:'var(--navy)'}}>Pasado</span>
+              <span style={{fontSize:20,fontWeight:700,color:'var(--blue)',letterSpacing:'-0.01em'}}>Collection Connector</span>
             </div>
 
             <p className="card-eyebrow">Welcome back</p>
             <h1 className="card-title">Sign in to your account</h1>
-            <div className="divider" />
+            <div className="header-rule" />
             <p className="card-sub">Enter your credentials to access your dashboard.</p>
 
             {error && (
@@ -457,46 +490,25 @@ export default function Login() {
               Don't have an account?{' '}
               <Link to="/register">Create one</Link>
             </p>
-            <div style={{ margin: '24px 0 0' }}>
-  <div style={{
-    display: 'flex', alignItems: 'center', gap: 10,
-    margin: '0 0 12px',
-    fontSize: 11, color: 'var(--muted)',
-    letterSpacing: '0.08em', textTransform: 'uppercase',
-  }}>
-    <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-    Are you a collection agency?
-    <span style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-  </div>
 
-  <div style={{
-    display: 'flex', alignItems: 'center', gap: 14,
-    background: 'var(--cream)', border: '1px solid var(--border)',
-    borderRadius: 12, padding: '14px 16px',
-  }}>
-    <div className="logo-mark" style={{ borderColor: 'var(--navy)', flexShrink: 0 }}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="#0f1f3d" strokeWidth="1.8" style={{ width: 18, height: 18 }}>
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-    <div style={{ flex: 1 }}>
-      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)', margin: '0 0 2px' }}>
-        Agency sign in
-      </p>
-      <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
-        Access your agency portal and manage assigned claims.
-      </p>
-    </div>
-    <Link to="/agency/login" style={{
-      fontSize: 12, fontWeight: 600, color: 'var(--gold-d)',
-      textDecoration: 'underline', textUnderlineOffset: 2, whiteSpace: 'nowrap',
-    }}>
-      Sign in ›
-    </Link>
-  </div>
-</div>
+            <div className="agency-divider">
+              <span />&nbsp;Are you a collection agency?&nbsp;<span />
+            </div>
+
+            <div className="agency-card">
+              <div className="agency-logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:18,height:18}}>
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div className="agency-card-text">
+                <p className="agency-card-title">Agency sign in</p>
+                <p className="agency-card-sub">Access your portal and manage assigned claims.</p>
+              </div>
+              <Link to="/agency/login" className="agency-signin-link">Sign in ›</Link>
+            </div>
 
             <div className="security-note">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.8">

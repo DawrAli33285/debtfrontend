@@ -24,8 +24,8 @@ const getInitials = (name = '') =>
   name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '??';
 
 const STATUS_STYLES = {
-  in_progress: { color: '#2563eb', bg: '#eff6ff', label: 'In Progress' },
-  assigned:    { color: '#a8883a', bg: '#fefce8', label: 'Assigned' },
+  in_progress: { color: '#1669A9', bg: '#e8f2fa', label: 'In Progress' },
+  assigned:    { color: '#0f5189', bg: '#c5ddf0', label: 'Assigned' },
   closed:      { color: '#16a34a', bg: '#f0fdf4', label: 'Closed' },
   submitted:   { color: '#6b7280', bg: '#f3f4f6', label: 'Submitted' },
 };
@@ -196,17 +196,17 @@ export default function AgencyChat() {
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-          --navy:   #0f1f3d;
-          --navy-2: #162847;
-          --gold:   #c9a84c;
-          --gold-l: #e2c97e;
-          --gold-d: #a8883a;
-          --cream:  #faf8f4;
-          --muted:  #8a95a3;
-          --border: #e4e2dd;
-          --white:  #ffffff;
-          --error:  #c0392b;
-        }
+  --navy:   #1669A9;   /* was #0f1f3d */
+  --navy-2: #0f5189;   /* was #162847 */
+  --gold:   #1669A9;   /* was #c9a84c */
+  --gold-l: #4a8fc4;   /* was #e2c97e */
+  --gold-d: #0f5189;   /* was #a8883a */
+  --cream:  #f5f7fa;   /* was #faf8f4 */
+  --muted:  #7a96a8;   /* was #8a95a3 */
+  --border: #e0e7ef;   /* was #e4e2dd */
+  --white:  #ffffff;
+  --error:  #c0392b;
+}
         body { font-family: 'DM Sans', sans-serif; background: var(--cream); }
 
         .chat-root { display: flex; flex-direction: column; height: 100vh; background: var(--cream); overflow: hidden; }
@@ -217,11 +217,17 @@ export default function AgencyChat() {
           display: flex; align-items: center; justify-content: space-between;
           flex-shrink: 0; z-index: 50; position: relative;
         }
-        .chat-nav::after {
-          content: ''; position: absolute; inset: 0; pointer-events: none;
-          background-image: linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-          background-size: 40px 40px;
-        }
+      .chat-nav::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
         .nav-brand { display: flex; align-items: center; gap: 9px; position: relative; z-index: 1; }
         .logo-mark {
           width: 30px; height: 30px; border: 1.5px solid var(--gold); border-radius: 7px;
@@ -389,7 +395,12 @@ export default function AgencyChat() {
           transition: border-color .15s, box-shadow .15s;
         }
         .chat-input::placeholder { color: var(--muted); }
-        .chat-input:focus { border-color: var(--gold-d); background: var(--white); box-shadow: 0 0 0 3px rgba(168,136,58,.08); }
+
+.chat-input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(22,105,169,0.1);  /* matches Login's focus ring */
+}
+
         .send-btn {
           position: absolute; right: 8px; bottom: 8px;
           width: 32px; height: 32px; border-radius: 9px;
