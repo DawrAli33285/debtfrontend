@@ -457,21 +457,7 @@ export default function AgencySelection() {
                 }
               </div>
 
-              <div className="field">
-                <label>Assignment Method</label>
-                <div className="method-group">
-                  {['manual', 'auto'].map(m => (
-                    <button
-                      key={m}
-                      type="button"
-                      className={`method-btn${method === m ? ' method-btn-active' : ''}`}
-                      onClick={() => setMethod(m)}
-                    >
-                      {m.charAt(0).toUpperCase() + m.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            
             </div>
 
             {error && (
