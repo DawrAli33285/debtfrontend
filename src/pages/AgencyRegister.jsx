@@ -1,6 +1,200 @@
-import { useState } from 'react';
+import { useState,useRef } from 'react';
 import { registerAgency } from '../api/auth';
 import { useNavigate, Link } from 'react-router-dom';
+
+const MSA_TEXT = `MASTER SERVICES AGREEMENT (MSA)
+Collections Connection Platform
+
+This Master Services Agreement ("Agreement") is entered into by and between Collections Connection ("Company") and the undersigned Collection Agency ("Agency") as of the Effective Date.
+
+1. Scope of Services
+Company operates a platform that facilitates the submission, management, and tracking of claims for collection. Agency agrees to utilize the Platform in accordance with this Agreement and all applicable laws and regulations.
+
+2. Platform Fee
+2.1 Fee Structure Company shall assess and retain a service fee equal to three percent (3%) of all funds recovered by Agency on claims submitted through the Platform.
+2.2 Calculation of Fee The fee shall be calculated based on the gross amount recovered, prior to any deductions, fees, or offsets applied by Agency.
+2.3 Applicability The fee applies to all claims submitted, sourced, or managed through the Platform, regardless of the method or timing of recovery.
+2.4 No Recovery – No Fee No fee shall be owed for claims where no funds are recovered.
+
+3. Payment Terms
+3.1 Remittance Obligation Agency shall remit all applicable Platform fees to Company within:
+  · Net 7 days from the date of recovery; or
+  · Net 15 days if expressly agreed to in writing.
+3.2 Method of Payment Company may, at its discretion:
+  · Deduct its fee directly from recovered funds prior to disbursement; or
+  · Invoice Agency for amounts due.
+3.3 Late Payments Any unpaid amounts beyond the applicable payment period may be subject to:
+  · Interest at the rate of 1.5% per month (or the maximum permitted by law), and
+  · Suspension of Platform access until payment is made.
+
+4. Reporting Requirements
+Agency shall maintain accurate, complete, and timely records of all claim activity and recoveries, including:
+  · Amounts collected
+  · Dates of recovery
+  · Payment status
+Agency agrees to provide such reporting to Company upon request or through Platform integration.
+
+5. Audit Rights
+5.1 Right to Audit Company reserves the right to audit Agency's books and records relating to claims processed through the Platform.
+5.2 Audit Scope Audits may include review of:
+  · Collection records
+  · Payment receipts
+  · Internal accounting systems related to Platform claims
+5.3 Notice & Frequency Audits shall be conducted upon reasonable notice and no more than twice per calendar year, unless discrepancies are identified.
+5.4 Discrepancies If an audit reveals underpayment of fees:
+  · Agency shall remit the outstanding balance immediately
+  · If discrepancy exceeds 5%, Agency shall reimburse reasonable audit costs
+
+6. Compliance
+Agency agrees to comply with all applicable federal, state, and local laws, including but not limited to:
+  · Fair Debt Collection Practices Act (FDCPA)
+  · State collection regulations
+Agency is solely responsible for its collection practices.
+
+7. Term & Termination
+7.1 Term This Agreement shall remain in effect until terminated by either party.
+7.2 Termination Either party may terminate with written notice. Company may suspend or terminate access immediately for:
+  · Non-payment
+  · Breach of terms
+  · Legal or compliance concerns
+
+8. Limitation of Liability
+Company shall not be liable for:
+  · Agency's collection outcomes
+  · Debtor disputes
+  · Regulatory actions arising from Agency conduct
+
+9. Miscellaneous
+  · This Agreement constitutes the entire agreement between the parties
+  · Any modifications must be in writing
+  · This Agreement shall be governed by the laws of the State of Indiana`;
+
+function MSAModal({ onAccept, onDecline }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [checked, setChecked]   = useState(false);
+  const bodyRef = useRef(null);
+
+  const handleScroll = () => {
+    const el = bodyRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+      setScrolled(true);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 999,
+      background: 'rgba(15,40,70,0.55)', backdropFilter: 'blur(4px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '16px',
+    }}>
+      <div style={{
+        width: '100%', maxWidth: 580, background: '#fff',
+        borderRadius: 16, overflow: 'hidden',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
+        display: 'flex', flexDirection: 'column', maxHeight: '90vh',
+        animation: 'fadeUp 0.3s cubic-bezier(.22,1,.36,1) both',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          background: '#1669A9', padding: '20px 24px', flexShrink: 0,
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}/>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 4, position: 'relative', zIndex: 1 }}>
+            Required Agreement
+          </p>
+          <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, color: '#fff', position: 'relative', zIndex: 1 }}>
+            Agency Fee &amp; Participation Agreement
+          </p>
+        </div>
+
+        {/* Scroll hint */}
+        {!scrolled && (
+          <div style={{
+            background: '#fff8e1', borderBottom: '1px solid #ffe082',
+            padding: '8px 20px', fontSize: 12, color: '#7a6000',
+            display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0,
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Please scroll to the bottom to enable acceptance
+          </div>
+        )}
+
+        {/* Body */}
+        <div
+          ref={bodyRef}
+          onScroll={handleScroll}
+          style={{
+            flex: 1, overflowY: 'auto', padding: '20px 24px',
+            fontSize: 13, lineHeight: 1.75, color: '#2a3a4a',
+            whiteSpace: 'pre-wrap', fontFamily: 'inherit',
+            borderBottom: '1px solid #e0e7ef',
+          }}
+        >
+          {MSA_TEXT}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: '18px 24px', flexShrink: 0 }}>
+
+          {/* Checkbox */}
+          <label style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            marginBottom: 16, cursor: scrolled ? 'pointer' : 'not-allowed',
+            opacity: scrolled ? 1 : 0.45,
+          }}>
+            <input
+              type="checkbox"
+              checked={checked}
+              disabled={!scrolled}
+              onChange={e => setChecked(e.target.checked)}
+              style={{ marginTop: 2, width: 15, height: 15, accentColor: '#1669A9', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: 12.5, color: '#4a6070', lineHeight: 1.55 }}>
+              I have read and agree to the Collections Connection Agency Fee &amp; Participation Agreement
+            </span>
+          </label>
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={onDecline}
+              style={{
+                flex: '0 0 auto', padding: '11px 20px',
+                border: '1.5px solid #e0e7ef', borderRadius: 8,
+                background: 'transparent', fontSize: 13.5, fontWeight: 600,
+                color: '#7a96a8', cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Decline
+            </button>
+            <button
+              onClick={onAccept}
+              disabled={!checked || !scrolled}
+              style={{
+                flex: 1, padding: '11px 20px',
+                border: 'none', borderRadius: 8,
+                background: checked && scrolled ? '#1669A9' : '#c5ddf0',
+                color: '#fff', fontSize: 13.5, fontWeight: 600,
+                cursor: checked && scrolled ? 'pointer' : 'not-allowed',
+                fontFamily: 'inherit', transition: 'background 0.15s',
+              }}
+            >
+              Accept &amp; Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
@@ -43,7 +237,9 @@ export default function AgencyRegister() {
     confirm:  '',
   });
 
-  const [agreed, setAgreed] = useState(false);
+  const [agreed, setAgreed]   = useState(false);
+  const [showMSA, setShowMSA] = useState(false);
+  const msaAccepted = useRef(false);
 
   const toggleState = (s) =>
     setAgency(prev => ({
@@ -74,7 +270,13 @@ export default function AgencyRegister() {
     setError('');
     if (owner.password !== owner.confirm) return setError('Passwords do not match');
     if (owner.password.length < 8) return setError('Password must be at least 8 characters');
-
+  
+    // Show MSA modal first if not yet accepted
+    if (!msaAccepted.current) {
+      setShowMSA(true);
+      return;
+    }
+  
     setLoading(true);
     const res = await registerAgency({
       agency_name:    agency.agency_name.trim(),
@@ -87,7 +289,7 @@ export default function AgencyRegister() {
       password:       owner.password,
     });
     setLoading(false);
-
+  
     if (res.token) {
       localStorage.setItem('agencyToken', res.token);
       navigate('/agency/subscription');
@@ -95,6 +297,7 @@ export default function AgencyRegister() {
       setError(res.message || 'Registration failed');
     }
   };
+
 
   return (
     <>
@@ -780,6 +983,37 @@ export default function AgencyRegister() {
           </div>
         </main>
       </div>
+
+      {showMSA && (
+        <MSAModal
+        onAccept={() => {
+          msaAccepted.current = true;
+          setShowMSA(false);
+          setLoading(true);
+          registerAgency({
+            agency_name:       agency.agency_name.trim(),
+            ein:               agency.ein.trim(),
+            fee_percentage:    parseFloat(agency.fee_percentage) || 0,
+            states_covered:    agency.states_covered,
+            specialties:       agency.specialties,
+            name:              owner.name.trim(),
+            email:             owner.email.trim(),
+            password:          owner.password,
+            agreement_version: 'v1.0',  
+          }).then(res => {
+              setLoading(false);
+              if (res.token) {
+                localStorage.setItem('agencyToken', res.token);
+                navigate('/agency/subscription');
+              } else {
+                setError(res.message || 'Registration failed');
+              }
+            });
+          }}
+          onDecline={() => setShowMSA(false)}
+        />
+      )}
+
     </>
   );
 }

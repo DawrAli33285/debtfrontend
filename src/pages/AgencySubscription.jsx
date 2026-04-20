@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { BASE_URL } from '../api/auth';
@@ -72,18 +72,23 @@ const plans = [
   },
 ];
 
-const STRIPE_ELEMENT_STYLE = {
-  style: {
-    base: {
-      fontSize: '14px',
-      fontFamily: 'DM Sans, sans-serif',
-      color: '#1a2a3a',
-      fontWeight: '500',
-      '::placeholder': { color: '#7a96a8' },
-    },
-    invalid: { color: '#c0392b' },
-  },
-};
+
+const PAYPAL_CLIENT_ID = "AUH8Cb7tNZVz2s3oLMx1TEL2jjqU-aJOF1k2PiEBfybGNiF10YGadyPXMOYi_h_t9_-N3L_Ocmcok3XB";
+
+
+function usePayPalSDK() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (window.paypal) { setReady(true); return; }
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
+    script.setAttribute('data-sdk-integration-source', 'button-factory');
+    script.onload = () => setReady(true);
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
+  return ready;
+}
 
 function CheckIcon() {
   return (
@@ -98,29 +103,81 @@ function CheckIcon() {
 }
 
 function CheckoutModal({ plan, onClose, onSuccess }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const paypalRef   = useRef(null);
+  const sdkReady    = usePayPalSDK();
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [rendered, setRendered] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!stripe || !elements) return;
-    setLoading(true); setError('');
-    try {
-      const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-        type: 'card', card: elements.getElement(CardNumberElement),
-      });
-      if (stripeError) { setError(stripeError.message); setLoading(false); return; }
-      const res = await fetch(`${BASE_URL}/subscription/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('agencyToken')}` },
-        body: JSON.stringify({ amount: plan.amount, planName: plan.id, paymentMethod: paymentMethod.id }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.message || 'Subscription failed'); setLoading(false); return; }
-      onSuccess();
-    } catch { setError('Something went wrong. Please try again.'); setLoading(false); }
-  };
+  useEffect(() => {
+    if (!sdkReady || !paypalRef.current || rendered) return;
+    setRendered(true);
+
+    window.paypal.Buttons({
+      style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' },
+
+      createSubscription: (data, actions) => {
+        setLoading(true);
+        setError('');
+        const token   = localStorage.getItem('agencyToken');
+        const userRaw = localStorage.getItem('agencyUser');
+        const user    = userRaw ? JSON.parse(userRaw) : null;
+
+        return fetch(`${BASE_URL}/subscription/get-plan-id`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ amount: plan.amount, planName: plan.id }),
+        })
+          .then(res => {
+            if (!res.ok) return res.json().then(d => { throw new Error(d.message || 'Failed to get plan') });
+            return res.json();
+          })
+          .then(data => {
+            if (!data.planId) throw new Error('No plan ID returned from server');
+            return actions.subscription.create({ plan_id: data.planId });
+          })
+          .catch(err => {
+            setError(err.message || 'Something went wrong. Please try again.');
+            setLoading(false);
+            throw err;
+          });
+      },
+
+      onApprove: (data) => {
+        setLoading(true);
+        const token   = localStorage.getItem('agencyToken');
+        const userRaw = localStorage.getItem('agencyUser');
+        const user    = userRaw ? JSON.parse(userRaw) : null;
+
+        fetch(`${BASE_URL}/subscription/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            subscriptionId: data.subscriptionID,
+            planName:       plan.id,
+            claimsLimit:    plan.claimsLimit,
+          }),
+        })
+          .then(res => res.json())
+          .then(() => { setLoading(false); onSuccess(); })
+          .catch(() => {
+            setError('Payment approved but failed to save. Please contact support.');
+            setLoading(false);
+          });
+      },
+
+      onError: (err) => {
+        console.error('PayPal error:', err);
+        setError('PayPal encountered an error. Please try again.');
+        setLoading(false);
+      },
+
+      onCancel: () => {
+        setError('Payment cancelled. You can try again.');
+        setLoading(false);
+      },
+    }).render(paypalRef.current);
+  }, [sdkReady, rendered]);
 
   return (
     <div
@@ -154,28 +211,23 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
           </div>
         </div>
 
-        {/* Fields */}
+        {/* PayPal Button */}
         <div style={{ padding:'20px 24px', display:'flex', flexDirection:'column', gap:14 }}>
-          <div>
-            <label style={{ fontSize:'10.5px', fontWeight:700, letterSpacing:'0.09em', textTransform:'uppercase', color:'#7a96a8', display:'block', marginBottom:6 }}>Card Number</label>
-            <div style={{ padding:'12px 14px', borderRadius:9, border:'1.5px solid #e0e7ef', background:'#f5f7fa' }}>
-              <CardNumberElement options={STRIPE_ELEMENT_STYLE}/>
+          {!sdkReady && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'16px 0', fontSize:13, color:'#7a96a8' }}>
+              <span style={{ width:14, height:14, borderRadius:'50%', border:'2px solid #e0e7ef', borderTopColor:'#1669A9', animation:'spin 0.7s linear infinite', display:'inline-block' }}/>
+              Loading PayPal…
             </div>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-            <div>
-              <label style={{ fontSize:'10.5px', fontWeight:700, letterSpacing:'0.09em', textTransform:'uppercase', color:'#7a96a8', display:'block', marginBottom:6 }}>Expiry Date</label>
-              <div style={{ padding:'12px 14px', borderRadius:9, border:'1.5px solid #e0e7ef', background:'#f5f7fa' }}>
-                <CardExpiryElement options={STRIPE_ELEMENT_STYLE}/>
-              </div>
+          )}
+
+          <div ref={paypalRef} />
+
+          {loading && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontSize:13, color:'#7a96a8' }}>
+              <span style={{ width:13, height:13, borderRadius:'50%', border:'2px solid #e0e7ef', borderTopColor:'#1669A9', animation:'spin 0.7s linear infinite', display:'inline-block' }}/>
+              Processing…
             </div>
-            <div>
-              <label style={{ fontSize:'10.5px', fontWeight:700, letterSpacing:'0.09em', textTransform:'uppercase', color:'#7a96a8', display:'block', marginBottom:6 }}>CVC</label>
-              <div style={{ padding:'12px 14px', borderRadius:9, border:'1.5px solid #e0e7ef', background:'#f5f7fa' }}>
-                <CardCvcElement options={STRIPE_ELEMENT_STYLE}/>
-              </div>
-            </div>
-          </div>
+          )}
 
           {error && (
             <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 14px', borderRadius:9, fontSize:13, background:'#fdf0ef', border:'1px solid #f1c0bc', color:'#c0392b' }}>
@@ -184,24 +236,13 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
             </div>
           )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !stripe}
-            style={{ width:'100%', padding:13, borderRadius:9, border:'none', fontFamily:'DM Sans, sans-serif', fontSize:14, fontWeight:600, background:'#1669A9', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, opacity: loading ? 0.7 : 1 }}
-          >
-            {loading ? (
-              <><span style={{ width:14, height:14, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.3)', borderTopColor:'#fff', animation:'spin 0.7s linear infinite', display:'inline-block' }}/> Processing…</>
-            ) : (
-              <>Subscribe — ${plan.price}/yr <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></>
-            )}
-          </button>
-
-          <p style={{ textAlign:'center', fontSize:11, color:'#bbb' }}>Secured by Stripe · Cancel anytime</p>
+          <p style={{ textAlign:'center', fontSize:11, color:'#bbb' }}>Secured by PayPal · Cancel anytime</p>
         </div>
       </div>
     </div>
   );
 }
+
 
 export default function AgencySubscriptionPlans() {
   const navigate = useNavigate();

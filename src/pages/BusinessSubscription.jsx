@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { BASE_URL } from '../api/auth';
+
+const PAYPAL_CLIENT_ID = "AUH8Cb7tNZVz2s3oLMx1TEL2jjqU-aJOF1k2PiEBfybGNiF10YGadyPXMOYi_h_t9_-N3L_Ocmcok3XB";
 
 const plans = [
   {
@@ -47,7 +49,7 @@ const plans = [
     ),
   },
   {
-    id: 'unlimited',
+    id: 'enterprise',
     name: 'Unlimited',
     tagline: 'For high-volume operations',
     price: '49.00',
@@ -72,19 +74,6 @@ const plans = [
   },
 ];
 
-const STRIPE_ELEMENT_STYLE = {
-  style: {
-    base: {
-      fontSize: '14px',
-      fontFamily: 'DM Sans, sans-serif',
-      color: '#0f1f3d',
-      fontWeight: '500',
-      '::placeholder': { color: '#8a95a3' },
-    },
-    invalid: { color: '#c0392b' },
-  },
-};
-
 function CheckIcon() {
   return (
     <div className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0"
@@ -96,63 +85,155 @@ function CheckIcon() {
   );
 }
 
-function CheckoutModal({ plan, onClose, onSuccess }) {
-  const stripe = useStripe();
-  const elements = useElements();
+function PayPalLoadingSpinner() {
+  const [{ isPending }] = usePayPalScriptReducer();
+  if (!isPending) return null;
+  return (
+    <div className="flex items-center justify-center gap-2 py-4 text-sm" style={{ color: '#8a95a3' }}>
+      <span className="w-4 h-4 rounded-full border-2 inline-block"
+        style={{ borderColor: 'rgba(15,31,61,0.2)', borderTopColor: '#0f1f3d', animation: 'spin 0.7s linear infinite' }} />
+      Loading PayPal…
+    </div>
+  );
+}
+
+// planId is already fetched — createSubscription is now fully synchronous.
+// No fetch() inside PayPal's context = no iframe blocking.
+function PayPalCheckout({ plan, planId, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async () => {
-    if (!stripe || !elements) return;
+  const createSubscription = (_data, actions) => {
+    // ✅ Pure sync — just passes the pre-fetched planId to PayPal
+    return actions.subscription.create({ plan_id: planId });
+  };
+
+  const onApprove = async (data) => {
     setLoading(true);
-    setError('');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const cardNumber = elements.getElement(CardNumberElement);
-      const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardNumber,
-      });
-
-      if (stripeError) {
-        setError(stripeError.message);
-        setLoading(false);
-        return;
-      }
-
-      const token = localStorage.getItem('token');
-      const userRaw = localStorage.getItem('user');
-      const user = userRaw ? JSON.parse(userRaw) : null;
-
-      const res = await fetch(`${BASE_URLs}/businessSubscription/create`, {
+      const res = await fetch(`${BASE_URL}/businessSubscription/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          email:        user?.email,
-          amount:       plan.amount,
-          planName:     plan.id,
-          claimsLimit:  plan.claimsLimit,
-          paymentMethod: paymentMethod.id,
+          subscriptionId: data.subscriptionID,
+          email: user?.email,
+          planName: plan.id,
+          claimsLimit: plan.claimsLimit,
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setError(data.message || 'Subscription failed');
-        setLoading(false);
-        return;
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.message || 'Failed to confirm subscription');
       }
 
-      onSuccess();
+      setLoading(false);
+      onSuccess(data.subscriptionID);
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      console.error('onApprove failed:', err);
+      setError('Payment approved but failed to save. Please contact support.');
       setLoading(false);
     }
   };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <PayPalLoadingSpinner />
+
+      <PayPalButtons
+        style={{ shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' }}
+        createSubscription={createSubscription}
+        onApprove={onApprove}
+        onError={(err) => {
+          console.error('PayPal onError:', err);
+          setError('PayPal encountered an error. Please try again.');
+          setLoading(false);
+        }}
+        onCancel={() => {
+          setError('Payment cancelled.');
+          setLoading(false);
+        }}
+      />
+
+      {loading && (
+        <div className="flex items-center justify-center gap-2 text-sm" style={{ color: '#8a95a3' }}>
+          <span className="w-3.5 h-3.5 rounded-full border-2 inline-block"
+            style={{ borderColor: 'rgba(15,31,61,0.2)', borderTopColor: '#0f1f3d', animation: 'spin 0.7s linear infinite' }} />
+          Processing…
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 px-3.5 py-3 rounded-xl text-[13px]"
+          style={{ background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {error}
+        </div>
+      )}
+
+      <p className="text-center text-[11px]" style={{ color: '#8a95a3' }}>
+        Secured by PayPal · Cancel anytime
+      </p>
+    </div>
+  );
+}
+
+// Modal fetches planId from YOUR backend immediately on open.
+// This is a normal top-level fetch — no iframe, no sandbox, no blocking.
+function CheckoutModal({ plan, onClose, onSuccess }) {
+  const [planId, setPlanId] = useState(null);
+  const [fetchError, setFetchError] = useState('');
+  const [fetching, setFetching] = useState(true);
+
+  // useEffect to run on mount
+  useEffect(() => {
+    const run = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        console.log('Fetching planId from backend...');
+        const res = await fetch(`${BASE_URL}/businessSubscription/get-plan-id`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: plan.amount,
+            planName: plan.id,
+            claimsLimit: plan.claimsLimit,
+          }),
+        });
+
+        console.log('Backend response status:', res.status);
+
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({}));
+          throw new Error(json.message || `Server error: ${res.status}`);
+        }
+
+        const { planId: id } = await res.json();
+        console.log('Got planId:', id);
+        if (!id) throw new Error('No plan ID returned from server');
+        setPlanId(id);
+      } catch (err) {
+        console.error('fetchPlanId failed:', err);
+        setFetchError(err.message || 'Failed to load payment options.');
+      } finally {
+        setFetching(false);
+      }
+    };
+    run();
+  }, []);
 
   return (
     <div
@@ -164,29 +245,22 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
         className="w-full max-w-md rounded-[22px] overflow-hidden"
         style={{ background: '#fff', boxShadow: '0 24px 64px rgba(15,31,61,0.2)', animation: 'fadeUp 0.3s cubic-bezier(.22,1,.36,1) both' }}
       >
-
-        {/* Modal Header */}
+        {/* Header */}
         <div className="relative overflow-hidden px-7 pt-6 pb-5" style={{ background: '#0f1f3d' }}>
           <div className="absolute inset-0 pointer-events-none" style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)',
             backgroundSize: '32px 32px',
           }} />
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all"
-            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}
-          >
+          <button onClick={onClose}
+            className="absolute top-4 right-4 z-10 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
           <div className="relative z-10">
-            <p className="text-[10px] font-semibold tracking-[0.1em] uppercase mb-1" style={{ color: '#c9a84c' }}>
-              Subscribe to
-            </p>
-            <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: '22px', color: '#fff' }}>
-              {plan.name} Plan
-            </p>
+            <p className="text-[10px] font-semibold tracking-[0.1em] uppercase mb-1" style={{ color: '#c9a84c' }}>Subscribe to</p>
+            <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: '22px', color: '#fff' }}>{plan.name} Plan</p>
             <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{plan.tagline}</p>
           </div>
         </div>
@@ -208,78 +282,45 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
           </div>
         </div>
 
-        {/* Card Fields */}
-        <div className="px-7 py-6 flex flex-col gap-4">
-
-          {/* Card Number */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[10.5px] font-semibold tracking-[0.09em] uppercase" style={{ color: '#8a95a3' }}>
-              Card Number
-            </label>
-            <div className="px-3.5 py-3 rounded-[10px]" style={{ background: '#faf8f4', border: '1px solid #e4e2dd' }}>
-              <CardNumberElement options={STRIPE_ELEMENT_STYLE} />
-            </div>
-          </div>
-
-          {/* Expiry + CVC */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10.5px] font-semibold tracking-[0.09em] uppercase" style={{ color: '#8a95a3' }}>
-                Expiry Date
-              </label>
-              <div className="px-3.5 py-3 rounded-[10px]" style={{ background: '#faf8f4', border: '1px solid #e4e2dd' }}>
-                <CardExpiryElement options={STRIPE_ELEMENT_STYLE} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10.5px] font-semibold tracking-[0.09em] uppercase" style={{ color: '#8a95a3' }}>
-                CVC
-              </label>
-              <div className="px-3.5 py-3 rounded-[10px]" style={{ background: '#faf8f4', border: '1px solid #e4e2dd' }}>
-                <CardCvcElement options={STRIPE_ELEMENT_STYLE} />
-              </div>
-            </div>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="flex items-center gap-2 px-3.5 py-3 rounded-xl text-[13px]"
-              style={{ background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {error}
+        {/* Body */}
+        <div className="px-7 py-6">
+          {fetching && (
+            <div className="flex items-center justify-center gap-2 py-6 text-sm" style={{ color: '#8a95a3' }}>
+              <span className="w-4 h-4 rounded-full border-2 inline-block"
+                style={{ borderColor: 'rgba(15,31,61,0.2)', borderTopColor: '#0f1f3d', animation: 'spin 0.7s linear infinite' }} />
+              Preparing checkout…
             </div>
           )}
 
-          {/* Submit */}
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !stripe}
-            className="w-full cursor-pointer rounded-xl py-3.5 text-[14px] font-semibold tracking-wide flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#0f1f3d', color: '#fff', marginTop: '4px' }}
-          >
-            {loading ? (
-              <>
-                <span className="w-3.5 h-3.5 rounded-full border-2 flex-shrink-0"
-                  style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff', animation: 'spin 0.7s linear infinite' }} />
-                Processing…
-              </>
-            ) : (
-              <>
-                Subscribe — ${plan.price}/mo
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+          {fetchError && (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 px-3.5 py-3 rounded-xl text-[13px]"
+                style={{ background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
-              </>
-            )}
-          </button>
+                {fetchError}
+              </div>
+              <button onClick={onClose}
+                className="w-full py-2.5 rounded-xl text-sm font-medium"
+                style={{ background: '#f0f0f0', color: '#555' }}>
+                Close
+              </button>
+            </div>
+          )}
 
-          <p className="text-center text-[11px]" style={{ color: '#8a95a3' }}>
-            Secured by Stripe · Cancel anytime
-          </p>
+          {!fetching && !fetchError && planId && (
+            <PayPalScriptProvider options={{
+              clientId: PAYPAL_CLIENT_ID,
+              vault: true,
+              intent: 'subscription',
+            }}>
+              <PayPalCheckout plan={plan} planId={planId} onSuccess={onSuccess} />
+            </PayPalScriptProvider>
+          )}
         </div>
-
       </div>
     </div>
   );
@@ -288,11 +329,6 @@ function CheckoutModal({ plan, onClose, onSuccess }) {
 export default function SubscriptionPlans() {
   const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState(null);
-
-  const handleSuccess = () => {
-    setSelectedPlan(null);
-    navigate('/dashboard');
-  };
 
   return (
     <>
@@ -320,13 +356,10 @@ export default function SubscriptionPlans() {
         .fade-up-2 { animation-delay: 0.12s; }
         .fade-up-3 { animation-delay: 0.19s; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spin { animation: spin 0.7s linear infinite; }
       `}</style>
 
-      {/* NAVBAR */}
       <nav className="navbar-grid sticky top-0 z-40 flex items-center justify-between px-10 h-16 relative overflow-hidden"
         style={{ background: 'var(--navy)', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
-        
         <Link to="/dashboard"
           className="relative z-10 flex items-center gap-1.5 text-[13px] font-medium no-underline rounded-lg px-3.5 py-1.5 transition-all"
           style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
@@ -433,12 +466,11 @@ export default function SubscriptionPlans() {
         </p>
       </div>
 
-      {/* CHECKOUT MODAL */}
       {selectedPlan && (
         <CheckoutModal
           plan={selectedPlan}
           onClose={() => setSelectedPlan(null)}
-          onSuccess={handleSuccess}
+          onSuccess={(id) => { setSelectedPlan(null); navigate('/dashboard'); }}
         />
       )}
     </>
