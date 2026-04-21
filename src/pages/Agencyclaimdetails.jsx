@@ -3,12 +3,16 @@ import { useParams, Link } from 'react-router-dom';
 import { getAgencyClaimById, getAgencyMe, acceptAgencyClaim, denyAgencyClaim, reopenAgencyClaim, closeAgencyClaim, BASE_URL } from '../api/auth';
 
 const STATUS_META = {
-  submitted:   { label: 'Submitted',   cls: 'status-submitted'  },
-  assigned:    { label: 'Assigned',    cls: 'status-assigned'   },
-  in_progress: { label: 'In Progress', cls: 'status-progress'   },
-  closed:      { label: 'Closed',      cls: 'status-closed'     },
-  denied:      { label: 'Denied',      cls: 'status-denied'     },
+  submitted:            { label: 'Submitted',            cls: 'status-submitted'          },
+  assigned:             { label: 'Assigned',             cls: 'status-assigned'           },
+  in_progress:          { label: 'In Progress',          cls: 'status-progress'           },
+  closed:               { label: 'Closed',               cls: 'status-closed'             },
+  denied:               { label: 'Denied',               cls: 'status-denied'             },
+  connection_approved:  { label: 'Connection Approved',  cls: 'status-connection-approved'},
+  connection_denied:    { label: 'Connection Denied',    cls: 'status-connection-denied'  },
 };
+
+
 
 function StatusBadge({ status }) {
   const { label, cls } = STATUS_META[status] || STATUS_META.submitted;
@@ -230,9 +234,12 @@ export default function AgencyClaimDetail() {
         .status-progress .status-dot   { background:#9b59b6; }
         .status-closed     { background:#eafaf1; color:#1e8449; border:1px solid #a9dfbf; }
         .status-closed .status-dot     { background:#27ae60; }
-        .status-denied     { background:#fdf0ef; color:#c0392b; border:1px solid #f1c0bc; }
-        .status-denied .status-dot     { background:#c0392b; }
-
+       .status-denied     { background:#fdf0ef; color:#c0392b; border:1px solid #f1c0bc; }
+.status-denied .status-dot     { background:#c0392b; }
+.status-connection-approved  { background: #eaf4fb; color: #1669A9; border: 1px solid #c5ddf0; }
+.status-connection-approved .status-dot  { background: #1669A9; }
+.status-connection-denied    { background: #fdf0ef; color: #c0392b; border: 1px solid #f1c0bc; }
+.status-connection-denied .status-dot    { background: #c0392b; }
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
 
@@ -438,16 +445,7 @@ export default function AgencyClaimDetail() {
 
       {/* NAVBAR */}
       <nav className="navbar">
-        <Link to="/agency/dashboard" className="nav-brand">
-          <div className="logo-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:16,height:16}}>
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <span className="logo-text">Collection Connector</span>
-        </Link>
+      
 
         <Link to="/agency/dashboard" className="back-link">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -490,6 +488,66 @@ export default function AgencyClaimDetail() {
               <StatusBadge status={claim.status} />
             </div>
 
+            {(claim.status === 'assigned' || claim.status === 'denied' || claim.status === 'in_progress' || claim.status === 'closed') && (
+              <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+
+                {actionError && (
+                  <div className="err-box" style={{ width: '100%' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    {actionError}
+                  </div>
+                )}
+
+                {claim.status === 'assigned' && (
+                  <>
+                    <button className="btn-accept" onClick={handleAccept} disabled={!!actionLoading}>
+                      {actionLoading === 'accept' ? (
+                        <><div className="btn-spinner" /> Accepting…</>
+                      ) : (
+                        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
+                      )}
+                    </button>
+                    <button className="btn-deny" onClick={handleDeny} disabled={!!actionLoading}>
+                      {actionLoading === 'deny' ? (
+                        <><div className="btn-spinner-red" /> Denying…</>
+                      ) : (
+                        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
+                      )}
+                    </button>
+                  </>
+                )}
+
+                {(claim.status === 'denied' || claim.status === 'closed') && (
+                  <button className="btn-reopen" onClick={() => setConfirmModal('reopen')} disabled={!!actionLoading}>
+                    {actionLoading === 'reopen' ? (
+                      <><div className="btn-spinner" /> Reopening…</>
+                    ) : (
+                      <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reopen Claim</>
+                    )}
+                  </button>
+                )}
+
+                {claim.status === 'in_progress' && (
+                  <button className="btn-close" onClick={() => setConfirmModal('close')} disabled={!!actionLoading}>
+                    {actionLoading === 'close' ? (
+                      <><div className="btn-spinner-dark" /> Closing…</>
+                    ) : (
+                      <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>Success</>
+                    )}
+                  </button>
+                )}
+
+                <Link to="/agency/chat" className="btn-chat">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                  </svg>
+                  Chat
+                </Link>
+
+              </div>
+            )}
             {/* Debtor Information */}
             <div className="section">
               <div className="section-card">
@@ -686,66 +744,7 @@ export default function AgencyClaimDetail() {
             </div>
 
             {/* Action Buttons */}
-            {(claim.status === 'assigned' || claim.status === 'denied' || claim.status === 'in_progress' || claim.status === 'closed') && (
-              <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-
-                {actionError && (
-                  <div className="err-box" style={{ width: '100%' }}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    {actionError}
-                  </div>
-                )}
-
-                {claim.status === 'assigned' && (
-                  <>
-                    <button className="btn-accept" onClick={handleAccept} disabled={!!actionLoading}>
-                      {actionLoading === 'accept' ? (
-                        <><div className="btn-spinner" /> Accepting…</>
-                      ) : (
-                        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Accept Claim</>
-                      )}
-                    </button>
-                    <button className="btn-deny" onClick={handleDeny} disabled={!!actionLoading}>
-                      {actionLoading === 'deny' ? (
-                        <><div className="btn-spinner-red" /> Denying…</>
-                      ) : (
-                        <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Claim</>
-                      )}
-                    </button>
-                  </>
-                )}
-
-                {(claim.status === 'denied' || claim.status === 'closed') && (
-                  <button className="btn-reopen" onClick={() => setConfirmModal('reopen')} disabled={!!actionLoading}>
-                    {actionLoading === 'reopen' ? (
-                      <><div className="btn-spinner" /> Reopening…</>
-                    ) : (
-                      <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reopen Claim</>
-                    )}
-                  </button>
-                )}
-
-                {claim.status === 'in_progress' && (
-                  <button className="btn-close" onClick={() => setConfirmModal('close')} disabled={!!actionLoading}>
-                    {actionLoading === 'close' ? (
-                      <><div className="btn-spinner-dark" /> Closing…</>
-                    ) : (
-                      <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Close Claim</>
-                    )}
-                  </button>
-                )}
-
-                <Link to="/agency/chat" className="btn-chat">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                  </svg>
-                  Chat
-                </Link>
-
-              </div>
-            )}
+          
 
             <p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed
@@ -754,13 +753,19 @@ export default function AgencyClaimDetail() {
             </p>
 
             {/* Confirmation Modals */}
-            {confirmModal && (
-              <div style={{
-                position: 'fixed', inset: 0, zIndex: 200,
-                background: 'rgba(26,42,58,0.55)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '24px',
-              }}>
+           
+          </>
+        )}
+      </div>
+      {confirmModal && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(26,42,58,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '24px',
+          }}> 
                 <div style={{
                   background: 'var(--white)',
                   borderRadius: '16px',
@@ -862,9 +867,6 @@ export default function AgencyClaimDetail() {
                 </div>
               </div>
             )}
-          </>
-        )}
-      </div>
     </>
   );
 }

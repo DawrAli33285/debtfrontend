@@ -175,6 +175,22 @@ export default function AdminDashboard() {
       </div>
     </div>
   </button>
+
+
+  <button
+    onClick={() => navigate('/admin/claimanagement')}
+    className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 text-left"
+  >
+    <div className="flex items-center gap-4">
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-sm">
+        <Users className="w-6 h-6 text-white" />
+      </div>
+      <div>
+        <p className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">Claim Management</p>
+        <p className="text-sm text-gray-500">Manage Active Claims</p>
+      </div>
+    </div>
+  </button>
 </div>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

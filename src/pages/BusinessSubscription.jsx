@@ -358,8 +358,8 @@ export default function SubscriptionPlans() {
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      <nav className="navbar-grid sticky top-0 z-40 flex items-center justify-between px-10 h-16 relative overflow-hidden"
-        style={{ background: 'var(--navy)', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
+<nav className="navbar-grid" style={{ background:'#1669A9', borderBottom:'1px solid rgba(255,255,255,0.12)', padding:'0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:40, overflow:'hidden', position:'sticky' }}>
+
         <Link to="/dashboard"
           className="relative z-10 flex items-center gap-1.5 text-[13px] font-medium no-underline rounded-lg px-3.5 py-1.5 transition-all"
           style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}

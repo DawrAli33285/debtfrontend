@@ -29,6 +29,7 @@ import UserManagement from './pages/AdminUserManagement';
 import AgencyManagement from './pages/AdminAgencyManagement';
 import ResetPassword from './pages/reset';
 import AgencyResetPassword from './pages/AgencyReset';
+import ClaimConnections from './pages/AdminClaimManagement';
 
 const stripePromise = loadStripe("pk_test_51SRynCPBwgTANTk6OM3ADMEkOYuyTGcfBfz92xAXVsLmm8O6tH7dCVgcwhG4rmi5OH3URGSa6faVFD2WYbI7E8oA00drLGc9l6");
 
@@ -45,7 +46,7 @@ export default function App() {
           <Route path='/admin/dashboard'        element={<AdminDashboard />} />
           <Route path='/admin/usermanagement'   element={<UserManagement />} />
           <Route path='/admin/agencymanagement' element={<AgencyManagement />} />
-
+          <Route path='/admin/claimanagement' element={<ClaimConnections/>}/>
           {/* ── All other routes (wrapped in Layout) ── */}
           <Route path="/*" element={
             <Layout>

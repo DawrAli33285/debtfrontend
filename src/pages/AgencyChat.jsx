@@ -440,7 +440,13 @@ export default function AgencyChat() {
         }
         .err-bar button { background: none; border: none; cursor: pointer; color: var(--error); font-size: 16px; line-height: 1; }
       `}</style>
-
+<nav className="navbar-grid" style={{ background:'#1669A9', borderBottom:'1px solid rgba(255,255,255,0.12)', padding:'0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:40, overflow:'hidden', position:'sticky' }}>
+     
+        <Link to="/agency/dashboard" style={{ position:'relative', zIndex:1, display:'inline-flex', alignItems:'center', gap:7, fontSize:13, fontWeight:500, color:'rgba(255,255,255,0.6)', textDecoration:'none', border:'1px solid rgba(255,255,255,0.2)', borderRadius:8, padding:'7px 14px' }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Dashboard
+        </Link>
+      </nav>
       <div className="chat-root">
 
         {/* Navbar */}

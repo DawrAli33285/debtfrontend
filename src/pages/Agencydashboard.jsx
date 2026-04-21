@@ -66,11 +66,13 @@ export default function AgencyDashboard() {
   });
 
   const stats = {
-    total:       assignments.length,
-    in_progress: assignments.filter(a => a.claim_id.status === 'in_progress').length,
-    closed:      assignments.filter(a => a.claim_id.status === 'closed').length,
-    denied:      assignments.filter(a => a.claim_id.status === 'denied').length,
-    totalValue:  assignments.reduce((s, a) => s + (a.claim_id?.amount || 0), 0),
+    total:                assignments.length,
+    in_progress:          assignments.filter(a => a.claim_id.status === 'in_progress').length,
+    closed:               assignments.filter(a => a.claim_id.status === 'closed').length,
+    denied:               assignments.filter(a => a.claim_id.status === 'denied').length,
+    connection_approved:  assignments.filter(a => a.claim_id.status === 'connection_approved').length,
+    connection_denied:    assignments.filter(a => a.claim_id.status === 'connection_denied').length,
+    totalValue:           assignments.reduce((s, a) => s + (a.claim_id?.amount || 0), 0),
   };
 
   const planUsedPct = agency
@@ -526,11 +528,13 @@ export default function AgencyDashboard() {
 
             <div className="tabs">
               {[
-                { key: 'all',         label: 'All' },
-                { key: 'assigned',    label: 'Assigned' },
-                { key: 'in_progress', label: 'In Progress' },
-                { key: 'closed',      label: 'Closed' },
-                { key: 'denied',      label: 'Denied' },
+              { key: 'all',                 label: 'All' },
+              { key: 'assigned',            label: 'Assigned' },
+              { key: 'in_progress',         label: 'In Progress' },
+              { key: 'closed',              label: 'Closed' },
+              { key: 'denied',              label: 'Denied' },
+              { key: 'connection_approved', label: 'Conn. Approved' },
+              { key: 'connection_denied',   label: 'Conn. Denied' },
               ].map(t => (
                 <button key={t.key} className={`tab${activeTab === t.key ? ' active' : ''}`} onClick={() => setActiveTab(t.key)}>
                   {t.label}
@@ -604,6 +608,21 @@ export default function AgencyDashboard() {
                                   Closed
                                 </span>
                               )}
+
+{claim.status === 'connection_approved' && (
+  <span className="new-badge" style={{ background: '#eaf4fb', border: '1px solid #c5ddf0', color: '#1669A9' }}>
+    <svg width="7" height="7" viewBox="0 0 24 24" fill="#1669A9"><circle cx="12" cy="12" r="10"/></svg>
+    Conn. Approved
+  </span>
+)}
+{claim.status === 'connection_denied' && (
+  <span className="new-badge badge-denied">
+    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    Conn. Denied
+  </span>
+)}
                             </div>
                             <div className="debtor-email">{claim.debtor_email || ''}</div>
                           </td>

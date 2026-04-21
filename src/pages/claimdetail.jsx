@@ -3,11 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import { getClaimById } from '../api/auth';
 
 const STATUS_META = {
-  submitted:   { label: 'Submitted',   cls: 'status-submitted'  },
-  assigned:    { label: 'Assigned',    cls: 'status-assigned'   },
-  in_progress: { label: 'In Progress', cls: 'status-progress'   },
-  closed:      { label: 'Closed',      cls: 'status-closed'     },
+  submitted:            { label: 'Submitted',            cls: 'status-submitted'           },
+  assigned:             { label: 'Assigned',             cls: 'status-assigned'            },
+  in_progress:          { label: 'In Progress',          cls: 'status-progress'            },
+  closed:               { label: 'Closed',               cls: 'status-closed'              },
+  connection_approved:  { label: 'Connection Approved',  cls: 'status-connection-approved' },
+  connection_denied:    { label: 'Connection Denied',    cls: 'status-connection-denied'   },
 };
+
 
 function StatusBadge({ status }) {
   const { label, cls } = STATUS_META[status] || STATUS_META.submitted;
@@ -126,8 +129,12 @@ export default function ClaimDetail() {
         .status-assigned .status-dot   { background: var(--blue); }
         .status-progress   { background: #f4ecf7; color: #6c3483; border: 1px solid #d7bde2; }
         .status-progress .status-dot   { background: #9b59b6; }
-        .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
-        .status-closed .status-dot     { background: #27ae60; }
+      .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+.status-closed .status-dot     { background: #27ae60; }
+.status-connection-approved  { background: #eaf4fb; color: #1669A9; border: 1px solid #c5ddf0; }
+.status-connection-approved .status-dot  { background: #1669A9; }
+.status-connection-denied    { background: #fdf0ef; color: #c0392b; border: 1px solid #f1c0bc; }
+.status-connection-denied .status-dot    { background: #c0392b; }
 
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }

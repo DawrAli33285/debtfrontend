@@ -151,6 +151,19 @@ export default function AgencyListing() {
         .empty-state { text-align:center; padding:60px 24px; color:var(--muted); font-size:14px; }
       `}</style>
 
+
+<nav className="navbar">
+        <div className="nav-actions">
+         
+         
+          <Link to="/dashboard" className="back-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Dashboard
+          </Link>
+        </div>
+      </nav>
    
 
       <div className="page">

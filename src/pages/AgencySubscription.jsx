@@ -300,12 +300,7 @@ export default function AgencySubscriptionPlans() {
 
       {/* Navbar */}
       <nav className="navbar-grid" style={{ background:'var(--blue)', borderBottom:'1px solid rgba(255,255,255,0.12)', padding:'0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:40, overflow:'hidden' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10, position:'relative', zIndex:1 }}>
-          <div style={{ width:36, height:36, background:'rgba(255,255,255,0.15)', border:'1.5px solid rgba(255,255,255,0.35)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" style={{width:18,height:18}}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          </div>
-          <span style={{ fontFamily:'Instrument Serif, serif', fontSize:17, color:'#fff' }}>Collection Connector</span>
-        </div>
+     
         <Link to="/agency/dashboard" style={{ position:'relative', zIndex:1, display:'inline-flex', alignItems:'center', gap:7, fontSize:13, fontWeight:500, color:'rgba(255,255,255,0.6)', textDecoration:'none', border:'1px solid rgba(255,255,255,0.2)', borderRadius:8, padding:'7px 14px' }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
           Back to Dashboard

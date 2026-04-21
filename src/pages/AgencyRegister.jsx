@@ -223,12 +223,15 @@ export default function AgencyRegister() {
   const [loading, setLoading] = useState(false);
 
   const [agency, setAgency] = useState({
-    agency_name:    '',
-    fee_percentage: '',
-    states_covered: [],
-    ein:            '',
-    specialties:    [],
+    agency_name:        '',
+    fee_percentage:     '',
+    states_covered:     [],
+    ein:                '',
+    specialties:        [],
+    upfront_fee:        null,
+    upfront_fee_amount: '',
   });
+  
 
   const [owner, setOwner] = useState({
     name:     '',
@@ -816,6 +819,70 @@ export default function AgencyRegister() {
                       />
                       <p className="field-hint">Your IRS-issued Employer Identification Number</p>
                     </div>
+
+                    {/* Upfront Fee */}
+                    <div>
+                      <p className="tag-label">Upfront Fee</p>
+                      <div style={{
+                        border: '1.5px solid var(--border)',
+                        borderRadius: 10,
+                        padding: '14px 16px',
+                        background: 'var(--white)',
+                      }}>
+                        <p style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 500, marginBottom: 12 }}>
+                          Do you charge an upfront fee for your services?
+                        </p>
+                        <div style={{ display: 'flex', gap: 10, marginBottom: agency.upfront_fee ? 14 : 0 }}>
+                          {['Yes', 'No'].map(opt => (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setAgency(prev => ({
+                                ...prev,
+                                upfront_fee: opt === 'Yes',
+                                upfront_fee_amount: opt === 'No' ? '' : prev.upfront_fee_amount,
+                              }))}
+                              style={{
+                                flex: 1, padding: '9px 0', borderRadius: 8,
+                                fontSize: 13.5, fontWeight: 600, cursor: 'pointer',
+                                fontFamily: 'inherit', transition: 'all 0.15s',
+                                border: agency.upfront_fee === (opt === 'Yes')
+                                  ? '1.5px solid var(--blue)'
+                                  : '1.5px solid var(--border)',
+                                background: agency.upfront_fee === (opt === 'Yes')
+                                  ? 'var(--blue-light)'
+                                  : 'var(--off-white)',
+                                color: agency.upfront_fee === (opt === 'Yes')
+                                  ? 'var(--blue)'
+                                  : 'var(--text-muted)',
+                              }}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        {agency.upfront_fee && (
+                          <div className="field" style={{ marginTop: 0 }}>
+                            <label htmlFor="upfront_amount">Upfront Fee Amount</label>
+                            <div className="input-suffix-wrap">
+                              <input
+                                id="upfront_amount"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                value={agency.upfront_fee_amount || ''}
+                                onChange={e => setAgency({ ...agency, upfront_fee_amount: e.target.value })}
+                              />
+                              <span className="input-suffix">$</span>
+                            </div>
+                            <p className="field-hint">The fixed amount charged before collection begins</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Specialties */}
 
                     {/* Specialties */}
                     <div>
