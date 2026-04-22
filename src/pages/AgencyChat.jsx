@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getAgencyChatRooms, getAgencyChatMessages, sendAgencyMessage, BASE_URL } from '../api/auth';
 import { useSocket } from '../components/usesocket';
 
@@ -58,6 +58,7 @@ export default function AgencyChat() {
 
 
   const currentAgencyId = getIdFromToken('agencyToken');
+  const [searchParams] = useSearchParams();
 
 
   const { sendSocketMessage } = useSocket(
@@ -80,6 +81,7 @@ export default function AgencyChat() {
       try {
         const res = await getAgencyChatRooms();
         if (res.rooms?.length) {
+          const claimId = searchParams.get('claim');
           const normalized = res.rooms.map(r => ({
             _id: r._id,
             client: {
@@ -87,6 +89,7 @@ export default function AgencyChat() {
               initials: getInitials(r.user_id?.business_name || r.user_id?.contact_name),
             },
             claim: {
+              _id:         r.claim_id?._id,
               debtor_name: r.claim_id?.debtor_name || '—',
               amount:      r.claim_id?.amount      || 0,
               description: r.claim_id?.description || '',   // ← add this
@@ -96,7 +99,10 @@ export default function AgencyChat() {
             unread:       r.unread       || 0,
           }));
           setRooms(normalized);
-          loadRoom(normalized[0]);
+          const target = claimId
+            ? normalized.find(r => r.claim._id === claimId) || normalized[0]
+            : normalized[0];
+          loadRoom(target);
         }
       } catch {
         setError('Failed to load conversations.');

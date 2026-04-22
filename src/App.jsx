@@ -30,6 +30,7 @@ import AgencyManagement from './pages/AdminAgencyManagement';
 import ResetPassword from './pages/reset';
 import AgencyResetPassword from './pages/AgencyReset';
 import ClaimConnections from './pages/AdminClaimManagement';
+import BuinsessAccount from './pages/BusinessAccount';
 
 const stripePromise = loadStripe("pk_test_51SRynCPBwgTANTk6OM3ADMEkOYuyTGcfBfz92xAXVsLmm8O6tH7dCVgcwhG4rmi5OH3URGSa6faVFD2WYbI7E8oA00drLGc9l6");
 
@@ -57,6 +58,7 @@ export default function App() {
                 <Route path='/reset' element={<ResetPassword/>}/>
                 <Route path="/business-plans"    element={<SubscriptionPlans />} />
                 <Route path="/dashboard"         element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path='/account' element={<BuinsessAccount/>}/>
                 <Route path="/claims/create"     element={<PrivateRoute><CreateClaim /></PrivateRoute>} />
                 <Route path="/claims/:id"        element={<PrivateRoute><ClaimDetail /></PrivateRoute>} />
                 <Route path="/edit-claim/:id"    element={<PrivateRoute><ClaimEdit /></PrivateRoute>} />

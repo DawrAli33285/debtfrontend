@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getChatRooms, getChatMessages, sendMessage, BASE_URL } from '../api/auth';
 import { useSocket } from '../components/usesocket'
 
@@ -55,6 +55,7 @@ export default function Chat() {
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
   const currentUserId = getIdFromToken('token');
+  const [searchParams] = useSearchParams();
 
   const { sendSocketMessage } = useSocket(
     activeRoom?._id,
@@ -77,6 +78,7 @@ export default function Chat() {
       try {
         const res = await getChatRooms();
         if (res.rooms?.length) {
+          const claimId = searchParams.get('claim');
           const normalized = res.rooms.map(r => ({
             _id:          r._id,
             agency: {
@@ -93,7 +95,10 @@ export default function Chat() {
             unread:       r.unread       || 0,
           }));
           setRooms(normalized);
-          loadRoom(normalized[0]);
+          const target = claimId
+            ? normalized.find(r => r.claim._id === claimId) || normalized[0]
+            : normalized[0];
+          loadRoom(target);
         }
       } catch {
         setError('Failed to load conversations.');

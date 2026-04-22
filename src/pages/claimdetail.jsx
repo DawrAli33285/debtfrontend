@@ -155,7 +155,15 @@ const handleBusinessClose = async () => {
 .status-connection-approved .status-dot  { background: #1669A9; }
 .status-connection-denied    { background: #fdf0ef; color: #c0392b; border: 1px solid #f1c0bc; }
 .status-connection-denied .status-dot    { background: #c0392b; }
-
+.btn-chat {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: 10px;
+  border: 1px solid var(--blue-mid); background: var(--blue-light); color: var(--blue);
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  text-decoration: none; transition: background 0.15s, border-color 0.15s;
+  margin-left: 10px;
+}
+.btn-chat:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
         /* ── SECTION CARDS ── */
         .section { margin-bottom: 16px; }
         .section-card {
@@ -287,22 +295,32 @@ const handleBusinessClose = async () => {
               <StatusBadge status={claim.status} />
             </div>
 
-            {!isClosed && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-                <button
-                  className="btn-close-claim"
-                  onClick={() => { setCloseModal(true); setSecondaryConfirm(false); setCloseError(''); }}
-                  disabled={closeLoading}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-                  </svg>
-                  Close Claim
-                </button>
-              </div>
-            )}
+  
 
-            {/* Debtor Information */}
+
+{!isClosed && (
+  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '24px' }}>
+    <button
+      className="btn-close-claim"
+      onClick={() => { setCloseModal(true); setSecondaryConfirm(false); setCloseError(''); }}
+      disabled={closeLoading}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      Close Claim
+    </button>
+
+    {claim.status !== 'assigned' && claim.status !== 'denied' && claim.status !== 'closed' && claim.status !== 'connection_approved' && (
+    <Link to={`/chat?claim=${claim._id}`} className="btn-chat">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+        Chat
+      </Link>
+    )}
+  </div>
+)}         {/* Debtor Information */}
             <div className="section">
               <div className="section-card">
                 <div className="section-head">

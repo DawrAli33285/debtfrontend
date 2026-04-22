@@ -19,11 +19,15 @@ export default function ClaimsList() {
   }, []);
 
   const STATUS_META = {
-    submitted:   { label: 'Submitted',   cls: 'status-submitted'  },
-    assigned:    { label: 'Assigned',    cls: 'status-assigned'   },
-    in_progress: { label: 'In Progress', cls: 'status-progress'   },
-    closed:      { label: 'Closed',      cls: 'status-closed'     },
+    submitted:            { label: 'Submitted',           cls: 'status-submitted'  },
+    assigned:             { label: 'Assigned',            cls: 'status-assigned'   },
+    in_progress:          { label: 'In Progress',         cls: 'status-progress'   },
+    closed:               { label: 'Closed',              cls: 'status-closed'     },
+    connection_approved:  { label: 'Connection Approved', cls: 'status-conn-approved' }, // add
+    connection_denied:    { label: 'Connection Denied',   cls: 'status-conn-denied'   }, // add
   };
+
+
 
   const filters = ['all', 'submitted', 'assigned', 'in_progress', 'closed'];
 
@@ -166,6 +170,10 @@ export default function ClaimsList() {
         .status-closed     { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
         .status-closed .status-dot     { background: #27ae60; }
 
+        .status-conn-approved { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+.status-conn-approved .status-dot { background: #27ae60; }
+.status-conn-denied   { background: #fdf0ef; color: #c0392b; border: 1px solid #f1c0bc; }
+.status-conn-denied   .status-dot { background: #c0392b; }
         .view-link {
           color: var(--blue); font-weight: 600; font-size: 12.5px;
           text-decoration: none; border: 1px solid var(--blue-mid);

@@ -348,16 +348,7 @@ export default function AgencyResetPassword() {
         {/* ── Left panel ── */}
         <aside className="rp-left">
           <div className="left-brand">
-            <div className="left-logo">
-              <div className="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5"/>
-                  <path d="M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span className="logo-text">Collection Connector</span>
-            </div>
+            
 
             <h2 className="left-headline">
               Recover your<br /><em>agency</em><br />account.

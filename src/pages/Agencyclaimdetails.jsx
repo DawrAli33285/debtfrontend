@@ -488,7 +488,7 @@ export default function AgencyClaimDetail() {
               <StatusBadge status={claim.status} />
             </div>
 
-            {(claim.status === 'assigned' || claim.status === 'denied' || claim.status === 'in_progress' || claim.status === 'closed') && (
+            {(claim.status === 'assigned' || claim.status === 'connection_approved' ||  claim.status === 'denied' || claim.status === 'in_progress' || claim.status === 'closed') && (
               <div className="section" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
 
                 {actionError && (
@@ -500,7 +500,7 @@ export default function AgencyClaimDetail() {
                   </div>
                 )}
 
-                {claim.status === 'assigned' && (
+                {claim.status === 'connection_approved' && (
                   <>
                     <button className="btn-accept" onClick={handleAccept} disabled={!!actionLoading}>
                       {actionLoading === 'accept' ? (
@@ -519,7 +519,7 @@ export default function AgencyClaimDetail() {
                   </>
                 )}
 
-                {(claim.status === 'denied' || claim.status === 'closed') && (
+                {( claim.status === 'closed') && (
                   <button className="btn-reopen" onClick={() => setConfirmModal('reopen')} disabled={!!actionLoading}>
                     {actionLoading === 'reopen' ? (
                       <><div className="btn-spinner" /> Reopening…</>
@@ -539,12 +539,12 @@ export default function AgencyClaimDetail() {
                   </button>
                 )}
 
-                <Link to="/agency/chat" className="btn-chat">
+              {claim.status!='assigned' && claim.status!="denied" && claim.status!='closed' && claim.status!='connection_approved'?  <Link to={`/agency/chat?claim=${claim._id}`} className="btn-chat">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
                   </svg>
                   Chat
-                </Link>
+                </Link>:''}
 
               </div>
             )}

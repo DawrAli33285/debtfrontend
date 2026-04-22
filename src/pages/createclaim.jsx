@@ -39,7 +39,7 @@ export default function CreateClaim() {
     const res = await createClaim(payload);
     setLoading(false);
     if (res.claim) {
-      navigate('/dashboard');
+      navigate('/agencies');
     } else {
       setError(res.message || 'Failed to submit claim');
     }
@@ -680,7 +680,7 @@ export default function CreateClaim() {
                     <option value="">Select period…</option>
                     <option value="3_months">3 months</option>
                     <option value="6_months">6 months</option>
-                    <option value="8_months">8 months</option>
+                    <option value="9_months">9 months</option>
                   </select>
                 </div>
               </div>

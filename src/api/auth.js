@@ -294,3 +294,40 @@ export const closeAgencyClaim = async (id) => {
   });
   return res.json();
 };
+
+
+
+
+// =====================
+// BUSINESS ACCOUNT
+// =====================
+export const getAccountOverview = async () => {
+  const res = await fetch(`${BASE_URL}/businessAccount/overview`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  return res.json();
+};
+
+export const updateAccountProfile = async (data) => {
+  const res = await fetch(`${BASE_URL}/businessAccount/profile`, {
+      method: 'PATCH',
+      headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+export const updateAccountPassword = async (data) => {
+  const res = await fetch(`${BASE_URL}/businessAccount/password`, {
+      method: 'PATCH',
+      headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(data),
+  });
+  return res.json();
+};

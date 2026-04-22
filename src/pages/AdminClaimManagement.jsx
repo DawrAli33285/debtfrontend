@@ -6,7 +6,9 @@ const STATUS_COLORS = {
   connection_denied:   { bg: '#fdf0ef', color: '#c0392b', border: '#f1c0bc', dot: '#c0392b' },
   pending_admin:       { bg: '#fef9e7', color: '#9a7d0a', border: '#f9e79f', dot: '#f4d03f' },
   approved_by_agency:  { bg: '#e8f2fa', color: '#1669A9', border: '#c5ddf0', dot: '#1669A9' },
+  assigned:            { bg: '#f3eefa', color: '#6c3ec1', border: '#d4bafc', dot: '#6c3ec1' }, // add
 };
+
 
 const STATUS_LABELS = {
   connection_approved: 'Connection Approved',
@@ -14,7 +16,9 @@ const STATUS_LABELS = {
   pending_admin:       'Pending Admin Approval',
   approved_by_agency:  'Approved by Agency',
   in_progress:         'In Progress',
+  assigned:            'Assigned', // add
 };
+
 
 function StatusBadge({ status }) {
   const s = STATUS_COLORS[status] || STATUS_COLORS.pending_admin;
@@ -114,7 +118,7 @@ function DetailModal({ claim, onClose, onApprove, onDeny, actionLoading }) {
           </Section>
 
           {/* Action Buttons */}
-          {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress') && (
+          {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress' || claim.status === 'assigned') && (
             <div style={{ display: 'flex', gap: 10, paddingTop: 4 }}>
               <button
                 onClick={() => onDeny(claim._id)}
@@ -289,14 +293,14 @@ export default function ClaimConnections() {
       c.debtor_name?.toLowerCase().includes(search.toLowerCase()) ||
       c.business?.business_name?.toLowerCase().includes(search.toLowerCase()) ||
       c.agency?.name?.toLowerCase().includes(search.toLowerCase());
-    if (filter === 'pending') return matchSearch && (c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress');
+      if (filter === 'pending') return matchSearch && (c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress' || c.status === 'assigned');
     if (filter === 'approved') return matchSearch && c.status === 'connection_approved';
     if (filter === 'denied')   return matchSearch && c.status === 'connection_denied';
     return matchSearch;
   });
 
   const counts = {
-    pending:  claims.filter(c => c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress').length,
+    pending: claims.filter(c => c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress' || c.status === 'assigned').length,
     approved: claims.filter(c => c.status === 'connection_approved').length,
     denied:   claims.filter(c => c.status === 'connection_denied').length,
   };
@@ -501,7 +505,7 @@ export default function ClaimConnections() {
                     {/* Actions */}
                     <td style={{ padding: '14px 20px' }} onClick={e => e.stopPropagation()}>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress') ? (
+                        {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress' || claim.status === 'assigned') ? (
                           <>
                             <button
                               className="cc-action"
