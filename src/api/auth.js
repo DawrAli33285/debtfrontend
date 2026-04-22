@@ -40,6 +40,18 @@ export const createClaim = async (data) => {
   });
   return res.json();
 };
+
+
+export const closeBusinessClaim = async (id) => {
+  const res = await fetch(`${BASE_URL}/claims/${id}/close`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  return res.json();
+};
+
 export const getClaims = async () => {
   const res = await fetch(`${BASE_URL}/claims`, {
     headers: { Authorization: `Bearer ${getToken()}` },

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getClaimById } from '../api/auth';
+import { getClaimById, closeBusinessClaim } from '../api/auth';
+
 
 const STATUS_META = {
   submitted:            { label: 'Submitted',            cls: 'status-submitted'           },
@@ -35,9 +36,14 @@ function Field({ label, value }) {
 
 export default function ClaimDetail() {
   const { id } = useParams();
-  const [claim, setClaim]     = useState(null);
-  const [error, setError]     = useState('');
-  const [loading, setLoading] = useState(true);
+  const [claim, setClaim]       = useState(null);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(true);
+  const [closeModal, setCloseModal]         = useState(false);
+  const [secondaryConfirm, setSecondaryConfirm] = useState(false);
+  const [closeLoading, setCloseLoading]     = useState(false);
+  const [closeError, setCloseError]         = useState('');
+
 
   useEffect(() => {
     (async () => {
@@ -54,6 +60,20 @@ export default function ClaimDetail() {
 
   const formatCurrency = (n) =>
     n != null ? `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : null;
+
+  const claimAgeHours = claim
+  ? (Date.now() - new Date(claim.createdAt).getTime()) / (1000 * 60 * 60)
+  : 0;
+const isHighValue   = claim && Number(claim.amount) >= 10000;
+const isClosed      = claim?.status === 'closed';
+
+const handleBusinessClose = async () => {
+  setCloseLoading(true); setCloseError('');
+  const res = await closeBusinessClaim(id);
+  setCloseLoading(false);
+  if (res.claim) { setClaim(res.claim); setCloseModal(false); setSecondaryConfirm(false); }
+  else setCloseError(res.message || 'Failed to close claim');
+};
 
   return (
     <>
@@ -199,6 +219,22 @@ export default function ClaimDetail() {
           display: flex; align-items: center; gap: 8px;
         }
 
+         /* ── CLOSE BUTTON ── */
+        .btn-close-claim {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 11px 22px; border-radius: 10px;
+          border: 1px solid #f1c0bc; background: #fdf0ef; color: #c0392b;
+          font-size: 14px; font-weight: 600; font-family: inherit;
+          cursor: pointer; transition: background 0.15s;
+        }
+        .btn-close-claim:hover:not(:disabled) { background: #fbe0dc; }
+        .btn-close-claim:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-spinner-red {
+          width: 14px; height: 14px;
+          border: 2px solid rgba(192,57,43,0.25); border-top-color: #c0392b;
+          border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+        }
+
         /* ── FOOTER ── */
         .footer-note { text-align: center; margin-top: 40px; font-size: 11.5px; color: var(--text-muted); line-height: 1.6; }
       `}</style>
@@ -250,6 +286,21 @@ export default function ClaimDetail() {
               </div>
               <StatusBadge status={claim.status} />
             </div>
+
+            {!isClosed && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+                <button
+                  className="btn-close-claim"
+                  onClick={() => { setCloseModal(true); setSecondaryConfirm(false); setCloseError(''); }}
+                  disabled={closeLoading}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  Close Claim
+                </button>
+              </div>
+            )}
 
             {/* Debtor Information */}
             <div className="section">
@@ -391,6 +442,8 @@ export default function ClaimDetail() {
               </div>
             </div>
 
+           
+
             <p className="footer-note">
               We are a technology platform that connects businesses with independent, licensed
               collection agencies. We do not provide debt collection services, legal advice,
@@ -399,6 +452,143 @@ export default function ClaimDetail() {
           </>
         )}
       </div>
+
+
+      {closeModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(26,42,58,0.55)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '24px',
+        }}>
+          <div style={{
+            background: 'var(--white)', borderRadius: '16px',
+            border: '1px solid var(--border)', padding: '32px 28px',
+            maxWidth: '460px', width: '100%',
+            boxShadow: '0 8px 40px rgba(26,42,58,0.18)',
+            animation: 'fadeUp 0.25s cubic-bezier(.22,1,.36,1) both',
+          }}>
+
+            {/* Icon */}
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '12px',
+              background: '#fdf0ef', border: '1px solid #f1c0bc',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: '20px',
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+
+            <h3 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)', marginBottom: '16px', lineHeight: 1.2 }}>
+              Close Claim Confirmation
+            </h3>
+
+            {/* Consequence bullets */}
+            <ul style={{ paddingLeft: '18px', fontSize: '14px', color: 'var(--text-mid)', lineHeight: 1.75, marginBottom: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <li>
+                {claimAgeHours > 24
+                  ? <><strong style={{ color: '#c0392b' }}>This claim is over 24 hours old</strong> — closing it will count against your package usage.</>
+                  : <>Closing within 24 hours of submission — <strong style={{ color: '#1e8449' }}>no package deduction</strong> will apply.</>
+                }
+              </li>
+              <li>Closing this claim will <strong style={{ color: 'var(--text)' }}>notify the agency</strong> currently working on it.</li>
+              <li>You will <strong style={{ color: 'var(--text)' }}>forfeit all progress and communication</strong> associated with this claim.</li>
+            </ul>
+
+            {/* 24-hour rule callout */}
+            <div style={{
+              background: claimAgeHours > 24 ? '#fdf0ef' : '#eafaf1',
+              border: `1px solid ${claimAgeHours > 24 ? '#f1c0bc' : '#a9dfbf'}`,
+              borderRadius: '10px', padding: '10px 14px',
+              fontSize: '13px', color: claimAgeHours > 24 ? '#c0392b' : '#1e8449',
+              display: 'flex', gap: '8px', alignItems: 'flex-start',
+              marginBottom: '14px',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              {claimAgeHours > 24
+                ? <>Claim age: <strong>{Math.floor(claimAgeHours)}h</strong> — 1 claim point will be deducted.</>
+                : <>Claim age: <strong>{Math.floor(claimAgeHours)}h {Math.floor((claimAgeHours % 1) * 60)}m</strong> — within the free cancellation window.</>
+              }
+            </div>
+
+            {/* High-value secondary confirmation */}
+            {isHighValue && (
+              <div style={{
+                background: '#fef9e7', border: '1px solid #f9e79f',
+                borderRadius: '10px', padding: '12px 14px',
+                fontSize: '13px', color: '#9a7d0a',
+                marginBottom: '14px',
+                display: 'flex', gap: '10px', alignItems: 'flex-start',
+              }}>
+                <input
+                  type="checkbox"
+                  id="highValueConfirm"
+                  checked={secondaryConfirm}
+                  onChange={e => setSecondaryConfirm(e.target.checked)}
+                  style={{ marginTop: '2px', flexShrink: 0, accentColor: '#9a7d0a', cursor: 'pointer' }}
+                />
+                <label htmlFor="highValueConfirm" style={{ cursor: 'pointer', lineHeight: 1.55 }}>
+                  <strong>High-value claim ({formatCurrency(claim?.amount)}).</strong> I understand this action cannot be undone.
+                </label>
+              </div>
+            )}
+
+            {/* API error */}
+            {closeError && (
+              <div style={{
+                background: '#fdf0ef', border: '1px solid #f1c0bc', color: '#c0392b',
+                fontSize: '13px', padding: '10px 14px', borderRadius: '10px',
+                marginBottom: '14px', display: 'flex', gap: '8px', alignItems: 'center',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {closeError}
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+              <button
+                onClick={() => { setCloseModal(false); setSecondaryConfirm(false); setCloseError(''); }}
+                disabled={closeLoading}
+                style={{
+                  flex: 1, padding: '11px 20px', borderRadius: '10px',
+                  border: '1px solid var(--border)', background: 'var(--off-white)',
+                  color: 'var(--text)', fontSize: '14px', fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBusinessClose}
+                disabled={closeLoading || (isHighValue && !secondaryConfirm)}
+                style={{
+                  flex: 1, padding: '11px 20px', borderRadius: '10px', border: 'none',
+                  background: (closeLoading || (isHighValue && !secondaryConfirm)) ? '#e0e0e0' : '#c0392b',
+                  color: (closeLoading || (isHighValue && !secondaryConfirm)) ? '#999' : '#fff',
+                  fontSize: '14px', fontWeight: 600,
+                  cursor: (closeLoading || (isHighValue && !secondaryConfirm)) ? 'not-allowed' : 'pointer',
+                  fontFamily: 'inherit', transition: 'background 0.15s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                }}
+              >
+                {closeLoading
+                  ? <><div className="btn-spinner-red" style={{ borderTopColor: '#999' }} /> Closing…</>
+                  : 'Confirm Close Claim'
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
