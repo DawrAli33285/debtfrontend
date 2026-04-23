@@ -345,8 +345,10 @@ export default function BuinsessAccount() {
   const planMeta = PLAN_META[user.subscription_plan] || PLAN_META.starter;
   const claimsRemaining = user.monthly_claim_limit === 999999 ? '∞' : Math.max(0, user.monthly_claim_limit - user.claims_used_this_month);
   const usagePct = user.monthly_claim_limit === 999999 ? 0 : Math.min(100, (user.claims_used_this_month / user.monthly_claim_limit) * 100);
-  const daysLeft = Math.max(0, Math.ceil((new Date(user.billing_cycle_end) - new Date()) / (1000 * 60 * 60 * 24)));
-
+  const daysLeft = user.billing_cycle_end
+  ? Math.max(0, Math.ceil((new Date(user.billing_cycle_end) - new Date()) / (1000 * 60 * 60 * 24)))
+  : 0;
+  
   const handleProfileSave = async () => {
     setProfileSaving(true);
     const res = await updateAccountProfile({ email, phone, contact_name: user.name, business_name: user.business_name });
@@ -605,11 +607,11 @@ export default function BuinsessAccount() {
                   </div>
                   <div>
                     <p style={{ fontSize: 18, fontWeight: 700, color: '#1a2a3a' }}>{planMeta.label} Plan</p>
-                    <p style={{ fontSize: 13, color: '#7a96a8' }}>Renews in {daysLeft} days · {planMeta.price}/mo</p>
+                    <p style={{ fontSize: 13, color: '#7a96a8' }}>{user.billing_cycle_end ? `Renews in ${daysLeft} days` : 'No active subscription'} · {planMeta.price}/mo</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowPlanModal(true)}
+                  onClick={() => navigate('/business-plans')}
                   style={{
                     padding: '10px 20px', borderRadius: 9, border: 'none',
                     background: '#1669A9', color: '#fff', fontSize: 13.5,
@@ -686,7 +688,7 @@ export default function BuinsessAccount() {
                 <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Need help choosing?</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>Our team will help you find the right plan for your needs.</p>
               </div>
-              <a href="mailto:support@example.com" style={{
+              <a href="rsmith@collectionconnector.com" style={{
                 position: 'relative', zIndex: 1,
                 padding: '10px 20px', borderRadius: 9,
                 border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.12)',
@@ -776,7 +778,7 @@ export default function BuinsessAccount() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                   Email Support
                 </a>
-                <a href="tel:+15551234567" style={{
+                <a href="tel:+1317-721-8177" style={{
                   padding: '10px 20px', borderRadius: 9,
                   border: '1.5px solid #e0e7ef', background: '#fff', color: '#1a2a3a',
                   fontSize: 13.5, fontWeight: 600, textDecoration: 'none',
