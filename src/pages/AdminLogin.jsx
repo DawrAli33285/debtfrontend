@@ -4,6 +4,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import { BASE_URL } from '../api/auth';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.jpg'; // adjust path as needed
+
 
 export default function SuperAdminLogin() {
   const [formData, setFormData] = useState({
@@ -102,7 +104,7 @@ toast.error("Error occured while trying to login",{containerId:"adminLogin"})
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-10 text-center">
           <div className="flex justify-center mb-6">
       <img
-          src="/logo.jpg"
+          src={logo}
         alt="Company Logo"
         className="w-24 h-24 rounded-full shadow-md object-cover ring-4 ring-white bg-white"
       />

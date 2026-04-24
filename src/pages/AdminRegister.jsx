@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios'
 import { BASE_URL } from '../api/auth';
 import {useNavigate} from 'react-router-dom'
+import logo from '../assets/logo.jpg'; // adjust path as needed
+
 
 function SuperAdminRegister({ onSwitchPage }) {
   const [formData, setFormData] = useState({ 
@@ -85,7 +87,7 @@ if(e?.response?.data?.error){
           <div className="bg-gradient-to-r from-green-600 to-green-800 px-8 py-10 text-center">
           <div className="flex justify-center mb-6">
       <img
-           src="/logo.jpg"
+           src={logo}
         alt="Company Logo"
         className="w-24 h-24 rounded-full shadow-md object-cover ring-4 ring-white bg-white"
       />
