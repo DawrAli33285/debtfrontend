@@ -52,7 +52,7 @@ export default function App() {
           <Route path="/*" element={
             <Layout>
               <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
+                
                 <Route path="/register"          element={<Register />} />
                 <Route path="/login"             element={<Login />} />
                 <Route path='/reset' element={<ResetPassword/>}/>
