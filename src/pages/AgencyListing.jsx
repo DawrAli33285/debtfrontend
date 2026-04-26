@@ -5,6 +5,8 @@ import { getAgencies } from '../api/auth';
 export default function AgencyListing() {
   const [agencies, setAgencies] = useState([]);
   const [loading, setLoading]   = useState(true);
+  const [selectedAgency, setSelectedAgency] = useState(null);
+const [showModal, setShowModal]           = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

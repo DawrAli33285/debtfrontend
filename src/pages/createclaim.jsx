@@ -20,6 +20,8 @@ export default function CreateClaim() {
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [usageInfo, setUsageInfo] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,12 +41,18 @@ export default function CreateClaim() {
     const res = await createClaim(payload);
     setLoading(false);
     if (res.claim) {
-      navigate('/agencies');
+      // navigate('/agencies');
+      setShowSuccessModal(true);
     } else {
       setError(res.message || 'Failed to submit claim');
     }
   };
 
+
+  const handleContinueToAgencies = () => {
+    setShowSuccessModal(false);
+    navigate('/agencies');
+  };
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -772,6 +780,45 @@ export default function CreateClaim() {
         </div>
 
       </div>
+
+      {showSuccessModal && (
+  <div style={{
+    position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.45)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+  }}>
+    <div style={{
+      background: 'white', borderRadius: '12px', padding: '2rem',
+      maxWidth: '440px', width: '90%', textAlign: 'center'
+    }}>
+      <div style={{
+        width: '52px', height: '52px', borderRadius: '50%',
+        background: '#EAF3DE', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', margin: '0 auto 1rem'
+      }}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M5 13l4 4L19 7" stroke="#3B6D11" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+      <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '0.75rem', color: '#111' }}>
+        Claim Successfully Submitted
+      </h2>
+      <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+        Your claim has been successfully submitted. Our system is now preparing your claim for agency review.
+        Please continue to the next step to select a collection agency.
+      </p>
+      <button
+        onClick={handleContinueToAgencies}
+        style={{
+          backgroundColor: '#111', color: '#fff', border: 'none',
+          borderRadius: '8px', padding: '10px 24px', fontSize: '14px',
+          fontWeight: '500', cursor: 'pointer', width: '100%'
+        }}
+      >
+        Select a Collection Agency
+      </button>
+    </div>
+  </div>
+)}
     </>
   );
 }

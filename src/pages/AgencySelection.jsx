@@ -5,6 +5,7 @@ import { getClaims, createAssignment } from '../api/auth';
 export default function AgencySelection() {
   const { state }   = useLocation();
   const navigate    = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   const agency      = state?.agency;
   const [claims, setClaims]               = useState([]);
   const [selectedClaim, setSelectedClaim] = useState('');
@@ -28,10 +29,11 @@ export default function AgencySelection() {
     try {
       const res = await createAssignment({ claim_id: selectedClaim, agency_id: agency._id, method });
       if (res.message === 'Claim assigned successfully') {
-        navigate('/assignments/confirm', { state: { agency, claim_id: selectedClaim, method } });
+        setShowModal(true);
       } else {
         setError(res.message || 'Assignment failed');
       }
+
     } catch { setError('Assignment failed. Please try again.'); }
     finally { setLoading(false); }
   };
@@ -45,6 +47,46 @@ export default function AgencySelection() {
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        .modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10, 28, 50, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.18s ease both;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-box {
+  background: var(--white); border-radius: 20px;
+  border: 1px solid var(--border);
+  max-width: 420px; width: 100%; padding: 32px 28px 28px;
+  animation: slideUp 0.22s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.modal-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: rgba(22,105,169,0.1);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.modal-title {
+  font-size: 22px; font-weight: 700;
+  color: var(--text); margin-bottom: 12px; line-height: 1.2;
+}
+.modal-body {
+  font-size: 13.5px; color: var(--text-muted); line-height: 1.65;
+  margin-bottom: 24px;
+}
+.modal-body p + p { margin-top: 8px; }
+
+.modal-btn {
+  width: 100%; padding: 13px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  border: none; background: var(--blue); color: #fff;
+  transition: background 0.15s;
+}
+.modal-btn:hover { background: var(--blue-dark); }
         :root {
           --blue:       #1669A9;
           --blue-dark:  #0f5189;
@@ -481,6 +523,29 @@ export default function AgencySelection() {
           </div>
         </main>
       </div>
+
+      {showModal && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+      <div className="modal-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="#1669A9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h2 className="modal-title">Claim Assigned for Review</h2>
+      <div className="modal-body">
+        <p>Your claim has been assigned to <strong>{agency.name}</strong> and submitted for internal review.</p>
+        <p>Our back office will review the claim details and connection request before the connection becomes active.</p>
+        <p>You will be notified once the connection is approved.</p>
+      </div>
+      <button className="modal-btn" onClick={() => navigate('/dashboard')}>
+        Go to Dashboard
+      </button>
+    </div>
+  </div>
+)}
     </>
   );
 }

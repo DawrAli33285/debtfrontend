@@ -55,6 +55,7 @@ export default function App() {
                 
                 <Route path="/register"          element={<Register />} />
                 <Route path="/login"             element={<Login />} />
+                <Route path="/agency/login"      element={<AgencyLogin />} />
                 <Route path='/reset' element={<ResetPassword/>}/>
                 <Route path="/business-plans"    element={<SubscriptionPlans />} />
                 <Route path="/dashboard"         element={<PrivateRoute><Dashboard /></PrivateRoute>} />
@@ -68,7 +69,7 @@ export default function App() {
                 <Route path="/assignments/confirm" element={<AssignmentConfirmation />} />
                 <Route path="/agency/register"   element={<AgencyRegister />} />
               <Route path='/agency/reset' element={<AgencyResetPassword/>}/>
-                <Route path="/agency/login"      element={<AgencyLogin />} />
+               
                 <Route path="/chat"              element={<Chat />} />
                 <Route path="/agency/chat"       element={<AgencyChat />} />
                 <Route path="/agency/subscription" element={<AgencySubscriptionPlans />} />
