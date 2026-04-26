@@ -232,6 +232,8 @@ export default function ClaimConnections() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      console.log("DATA")
+      console.log(data)
       setClaims(data.claims || []);
     } catch {
       setError('Failed to load claims. Please try again.');
@@ -293,14 +295,14 @@ export default function ClaimConnections() {
       c.debtor_name?.toLowerCase().includes(search.toLowerCase()) ||
       c.business?.business_name?.toLowerCase().includes(search.toLowerCase()) ||
       c.agency?.name?.toLowerCase().includes(search.toLowerCase());
-      if (filter === 'pending') return matchSearch && (c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress' || c.status === 'assigned');
+      if (filter === 'pending') return matchSearch && c.status !== 'connection_approved' && c.status !== 'connection_denied' && c.status !== 'denied';
     if (filter === 'approved') return matchSearch && c.status === 'connection_approved';
     if (filter === 'denied')   return matchSearch && c.status === 'connection_denied';
     return matchSearch;
   });
 
   const counts = {
-    pending: claims.filter(c => c.status === 'pending_admin' || c.status === 'approved_by_agency' || c.status === 'in_progress' || c.status === 'assigned').length,
+    pending: claims.filter(c => c.status !== 'connection_approved' && c.status !== 'connection_denied').length,
     approved: claims.filter(c => c.status === 'connection_approved').length,
     denied:   claims.filter(c => c.status === 'connection_denied').length,
   };
@@ -308,6 +310,8 @@ export default function ClaimConnections() {
   const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
   const fmtCur = n => n != null ? `$${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '—';
 
+  console.log('filtered count:', filtered.length, 'statuses:', claims.map(c => c.status));
+  
   return (
     <>
       <style>{`
