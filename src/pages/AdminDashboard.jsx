@@ -147,7 +147,7 @@ export default function AdminDashboard() {
 {/* Quick Navigation */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
   <button
-    onClick={() => navigate('/admin/usermanagement')}
+    onClick={() => navigate('/superadmin/usermanagement')}
     className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 text-left"
   >
     <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
   </button>
 
   <button
-    onClick={() => navigate('/admin/agencymanagement')}
+    onClick={() => navigate('/superadmin/agencymanagement')}
     className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 text-left"
   >
     <div className="flex items-center gap-4">
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
 
 
   <button
-    onClick={() => navigate('/admin/claimanagement')}
+    onClick={() => navigate('/superadmin/claimanagement')}
     className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 text-left"
   >
     <div className="flex items-center gap-4">

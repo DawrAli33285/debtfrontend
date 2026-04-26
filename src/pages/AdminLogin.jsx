@@ -69,7 +69,7 @@ export default function SuperAdminLogin() {
     password: ''
      })
        
-     navigate('/admin/dashboard')
+     navigate('/superadmin/dashboard')
     }catch(e){
         setIsLoading(false)
 if(e?.response?.data?.error){

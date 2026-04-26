@@ -59,7 +59,7 @@ const navigate=useNavigate();
     setIsSuccess(true)
     setIsLoading(false)
     toast.success(response.data.message,{containerId:"adminResetPage"})
-    navigate('/admin/login')
+    navigate('/superadmin/login')
  }catch(e){
 setIsLoading(false)
 if(e?.response?.data?.error){
@@ -72,7 +72,7 @@ if(e?.response?.data?.error){
 
   const handleBackToLogin = () => {
     // Navigate back to login - you can replace this with your routing logic
-    window.location.href = '/admin/login';
+    window.location.href = '/superadmin/login';
   };
 
   if (isSuccess) {
@@ -100,7 +100,7 @@ if(e?.response?.data?.error){
               <p className="text-gray-600 mb-6">
                 Your password for <strong>{email}</strong> has been successfully reset. You can now log in with your new password.
               </p>
-              <Link to='/admin/login'>
+              <Link to='/superadmin/login'>
            
               <button
                

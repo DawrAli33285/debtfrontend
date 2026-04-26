@@ -41,13 +41,13 @@ export default function App() {
         <Routes>
 
           {/* ── Admin routes (no Layout) ── */}
-          <Route path='/admin/login'            element={<SuperAdminLogin />} />
-          <Route path='/admin/register'         element={<SuperAdminRegister />} />
-          <Route path='/admin/reset'            element={<SuperAdminReset />} />
-          <Route path='/admin/dashboard'        element={<AdminDashboard />} />
-          <Route path='/admin/usermanagement'   element={<UserManagement />} />
-          <Route path='/admin/agencymanagement' element={<AgencyManagement />} />
-          <Route path='/admin/claimanagement' element={<ClaimConnections/>}/>
+          <Route path='/superadmin/login'            element={<SuperAdminLogin />} />
+          <Route path='/superadmin/register'         element={<SuperAdminRegister />} />
+          <Route path='/superadmin/reset'            element={<SuperAdminReset />} />
+          <Route path='/superadmin/dashboard'        element={<AdminDashboard />} />
+          <Route path='/superadmin/usermanagement'   element={<UserManagement />} />
+          <Route path='/superadmin/agencymanagement' element={<AgencyManagement />} />
+          <Route path='/superadmin/claimanagement' element={<ClaimConnections/>}/>
           {/* ── All other routes (wrapped in Layout) ── */}
           <Route path="/*" element={
             <Layout>

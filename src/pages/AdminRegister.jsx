@@ -59,7 +59,7 @@ function SuperAdminRegister({ onSwitchPage }) {
         confirmPassword: '' 
     })
     toast.success("Registeration was sucessfull",{containerId:"adminRegister"})
-    navigate('/admin/dashboard')
+    navigate('/superadmin/dashboard')
    }catch(e){
     setIsLoading(false)
 if(e?.response?.data?.error){
@@ -97,7 +97,7 @@ if(e?.response?.data?.error){
           </div>
 
           <div className="px-8 py-10">
-           <Link to='/admin/login'>
+           <Link to='/superadmin/login'>
            <button 
               
               className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
