@@ -185,7 +185,7 @@ toast.error("Error occured while trying to login",{containerId:"adminLogin"})
                   />
                   <span className="ml-2 text-sm text-gray-600">Remember me</span>
                 </label>
-                <a href="/admin/reset" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                <a href="/superadmin/reset" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                   Forgot password?
                 </a>
               </div>
@@ -218,7 +218,7 @@ toast.error("Error occured while trying to login",{containerId:"adminLogin"})
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 text-center mb-4">
                 Don't have an account?{' '}
-                <a href="/admin/register" className="text-blue-600 hover:text-blue-800 font-medium">
+                <a href="/superadmin/register" className="text-blue-600 hover:text-blue-800 font-medium">
                   Register here
                 </a>
               </p>
