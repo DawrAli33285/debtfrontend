@@ -575,7 +575,7 @@ export default function BuinsessAccount() {
                   <p style={{ fontSize: 12, color: '#7a96a8' }}>Get more claims & features</p>
                 </div>
               </button>
-              <a href="mailto:support@example.com" style={{
+              <a href="mailto:rsmith@enrichifydata.com" style={{
                 padding: '14px 20px', borderRadius: 10, border: '1.5px solid #e0e7ef',
                 background: '#fff', cursor: 'pointer', fontFamily: 'inherit',
                 display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
@@ -769,7 +769,7 @@ export default function BuinsessAccount() {
             <SectionCard title="Support" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>}>
               <p style={{ fontSize: 13.5, color: '#7a96a8', marginBottom: 16 }}>Having trouble with your account? Our support team is here to help.</p>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <a href="mailto:support@example.com" style={{
+                <a href="mailto:rsmith@enrichifydata.com" style={{
                   padding: '10px 20px', borderRadius: 9,
                   border: 'none', background: '#1669A9', color: '#fff',
                   fontSize: 13.5, fontWeight: 600, textDecoration: 'none',

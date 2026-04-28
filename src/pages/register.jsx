@@ -6,11 +6,13 @@ export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     business_name: '',
-    contact_name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
     ein: '',
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -23,7 +25,11 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await registerUser({ ...form, role: 'user' });
+    const res = await registerUser({
+      ...form,
+      contact_name: `${form.first_name} ${form.last_name}`.trim(),
+      role: 'user',
+    });
     setLoading(false);
     if (res.token) {
       localStorage.setItem('token', res.token);
@@ -404,32 +410,45 @@ export default function Register() {
 
             <form onSubmit={handleSubmit}>
               <div className="field-group">
-                <div className="field-row">
-                  <div className="field">
-                    <label htmlFor="business_name">Business Name</label>
-                    <input
-                      id="business_name"
-                      type="text"
-                      name="business_name"
-                      value={form.business_name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Acme Corp"
-                    />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="contact_name">Contact Name</label>
-                    <input
-                      id="contact_name"
-                      type="text"
-                      name="contact_name"
-                      value={form.contact_name}
-                      onChange={handleChange}
-                      required
-                      placeholder="John Doe"
-                    />
-                  </div>
-                </div>
+              <div className="field">
+  <label htmlFor="business_name">Business Name</label>
+  <input
+    id="business_name"
+    type="text"
+    name="business_name"
+    value={form.business_name}
+    onChange={handleChange}
+    required
+    placeholder="Acme Corp"
+  />
+</div>
+<div className="field-row">
+  <div className="field">
+    <label htmlFor="first_name">First Name</label>
+    <input
+      id="first_name"
+      type="text"
+      name="first_name"
+      value={form.first_name}
+      onChange={handleChange}
+      required
+      placeholder="John"
+    />
+  </div>
+  <div className="field">
+    <label htmlFor="last_name">Last Name</label>
+    <input
+      id="last_name"
+      type="text"
+      name="last_name"
+      value={form.last_name}
+      onChange={handleChange}
+      required
+      placeholder="Doe"
+    />
+  </div>
+</div>
+
 
                 <div className="field">
                   <label htmlFor="ein">Business EIN</label>

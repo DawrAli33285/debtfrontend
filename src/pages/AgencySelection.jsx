@@ -464,10 +464,7 @@ export default function AgencySelection() {
                 <span className="summary-label">Recovery Fee</span>
                 <span className="summary-value">{agency.fee_percentage}%</span>
               </div>
-              <div className="summary-row">
-                <span className="summary-label">Capacity</span>
-                <span className="summary-value">{agency.claims_used} / {agency.claim_limit}</span>
-              </div>
+             
             </div>
 
             {/* Form fields */}

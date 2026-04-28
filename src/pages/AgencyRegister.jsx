@@ -236,6 +236,7 @@ export default function AgencyRegister() {
   const [owner, setOwner] = useState({
     name:     '',
     email:    '',
+    tax_id:   '',
     password: '',
     confirm:  '',
   });
@@ -289,6 +290,7 @@ export default function AgencyRegister() {
       specialties:    agency.specialties,
       name:           owner.name.trim(),
       email:          owner.email.trim(),
+      tax_id:         owner.tax_id.trim(),
       password:       owner.password,
     });
     setLoading(false);
@@ -972,6 +974,22 @@ export default function AgencyRegister() {
                       />
                     </div>
 
+
+<div className="field">
+  <label htmlFor="owner_tax_id">Tax ID (SSN / ITIN)</label>
+  <input
+    id="owner_tax_id"
+    type="text"
+    value={owner.tax_id}
+    onChange={e => setOwner({...owner, tax_id: e.target.value})}
+    required
+    placeholder="XXX-XX-XXXX"
+    maxLength={11}
+  />
+  <p className="field-hint">Used for identity verification only — never shared</p>
+</div>
+
+
                     <div className="field-row">
                       <div className="field">
                         <label htmlFor="owner_pass">Password</label>
@@ -1056,6 +1074,7 @@ export default function AgencyRegister() {
             specialties:       agency.specialties,
             name:              owner.name.trim(),
             email:             owner.email.trim(),
+            tax_id:            owner.tax_id.trim(),
             password:          owner.password,
             agreement_version: 'v1.0',  
           }).then(res => {

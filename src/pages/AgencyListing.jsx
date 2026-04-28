@@ -218,10 +218,7 @@ const [showModal, setShowModal]           = useState(false);
                       </div>
                     </div>
 
-                    <div className="capacity-label">
-                      <span>Capacity</span>
-                      <span>{agency.claims_used}/{agency.claim_limit} claims</span>
-                    </div>
+                   
                     <div className="capacity-track">
                       <div className={`capacity-fill ${full ? 'fill-full' : 'fill-ok'}`} style={{width:`${pct}%`}} />
                     </div>

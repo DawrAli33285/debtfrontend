@@ -36,6 +36,7 @@ export default function AgencyDashboard() {
     try {
       const [meRes, assignRes] = await Promise.all([getAgencyMe(), getAgencyAssignments()]);
       if (meRes.error || !meRes.agency) { navigate('/agency/login'); return; }
+  
       setAgency(meRes.agency);
       setUser(meRes.user);
       setAssignments(assignRes.assignments || []);
@@ -86,6 +87,9 @@ export default function AgencyDashboard() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
+
+  const fmtStatus = (s) =>
+    s ? s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '—';
 
   return (
     <>
@@ -439,7 +443,7 @@ export default function AgencyDashboard() {
         {/* Header */}
         <div className="page-header">
           <p className="page-eyebrow">Agency Overview</p>
-          <h1 className="page-title">Agency <span>Dashboard</span></h1>
+          <h1 className="page-title">{agency?.name || 'Agency'} <span>Dashboard</span></h1>
           <div className="header-rule" />
           <p className="page-sub">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           <div className="quick-links">
@@ -562,6 +566,7 @@ export default function AgencyDashboard() {
                     <tr>
                       <th>Debtor</th>
                       <th>Amount</th>
+                      <th>Status</th>
                       <th>Due Date</th>
                       <th>Assigned On</th>
                     </tr>
@@ -627,6 +632,7 @@ export default function AgencyDashboard() {
                             <div className="debtor-email">{claim.debtor_email || ''}</div>
                           </td>
                           <td><span className="amount-cell">{fmt(claim.amount)}</span></td>
+                          <td><span className="date-text">{fmtStatus(claim.status)}</span></td>
                           <td><span className="date-text">{fmtDate(claim.due_date)}</span></td>
                           <td><span className="date-text">{fmtDate(a.assigned_at)}</span></td>
                         </tr>

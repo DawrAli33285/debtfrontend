@@ -36,14 +36,17 @@ export default function Dashboard() {
 
   const statusMeta = (status) => {
     switch (status) {
-      case 'submitted':   return { label: 'Submitted',   cls: 'status-submitted' };
-      case 'assigned':    return { label: 'Assigned',    cls: 'status-assigned' };
-      case 'in_progress': return { label: 'In Progress', cls: 'status-progress' };
-      case 'closed':      return { label: 'Closed',      cls: 'status-closed' };
-      default:            return { label: status,        cls: 'status-default' };
+      case 'submitted':           return { label: 'Submitted',           cls: 'status-submitted' };
+      case 'assigned':            return { label: 'Assigned',            cls: 'status-assigned' };
+      case 'in_progress':         return { label: 'In Progress',         cls: 'status-progress' };
+      case 'closed':              return { label: 'Closed',              cls: 'status-closed' };
+      case 'denied':              return { label: 'Denied',              cls: 'status-default' };
+      case 'connection_approved': return { label: 'Connection Approved', cls: 'status-assigned' };
+      case 'connection_denied':   return { label: 'Connection Denied',   cls: 'status-default' };
+      default:                    return { label: status,                cls: 'status-default' };
     }
   };
-
+  
   const stats = {
     total:       claims.length,
     submitted:   claims.filter(c => c.status === 'submitted').length,
