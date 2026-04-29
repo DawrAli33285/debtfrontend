@@ -73,7 +73,7 @@ const plans = [
 ];
 
 
-const PAYPAL_CLIENT_ID = "AUH8Cb7tNZVz2s3oLMx1TEL2jjqU-aJOF1k2PiEBfybGNiF10YGadyPXMOYi_h_t9_-N3L_Ocmcok3XB";
+const PAYPAL_CLIENT_ID = "AUyDFte1joYMqQnmR0keBQIYGqV3pdIyZDztnjd3S15oH2IJ_gcIrRDu5kBKJ7JrXTAxj9tMZFp2gbG8";
 
 
 function usePayPalSDK() {
