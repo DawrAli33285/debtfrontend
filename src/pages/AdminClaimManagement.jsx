@@ -392,7 +392,7 @@ function DetailModal({ claim, onClose, onApprove, onDeny, actionLoading }) {
             <Row label="Due Date" value={fmt(claim.due_date)} />
             <Row label="Description" value={claim.description || '—'} full />
           </Section>
-          {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress' || claim.status === 'assigned') && (
+          {claim.status === 'pending' && (
             <div style={{ display: 'flex', gap: 10, paddingTop: 4 }}>
               <button onClick={() => onDeny(claim._id)} disabled={!!actionLoading} style={{ flex: 1, padding: '12px 20px', borderRadius: 10, border: '1px solid #f1c0bc', background: '#fdf0ef', color: '#c0392b', fontSize: 14, fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: actionLoading ? 0.55 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                 {actionLoading === `deny-${claim._id}` ? <Spinner color="#c0392b" /> : (<><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Deny Connection</>)}
@@ -729,7 +729,7 @@ export default function ClaimConnections() {
                     </td>
                     <td style={{ padding: '14px 20px' }} onClick={e => e.stopPropagation()}>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        {(claim.status === 'pending_admin' || claim.status === 'approved_by_agency' || claim.status === 'in_progress' || claim.status === 'assigned') ? (
+                      {claim.status === 'pending' ? (
                           <>
                             <button className="cc-action" onClick={() => handleDeny(claim._id)} disabled={!!actionLoading} title="Deny Connection" style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #f1c0bc', background: '#fdf0ef', color: '#c0392b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.55 : 1, transition: 'opacity 0.15s' }}>
                               {actionLoading === `deny-${claim._id}` ? <Spinner color="#c0392b" /> : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>}

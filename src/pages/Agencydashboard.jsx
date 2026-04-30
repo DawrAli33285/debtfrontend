@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getAgencyMe, getAgencyAssignments, updateAssignmentStatus } from '../api/auth';
-
+import { BASE_URL } from '../api/auth';
 const PLAN_META = {
   starter:      { color: '#1669A9', bg: '#e8f2fa' },
   growth:       { color: '#1669A9', bg: '#c5ddf0' },
@@ -25,6 +25,7 @@ export default function AgencyDashboard() {
   const [activeTab, setActiveTab]     = useState('all');
   const [updating, setUpdating]       = useState(null);
   const [search, setSearch]           = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!localStorage.getItem('agencyToken')) { navigate('/agency/login'); return; }
@@ -36,10 +37,15 @@ export default function AgencyDashboard() {
     try {
       const [meRes, assignRes] = await Promise.all([getAgencyMe(), getAgencyAssignments()]);
       if (meRes.error || !meRes.agency) { navigate('/agency/login'); return; }
-  
+      const countRes = await fetch(`${BASE_URL}/chat/agency/unread-count`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('agencyToken')}` }
+      });
+
       setAgency(meRes.agency);
       setUser(meRes.user);
       setAssignments(assignRes.assignments || []);
+      const countData = await countRes.json();
+setUnreadCount(countData.unread || 0);
     } catch (err) {
       console.error(err);
       setError('Failed to load dashboard. Please refresh.');
@@ -419,12 +425,21 @@ export default function AgencyDashboard() {
           </Link>
 
           <Link to="/agency/chat" className="nav-link">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-            </svg>
-            Messages
-          </Link>
-
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  </svg>
+  Messages
+  
+    <span style={{
+      background: '#c0392b', color: '#fff',
+      fontSize: 10, fontWeight: 700,
+      borderRadius: '99px', padding: '1px 6px',
+      marginLeft: 4, lineHeight: '16px',
+    }}>
+      {unreadCount > 99 ? '99+' : unreadCount}
+    </span>
+ 
+</Link>
           <Link to="/agency/subscription" className="nav-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>

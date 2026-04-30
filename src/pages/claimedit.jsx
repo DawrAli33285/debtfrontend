@@ -9,6 +9,7 @@ const STATUS_META = {
   closed:               { label: 'Closed',               cls: 'status-closed'             },
   connection_approved:  { label: 'Connection Approved',  cls: 'status-connection-approved'},
   connection_denied:    { label: 'Connection Denied',    cls: 'status-connection-denied'  },
+  pending:              { label: 'Pending',             cls: 'status-submitted'}
 };
 
 

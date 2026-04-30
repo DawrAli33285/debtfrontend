@@ -76,6 +76,7 @@ export default function Chat() {
     const load = async () => {
       setLoadingRooms(true);
       try {
+        setRooms(prev => prev.map(r => r._id === room._id ? { ...r, unread: 0 } : r));
         const res = await getChatRooms();
         if (res.rooms?.length) {
           const claimId = searchParams.get('claim');

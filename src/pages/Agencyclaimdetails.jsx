@@ -10,6 +10,7 @@ const STATUS_META = {
   denied:               { label: 'Denied',               cls: 'status-denied'             },
   connection_approved:  { label: 'Connection Approved',  cls: 'status-connection-approved'},
   connection_denied:    { label: 'Connection Denied',    cls: 'status-connection-denied'  },
+   pending:              { label: 'Pending',             cls: 'status-submitted'}
 };
 
 
@@ -500,7 +501,7 @@ export default function AgencyClaimDetail() {
                   </div>
                 )}
 
-                {claim.status === 'connection_approved' && (
+                {claim.status === 'assigned' && (
                   <>
                     <button className="btn-accept" onClick={handleAccept} disabled={!!actionLoading}>
                       {actionLoading === 'accept' ? (

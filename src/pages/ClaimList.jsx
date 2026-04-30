@@ -23,6 +23,7 @@ export default function ClaimsList() {
     assigned:             { label: 'Assigned',            cls: 'status-assigned'   },
     in_progress:          { label: 'In Progress',         cls: 'status-progress'   },
     closed:               { label: 'Closed',              cls: 'status-closed'     },
+    pending:              { label: 'Pending',             cls: 'status-submitted'},
     connection_approved:  { label: 'Connection Approved', cls: 'status-conn-approved' }, // add
     connection_denied:    { label: 'Connection Denied',   cls: 'status-conn-denied'   }, // add
   };

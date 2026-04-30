@@ -121,8 +121,12 @@ export default function AgencyChat() {
     setSidebarOpen(false);
     setLoadingMessages(true);
     setMessages([]);
+  
+    // ← Clear unread badge immediately in UI
+    setRooms(prev => prev.map(r => r._id === room._id ? { ...r, unread: 0 } : r));
+  
     try {
-      const res = await getAgencyChatMessages(room._id);
+      const res = await getAgencyChatMessages(room._id); // this triggers markAsRead on backend
       if (res.messages) {
         setMessages(res.messages.map(m => ({
           ...m,
