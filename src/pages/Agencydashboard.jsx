@@ -409,7 +409,7 @@ export default function AgencyDashboard() {
         </div>
 
         <div className="nav-actions">
-          <Link to="/login" className="nav-link">
+          <Link to="/dashboard" className="nav-link">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <rect x="2" y="3" width="20" height="14" rx="2"/>
               <line x1="8" y1="21" x2="16" y2="21"/>
