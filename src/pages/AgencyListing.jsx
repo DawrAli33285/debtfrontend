@@ -219,9 +219,7 @@ const [showModal, setShowModal]           = useState(false);
                     </div>
 
                    
-                    <div className="capacity-track">
-                      <div className={`capacity-fill ${full ? 'fill-full' : 'fill-ok'}`} style={{width:`${pct}%`}} />
-                    </div>
+                  
 
                     <button
                       onClick={() => handleSelect(agency)}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getClaims, getMe } from '../api/auth';
+import { BASE_URL, getClaims, getMe } from '../api/auth';
 import TermsModal from '../components/termsmodal';
 
 export default function Dashboard() {
@@ -9,10 +9,12 @@ export default function Dashboard() {
   const [loading, setLoading]           = useState(true);
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [currentUser, setCurrentUser]   = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return navigate('/login');
+    
 
     getMe().then(({ user }) => {
       if (!user) return;
@@ -27,6 +29,18 @@ export default function Dashboard() {
     const res = await getClaims();
     setLoading(false);
     if (res.claims) setClaims(res.claims);
+   try{
+    const countRes = await fetch(`${BASE_URL}/chat/unread-count`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    const countData = await countRes.json();
+    console.log("COUNTDATA")
+    console.log(countData)
+setUnreadCount(countData.unread || 0);
+   }catch(e){
+console.log(e.message)
+   }
   };
 
   const logout = () => {
@@ -543,11 +557,21 @@ export default function Dashboard() {
           </Link>
 
           <Link to="/chat" className="nav-link">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-            </svg>
-            Messages
-          </Link>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+  </svg>
+  Messages
+  
+    <span style={{
+      background: '#c0392b', color: '#fff',
+      fontSize: 10, fontWeight: 700,
+      borderRadius: '99px', padding: '1px 6px',
+      marginLeft: 4, lineHeight: '16px',
+    }}>
+      {unreadCount > 99 ? '99+' : unreadCount}
+    </span>
+ 
+</Link>
 
           <Link to="/claims/create" className="btn-submit-nav">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
