@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { BASE_URL } from '../api/auth';
+import WelcomeModal from '../components/WelcomePopup';
 
 const PAYPAL_CLIENT_ID = "AUyDFte1joYMqQnmR0keBQIYGqV3pdIyZDztnjd3S15oH2IJ_gcIrRDu5kBKJ7JrXTAxj9tMZFp2gbG8";
 
@@ -473,6 +474,7 @@ export default function SubscriptionPlans() {
           onSuccess={(id) => { setSelectedPlan(null); navigate('/dashboard'); }}
         />
       )}
+      <WelcomeModal/>
     </>
   );
 }

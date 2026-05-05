@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { BASE_URL, getClaims, getMe } from '../api/auth';
 import TermsModal from '../components/termsmodal';
+import WelcomeModal from '../components/WelcomePopup';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -752,6 +753,7 @@ console.log(e.message)
         </div>
 
       </div>
+<WelcomeModal/>
     </>
   );
 }

@@ -33,7 +33,7 @@ export default function Register() {
     setLoading(false);
     if (res.token) {
       localStorage.setItem('token', res.token);
-      navigate('/business-plans');
+      navigate('/business-plans?justNow=true');
     } else {
       setError(res.message || 'Registration failed');
     }
