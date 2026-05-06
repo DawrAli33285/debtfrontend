@@ -16,6 +16,8 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,6 +31,7 @@ export default function Register() {
       ...form,
       contact_name: `${form.first_name} ${form.last_name}`.trim(),
       role: 'user',
+      sms_consent: smsConsent,
     });
     setLoading(false);
     if (res.token) {
@@ -505,7 +508,21 @@ export default function Register() {
                   collection or contact debtors directly.
                 </label>
               </div>
-
+              <div className="agree-row">
+                <input
+                  type="checkbox"
+                  id="sms_consent"
+                  checked={smsConsent}
+                  onChange={(e) => setSmsConsent(e.target.checked)}
+                />
+                <label htmlFor="sms_consent">
+                  I agree to receive SMS communications from Collections Connector, including claim
+                  status updates, agency notifications, account alerts, and support messages.
+                  Message frequency varies; message and data rates may apply. Reply <strong>STOP</strong> to
+                  opt out at any time or <strong>HELP</strong> for assistance. SMS consent is not required
+                  to use our services. View our <a href="/sms-policy">SMS Policy</a>.
+                </label>
+              </div>
               <button type="submit" className="btn-submit" disabled={loading || !agreed}>
                 <span className="btn-inner">
                   {loading && <span className="spinner" />}
